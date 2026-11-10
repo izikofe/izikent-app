@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#607f87"><meta name="app-version" content="7.1-auto-update"><meta name="description" content="ИзиКент — помощник команды ИзиКофе">
+<meta name="theme-color" content="#607f87"><meta name="app-version" content="7.2-cakes"><meta name="description" content="ИзиКент — помощник команды ИзиКофе">
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml">
 <title>ИзиКент</title>
 <style>
@@ -45,6 +45,7 @@ footer{text-align:center;color:#9a8e81;font-size:10px;padding:8px 0 18px}
 <main>
 <section id="home"><div class="eyebrow">Рабочее пространство</div><h1>Главное меню</h1>
 <div class="grid"><button class="tile" data-page="loans"><div class="ico">⇄</div><div><strong>Займы и возвраты</strong><small>Занять товар, вернуть и посмотреть сверку между точками</small></div></button></div>
+<div class="grid" style="margin-top:12px"><button class="tile" data-page="cakes"><div class="ico">🎂</div><div><strong>Торты</strong><small>Записать количество тортов по торговым точкам</small></div></button></div>
 <div class="grid" style="margin-top:12px"><button class="tile hidden" id="usersTile" data-page="users"><div class="ico">＋</div><div><strong>Пользователи</strong><small>Добавить сотрудника, PIN-код и роль</small></div></button></div>
 <div class="card"><div class="row"><h2>Обратная связь</h2><span class="pill">Остаётся в MAX</span></div><p class="muted">Сбор отзывов и ежедневные отчёты продолжают работать в существующем MAX-боте. В приложение этот раздел пока не переносим.</p></div>
 <div class="notice">Займы, возвраты и сверка задолженностей доступны в приложении. Обратная связь и ежедневные отчёты остаются в MAX-боте.</div>
@@ -80,7 +81,19 @@ footer{text-align:center;color:#9a8e81;font-size:10px;padding:8px 0 18px}
 <section id="reconcile" class="hidden"><button class="back" data-page="home">← Главное меню</button><div class="eyebrow">Контроль задолженностей</div><h1>Сверка</h1>
 <div class="card"><div class="row"><h2>Текущие долги</h2><button class="back" id="refreshReconcile" type="button">↻ Обновить</button></div>
 <div id="reconcileDate" class="muted"></div><div id="reconcileContent" style="margin-top:12px">Нажми «Обновить», чтобы загрузить данные.</div></div></section>
-<section id="users" class="hidden"><button class="back" data-page="home">← Главное меню</button><div class="eyebrow">Управление доступом</div><h1>Пользователи</h1>
+<section id="cakes" class="hidden"><button class="back" data-page="home">← Главное меню</button><div class="eyebrow">Учёт продукции</div><h1>Торты</h1>
+<div class="card"><h2>Новая запись</h2><p class="muted">Дата поставится автоматически. Выбери торт и торговую точку, затем укажи количество целых тортов.</p>
+<form id="cakesForm">
+<label class="field-label" for="cakeName">Наименование торта</label>
+<select class="select" id="cakeName" required><option value="">Загружаем список…</option></select>
+<label class="field-label" for="cakeQuantity">Количество целых тортов</label>
+<input class="select" id="cakeQuantity" type="number" min="1" step="1" inputmode="numeric" placeholder="Например, 2" required>
+<label class="field-label" for="cakePlace">Торговая точка</label>
+<select class="select" id="cakePlace" required><option value="">Загружаем список…</option></select>
+<button class="primary" id="cakesSubmit" type="submit">Записать в таблицу</button>
+<div class="error" id="cakesError" role="alert"></div><div class="notice hidden" id="cakesSuccess" role="status"></div>
+</form></div></section>
+'''<section id="users" class="hidden"><button class="back" data-page="home">← Главное меню</button><div class="eyebrow">Управление доступом</div><h1>Пользователи</h1>
 <div class="card"><h2>Добавить пользователя</h2><p class="muted">Задай имя, роль и PIN-код из 8 цифр.</p>
 <form id="createUserForm">
 <label class="field-label" for="newUserName">Имя сотрудника</label><input class="select" id="newUserName" type="text" maxlength="50" placeholder="Например, Анна" required>
@@ -121,9 +134,16 @@ const returnError=document.getElementById('returnError');
 const returnSuccess=document.getElementById('returnSuccess');
 const reconcileContent=document.getElementById('reconcileContent');
 const reconcileDate=document.getElementById('reconcileDate');
+const cakesForm=document.getElementById('cakesForm');
+const cakeName=document.getElementById('cakeName');
+const cakePlace=document.getElementById('cakePlace');
+const cakeQuantity=document.getElementById('cakeQuantity');
+const cakesSubmit=document.getElementById('cakesSubmit');
+const cakesError=document.getElementById('cakesError');
+const cakesSuccess=document.getElementById('cakesSuccess');
+let cakesListsLoaded=false;
 let returnDebtChoices=[];
 let borrowItemCount=0;
-
 
 function showApp(user){
   loginScreen.classList.add('hidden');
@@ -184,6 +204,62 @@ async function loadUsersList(){
   }catch(error){list.textContent=error.message;}
 }
 
+async function loadCakesData(force=false){
+  if(cakesListsLoaded&&!force)return;
+  const session=getSession();
+  if(!session?.token)throw new Error('Сессия закончилась. Войди заново.');
+  const response=await fetch(API_URL+'?action=cakes-data',{
+    headers:{'X-Session-Token':session.token},cache:'no-store'
+  });
+  const data=await response.json();
+  if(response.status===401){sessionStorage.removeItem(SESSION_KEY);showLogin();throw new Error('Сессия закончилась. Войди заново.');}
+  if(!response.ok||!data.ok)throw new Error(data.error||'Не удалось загрузить списки тортов.');
+  const fill=(select,items,placeholder)=>{
+    select.innerHTML='';
+    const first=document.createElement('option');first.value='';first.textContent=placeholder;select.append(first);
+    (items||[]).forEach(value=>{const option=document.createElement('option');option.value=value;option.textContent=value;select.append(option);});
+  };
+  fill(cakeName,data.cakes,'Выбери торт');
+  fill(cakePlace,data.places,'Выбери торговую точку');
+  cakesListsLoaded=true;
+}
+async function openCakesPage(){
+  cakesError.textContent='';
+  cakesSuccess.classList.add('hidden');
+  try{await loadCakesData();}
+  catch(error){cakesError.textContent=error.message;}
+}
+cakesForm.addEventListener('submit',async(event)=>{
+  event.preventDefault();
+  cakesError.textContent='';
+  cakesSuccess.classList.add('hidden');
+  const session=getSession();
+  if(!session?.token){cakesError.textContent='Сессия закончилась. Войди заново.';showLogin();return;}
+  const cake=cakeName.value;
+  const place=cakePlace.value;
+  const quantity=cakeQuantity.value.trim();
+  if(!cake||!place||!/^[1-9]\d*$/.test(quantity)){
+    cakesError.textContent='Выбери торт и торговую точку, укажи целое количество больше нуля.';
+    return;
+  }
+  if(!confirm('Проверь запись:\n\nТорт: '+cake+'\nКоличество: '+quantity+'\nТорговая точка: '+place+'\n\nЗаписать в таблицу?'))return;
+  cakesSubmit.disabled=true;
+  cakesSubmit.textContent='Записываем…';
+  try{
+    const response=await fetch(API_URL+'?action=cakes-add',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-Session-Token':session.token},
+      body:JSON.stringify({cake,place,quantity})
+    });
+    const data=await response.json();
+    if(response.status===401){sessionStorage.removeItem(SESSION_KEY);showLogin();throw new Error('Сессия закончилась. Войди заново.');}
+    if(!response.ok||!data.ok)throw new Error(data.error||'Не удалось записать торты.');
+    cakesSuccess.textContent='Запись добавлена в таблицу «ТОРТЫ».';
+    cakesSuccess.classList.remove('hidden');
+    cakesForm.reset();
+  }catch(error){cakesError.textContent=error.message||'Ошибка связи с сервером.';}
+  finally{cakesSubmit.disabled=false;cakesSubmit.textContent='Записать в таблицу';}
+});
 
 logoutButton.addEventListener('click',()=>{
   sessionStorage.removeItem(SESSION_KEY);
@@ -222,8 +298,6 @@ loginForm.addEventListener('submit',async(event)=>{
   }
 });
 
-
-
 function getSession(){
   try{return JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null');}catch(e){return null;}
 }
@@ -235,8 +309,7 @@ async function loadDebts(){
   if(response.status===401){sessionStorage.removeItem(SESSION_KEY);showLogin();throw new Error('Сессия закончилась. Войди заново.');}
   if(!response.ok||!data.ok) throw new Error(data.error||'Не удалось загрузить долги.');
   return data;
-}
-async function showReturnDebts(){
+}async function showReturnDebts(){
   const borrower=returnBorrower.value;returnFormCard.classList.add('hidden');returnDebtList.innerHTML='';returnDebtChoices=[];
   if(!borrower){returnDebtList.textContent='Сначала выбери точку.';return;}
   loadReturnDebtsButton.disabled=true;loadReturnDebtsButton.textContent='Загружаем…';
@@ -375,7 +448,7 @@ borrowForm.addEventListener('submit', async (event)=>{
 });
 
 const pages=[...document.querySelectorAll('main section')];
-function showPage(id){pages.forEach(p=>p.classList.toggle('hidden',p.id!==id));document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('active',b.dataset.page===id));if(id==='users')loadUsersList();if(id==='reconcile')showReconcile();window.scrollTo({top:0,behavior:'smooth'});}
+function showPage(id){pages.forEach(p=>p.classList.toggle('hidden',p.id!==id));document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('active',b.dataset.page===id));if(id==='users')loadUsersList();if(id==='reconcile')showReconcile();if(id==='cakes')openCakesPage();window.scrollTo({top:0,behavior:'smooth'});}
 document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
 // Автообновление приложения: сессия хранится в sessionStorage и переживает перезагрузку вкладки.
 let swReloadPending=false;
