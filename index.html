@@ -9,7 +9,7 @@
 :root{--blue:#607f87;--blue-dark:#355762;--blue-light:#dce7e7;--cream:#f6f0e6;--paper:#fffdf8;--espresso:#392820;--line:#e6ddd0;--muted:#82786f;--shadow:0 8px 24px rgba(54,43,34,.08)}
 *{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--espresso);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input{font:inherit}button{cursor:pointer}
 .app{max-width:520px;min-height:100vh;margin:0 auto;background:linear-gradient(180deg,#f9f5ed,#f2ece1);padding-bottom:82px}
-header{background:var(--blue);color:#fff;padding:22px 22px 25px;border-radius:0 0 28px 28px;position:relative;overflow:hidden}
+header{background:var(--blue);color:#fff;padding:22px 22px 25px;border-radius:0 0 28px 28px;position:relative;overflow:hidden}.logout-btn{position:absolute;z-index:2;top:14px;right:14px;border:1px solid #ffffff80;background:#ffffff20;color:#fff;border-radius:20px;padding:8px 11px;font-size:12px;font-weight:700}.logout-btn:active{transform:scale(.97)}
 header:after{content:"";position:absolute;width:230px;height:230px;border:1px solid #ffffff40;border-radius:50%;right:-90px;top:-125px}
 .topline{display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
 .brandmark{width:100%;display:flex;justify-content:center;align-items:center}
@@ -41,7 +41,7 @@ footer{text-align:center;color:#9a8e81;font-size:10px;padding:8px 0 18px}
   </div>
 </section>
 <div class="app hidden" id="appScreen">
-<header><div class="topline"><div class="brandmark"><img src="mascot-izikent.png" alt="ИзиКент"></div></div><div class="hello" id="helloText">Привет, команда!</div><div class="hello-sub">Все рабочие функции — в одном месте.</div></header>
+<header><button class="logout-btn" id="logoutButton" type="button">Выйти ↗</button><div class="topline"><div class="brandmark"><img src="mascot-izikent.png" alt="ИзиКент"></div></div><div class="hello" id="helloText">Привет, команда!</div><div class="hello-sub">Все рабочие функции — в одном месте.</div></header>
 <main>
 <section id="home"><div class="eyebrow">Рабочее пространство</div><h1>Главное меню</h1>
 <div class="grid"><button class="tile" data-page="loans"><div class="ico">⇄</div><div><strong>Займы и возвраты</strong><small>Занять товар, вернуть и посмотреть сверку между точками</small></div></button></div>
@@ -94,6 +94,8 @@ const createUserForm=document.getElementById('createUserForm');
 const createUserButton=document.getElementById('createUserButton');
 const createUserError=document.getElementById('createUserError');
 const createUserSuccess=document.getElementById('createUserSuccess');
+const logoutButton=document.getElementById('logoutButton');
+
 
 function showApp(user){
   loginScreen.classList.add('hidden');
@@ -133,14 +135,9 @@ async function loadLoginUsers(){
     if(!response.ok||!data.ok) throw new Error(data.error||'Ошибка');
     select.innerHTML='<option value="">Выбери сотрудника</option>';
     data.users.forEach(user=>{
-      const option=document.createElement('option');
-      option.value=user.name;
-      option.textContent=user.name;
-      select.appendChild(option);
+      const option=document.createElement('option');option.value=user.name;option.textContent=user.name;select.appendChild(option);
     });
-  }catch(error){
-    select.innerHTML='<option value="Максим">Максим</option><option value="Розалия">Розалия</option>';
-  }
+  }catch(error){select.innerHTML='<option value="Максим">Максим</option><option value="Розалия">Розалия</option>';}
 }
 async function loadUsersList(){
   const session=JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null');
@@ -148,28 +145,26 @@ async function loadUsersList(){
   if(!session?.token){list.textContent='Сессия закончилась. Войди заново.';return;}
   list.textContent='Загружаем список…';
   try{
-    const response=await fetch(API_URL+'?action=users',{
-      headers:{'X-Session-Token':session.token},cache:'no-store'
-    });
-    const data=await response.json();
-    if(!response.ok||!data.ok) throw new Error(data.error||'Не удалось загрузить список');
+    const response=await fetch(API_URL+'?action=users',{headers:{'X-Session-Token':session.token},cache:'no-store'});
+    const data=await response.json();if(!response.ok||!data.ok)throw new Error(data.error||'Не удалось загрузить список');
     list.innerHTML='';
-    data.users.forEach(user=>{
-      const item=document.createElement('div');
-      item.className='listitem';
-      const left=document.createElement('span');
-      left.textContent=user.name;
-      const right=document.createElement('span');
-      right.className='pill';
-      right.textContent=user.role;
-      item.append(left,right);
-      list.appendChild(item);
-    });
-    if(!data.users.length) list.textContent='Пользователей пока нет.';
-  }catch(error){
-    list.textContent=error.message;
-  }
+    data.users.forEach(user=>{const item=document.createElement('div');item.className='listitem';
+      const left=document.createElement('span');left.textContent=user.name;
+      const right=document.createElement('span');right.className='pill';right.textContent=user.role;
+      item.append(left,right);list.appendChild(item);});
+    if(!data.users.length)list.textContent='Пользователей пока нет.';
+  }catch(error){list.textContent=error.message;}
 }
+
+
+logoutButton.addEventListener('click',()=>{
+  sessionStorage.removeItem(SESSION_KEY);
+  loginForm.reset();
+  loginError.textContent='';
+  showPage('home');
+  showLogin();
+  loadLoginUsers();
+});
 
 loginForm.addEventListener('submit',async(event)=>{
   event.preventDefault();
@@ -177,8 +172,7 @@ loginForm.addEventListener('submit',async(event)=>{
   const name=document.getElementById('employee').value;
   const pin=pinInput.value.trim();
   if(!/^\d{8}$/.test(pin)){loginError.textContent='Введи PIN-код из 8 цифр.';return;}
-  loginButton.disabled=true;
-  loginButton.textContent='Проверяем…';
+  loginButton.disabled=true;loginButton.textContent='Проверяем…';
   try{
     const response=await fetch(API_URL+'?action=login',{
       method:'POST',
@@ -190,67 +184,38 @@ loginForm.addEventListener('submit',async(event)=>{
       loginError.textContent=data.error||'Не удалось войти. Проверь имя и PIN.';
       return;
     }
-    sessionStorage.setItem(SESSION_KEY,JSON.stringify({
-      token:data.token,
-      user:data.user,
-      expiresAt:Date.now()+Number(data.expires_in||28800)*1000
-    }));
+    sessionStorage.setItem(SESSION_KEY,JSON.stringify({token:data.token,user:data.user,expiresAt:Date.now()+Number(data.expires_in||28800)*1000}));
     pinInput.value='';
     showApp(data.user);
   }catch(error){
     loginError.textContent='Не удалось связаться с сервером. Проверь интернет и попробуй ещё раз.';
   }finally{
-    loginButton.disabled=false;
-    loginButton.textContent='Войти';
+    loginButton.disabled=false;loginButton.textContent='Войти';
   }
 });
 
+
 createUserForm.addEventListener('submit',async(event)=>{
-  event.preventDefault();
-  createUserError.textContent='';
-  createUserSuccess.classList.add('hidden');
+  event.preventDefault();createUserError.textContent='';createUserSuccess.classList.add('hidden');
   const session=JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null');
-  if(!session?.token){
-    createUserError.textContent='Сессия закончилась. Войди заново.';
-    showLogin();
-    return;
-  }
+  if(!session?.token){createUserError.textContent='Сессия закончилась. Войди заново.';showLogin();return;}
   const name=document.getElementById('newUserName').value.trim();
   const role=document.getElementById('newUserRole').value.trim();
   const pin=document.getElementById('newUserPin').value.trim();
-  if(!name||!role||!/^\d{8}$/.test(pin)){
-    createUserError.textContent='Проверь имя, роль и PIN-код из 8 цифр.';
-    return;
-  }
-  createUserButton.disabled=true;
-  createUserButton.textContent='Создаём…';
+  if(!name||!role||!/^\d{8}$/.test(pin)){createUserError.textContent='Проверь имя, роль и PIN-код из 8 цифр.';return;}
+  createUserButton.disabled=true;createUserButton.textContent='Создаём…';
   try{
-    const response=await fetch(API_URL+'?action=create-user',{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'X-Session-Token':session.token
-      },
-      body:JSON.stringify({name,role,pin})
-    });
+    const response=await fetch(API_URL+'?action=create-user',{method:'POST',
+      headers:{'Content-Type':'application/json','X-Session-Token':session.token},
+      body:JSON.stringify({name,role,pin})});
     const data=await response.json();
-    if(response.status===401){
-      sessionStorage.removeItem(SESSION_KEY);
-      showLogin();
-      throw new Error('Сессия закончилась. Войди заново.');
-    }
-    if(!response.ok||!data.ok) throw new Error(data.error||'Не удалось создать пользователя');
+    if(response.status===401){sessionStorage.removeItem(SESSION_KEY);showLogin();throw new Error('Сессия закончилась. Войди заново.');}
+    if(!response.ok||!data.ok)throw new Error(data.error||'Не удалось создать пользователя');
     createUserSuccess.textContent='Пользователь '+data.user.name+' добавлен.';
-    createUserSuccess.classList.remove('hidden');
-    createUserForm.reset();
-    await loadUsersList();
-    await loadLoginUsers();
-  }catch(error){
-    createUserError.textContent=error.message;
-  }finally{
-    createUserButton.disabled=false;
-    createUserButton.textContent='Добавить пользователя';
-  }
+    createUserSuccess.classList.remove('hidden');createUserForm.reset();
+    await loadUsersList();await loadLoginUsers();
+  }catch(error){createUserError.textContent=error.message;}
+  finally{createUserButton.disabled=false;createUserButton.textContent='Добавить пользователя';}
 });
 
 borrowForm.addEventListener('submit', async (event)=>{
@@ -260,72 +225,40 @@ borrowForm.addEventListener('submit', async (event)=>{
   const session=JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null');
   if(!session||!session.token){
     borrowError.textContent='Сессия закончилась. Войди в приложение заново.';
-    showLogin();
-    return;
+    showLogin(); return;
   }
   const borrower=document.getElementById('borrower').value;
   const lender=document.getElementById('lender').value;
   const product=document.getElementById('borrowProduct').value.trim();
   const quantity=document.getElementById('borrowQuantity').value.trim();
   const unit=document.getElementById('borrowUnit').value;
-  if(!borrower||!lender||!product||!quantity){
-    borrowError.textContent='Заполни все поля.';
-    return;
-  }
-  if(borrower===lender){
-    borrowError.textContent='Точка не может занять сама у себя.';
-    return;
-  }
+  if(!borrower||!lender||!product||!quantity){borrowError.textContent='Заполни все поля.';return;}
+  if(borrower===lender){borrowError.textContent='Точка не может занять сама у себя.';return;}
   if(!/^\d+(?:[.,]\d+)?$/.test(quantity)||Number(quantity.replace(',','.'))<=0||Number(quantity.replace(',','.'))>100000){
-    borrowError.textContent='Проверь количество: нужно число больше нуля и не больше 100000.';
-    return;
+    borrowError.textContent='Проверь количество: нужно число больше нуля и не больше 100000.';return;
   }
-  const employee=session.user?.name||decodeTokenPayload(session.token)?.sub||'Сотрудник';
+  const employee=session.user?.name || decodeTokenPayload(session.token)?.sub || 'Сотрудник';
   const summary='Проверь займ:\n\nКто занял: '+borrower+'\nУ кого занял: '+lender+'\nСотрудник: '+employee+'\nПродукт: '+product+'\nКоличество: '+quantity+' '+unit+'\n\nЗаписать эту операцию в журнал?';
   if(!window.confirm(summary)) return;
-  borrowButton.disabled=true;
-  borrowButton.textContent='Записываем…';
+  borrowButton.disabled=true;borrowButton.textContent='Записываем…';
   try{
     const response=await fetch(API_URL+'?action=borrow',{
       method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'X-Session-Token':session.token
-      },
-      body:JSON.stringify({
-        borrower,lender,product,quantity,unit,
-        request_id:(crypto.randomUUID?crypto.randomUUID():('app_'+Date.now()+'_'+Math.random().toString(36).slice(2)))
-      })
+      headers:{'Content-Type':'application/json','X-Session-Token':session.token},
+      body:JSON.stringify({borrower,lender,product,quantity,unit,request_id:(crypto.randomUUID?crypto.randomUUID():('app_'+Date.now()+'_'+Math.random().toString(36).slice(2)))})
     });
     const data=await response.json();
-    if(response.status===401){
-      sessionStorage.removeItem(SESSION_KEY);
-      showLogin();
-      throw new Error('Сессия закончилась. Войди заново.');
-    }
+    if(response.status===401){sessionStorage.removeItem(SESSION_KEY);showLogin();throw new Error('Сессия закончилась. Войди заново.');}
     if(!response.ok||!data.ok) throw new Error(data.error||'Не удалось записать займ.');
     borrowSuccess.textContent=data.duplicate?'Эта операция уже была записана.':'Займ записан в журнал.';
-    borrowSuccess.classList.remove('hidden');
-    borrowForm.reset();
-  }catch(error){
-    borrowError.textContent=error.message||'Ошибка связи с сервером. Попробуй ещё раз.';
-  }finally{
-    borrowButton.disabled=false;
-    borrowButton.textContent='Продолжить';
-  }
+    borrowSuccess.classList.remove('hidden');borrowForm.reset();
+  }catch(error){borrowError.textContent=error.message||'Ошибка связи с сервером. Попробуй ещё раз.';}
+  finally{borrowButton.disabled=false;borrowButton.textContent='Продолжить';}
 });
 
 const pages=[...document.querySelectorAll('main section')];
-function showPage(id){
-  pages.forEach(p=>p.classList.toggle('hidden',p.id!==id));
-  document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('active',b.dataset.page===id));
-  if(id==='users') loadUsersList();
-  window.scrollTo({top:0,behavior:'smooth'});
-}
+function showPage(id){pages.forEach(p=>p.classList.toggle('hidden',p.id!==id));document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('active',b.dataset.page===id));if(id==='users')loadUsersList();window.scrollTo({top:0,behavior:'smooth'});}
 document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
-if('serviceWorker'in navigator&&location.protocol.startsWith('http')){
-  navigator.serviceWorker.register('./sw.js').catch(()=>{});
-}
-loadLoginUsers();
-if(!restoreSession()) showLogin();
+if('serviceWorker'in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+loadLoginUsers();if(!restoreSession())showLogin();
 </script></body></html>
