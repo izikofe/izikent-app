@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#607f87"><meta name="description" content="ИзиКент — помощник команды ИзиКофе">
+<meta name="theme-color" content="#607f87"><meta name="app-version" content="7.1-auto-update"><meta name="description" content="ИзиКент — помощник команды ИзиКофе">
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml">
 <title>ИзиКент</title>
 <style>
@@ -46,8 +46,12 @@ footer{text-align:center;color:#9a8e81;font-size:10px;padding:8px 0 18px}
 <section id="home"><div class="eyebrow">Рабочее пространство</div><h1>Главное меню</h1>
 <div class="grid"><button class="tile" data-page="loans"><div class="ico">⇄</div><div><strong>Займы и возвраты</strong><small>Занять товар, вернуть и посмотреть сверку между точками</small></div></button></div>
 <div class="grid" style="margin-top:12px"><button class="tile hidden" id="usersTile" data-page="users"><div class="ico">＋</div><div><strong>Пользователи</strong><small>Добавить сотрудника, PIN-код и роль</small></div></button></div>
+<div class="grid" style="margin-top:12px">
+<button class="tile" data-page="returns"><div class="ico">📥</div><div><strong>Возврат товара</strong><small>Посмотреть открытые займы и оформить возврат</small></div></button>
+<button class="tile" data-page="reconcile"><div class="ico">📊</div><div><strong>Сверка</strong><small>Посмотреть долги между точками</small></div></button>
+</div>
 <div class="card"><div class="row"><h2>Обратная связь</h2><span class="pill">Остаётся в MAX</span></div><p class="muted">Сбор отзывов и ежедневные отчёты продолжают работать в существующем MAX-боте. В приложение этот раздел пока не переносим.</p></div>
-<div class="notice">В приложении пока оставляем только действующий модуль займов и возвратов. Новые функции не добавляем.</div>
+<div class="notice">Займы, возвраты и сверка задолженностей доступны в приложении. Обратная связь и ежедневные отчёты остаются в MAX-боте.</div>
 </section>
 <section id="loans" class="hidden"><button class="back" data-page="home">← Главное меню</button><div class="eyebrow">Займы и возвраты</div><h1>Операции между точками</h1>
 <div class="card">
@@ -57,13 +61,26 @@ footer{text-align:center;color:#9a8e81;font-size:10px;padding:8px 0 18px}
 <select class="select" id="borrower" required><option value="">Выбери точку</option><option>Сиреневая</option><option>Партизанская</option><option>Солнечная Поляна</option><option>Георгия Исакова</option></select>
 <label class="field-label" for="lender">У какой точки заняли?</label>
 <select class="select" id="lender" required><option value="">Выбери точку</option><option>Сиреневая</option><option>Партизанская</option><option>Солнечная Поляна</option><option>Георгия Исакова</option></select>
-<label class="field-label" for="borrowProduct">Продукт</label><input class="select" id="borrowProduct" type="text" maxlength="90" placeholder="Например, Молоко" required>
-<label class="field-label" for="borrowQuantity">Количество</label><input class="select" id="borrowQuantity" type="text" inputmode="decimal" placeholder="Например, 6 или 1,5" required>
-<label class="field-label" for="borrowUnit">Единица измерения</label><select class="select" id="borrowUnit" required><option value="шт">шт</option><option value="кг">кг</option><option value="г">г</option><option value="л">л</option><option value="мл">мл</option></select>
-<button class="primary" id="borrowButton" type="submit">Продолжить</button>
+<div id="borrowItems"></div>
+<button class="back" id="addBorrowItem" type="button">＋ Добавить ещё товар</button>
+<button class="primary" id="borrowButton" type="submit">Проверить заявку</button>
 <div class="error" id="borrowError" role="alert"></div><div class="notice hidden" id="borrowSuccess" role="status"></div>
 </form></div>
 <div class="card"><h2>Другие операции</h2><div class="listitem"><span>📥 Вернуть товар</span><span class="pill">Следующий этап</span></div><div class="listitem"><span>📊 Сверка задолженностей</span><span class="pill">Следующий этап</span></div><p class="muted">Возвраты и сверку подключим отдельно, сохранив правила существующего MAX-бота.</p></div></section>
+<section id="returns" class="hidden"><button class="back" data-page="home">← Главное меню</button><div class="eyebrow">Займы и возвраты</div><h1>Возврат товара</h1>
+<div class="card"><h2>Открытые займы</h2><p class="muted">Выбери точку, которая брала товар. Покажем только её незакрытые долги.</p>
+<label class="field-label" for="returnBorrower">Кто брал товар?</label>
+<select class="select" id="returnBorrower"><option value="">Выбери точку</option><option>Сиреневая</option><option>Партизанская</option><option>Солнечная Поляна</option><option>Георгия Исакова</option></select>
+<button class="primary" id="loadReturnDebts" type="button">Показать долги</button>
+<div id="returnDebtList" class="muted" style="margin-top:12px">Сначала выбери точку.</div>
+</div>
+<div class="card hidden" id="returnFormCard"><h2>Состав заявки на возврат</h2><p class="muted">Отметь товары и укажи количество напротив каждого. Все позиции проверятся до записи.</p>
+<div id="returnSelectedInfo"></div>
+<button class="primary" id="returnSubmit" type="button">Проверить и оформить возврат</button><div class="error" id="returnError" role="alert"></div><div class="notice hidden" id="returnSuccess" role="status"></div>
+</div></section>
+<section id="reconcile" class="hidden"><button class="back" data-page="home">← Главное меню</button><div class="eyebrow">Контроль задолженностей</div><h1>Сверка</h1>
+<div class="card"><div class="row"><h2>Текущие долги</h2><button class="back" id="refreshReconcile" type="button">↻ Обновить</button></div>
+<div id="reconcileDate" class="muted"></div><div id="reconcileContent" style="margin-top:12px">Нажми «Обновить», чтобы загрузить данные.</div></div></section>
 <section id="users" class="hidden"><button class="back" data-page="home">← Главное меню</button><div class="eyebrow">Управление доступом</div><h1>Пользователи</h1>
 <div class="card"><h2>Добавить пользователя</h2><p class="muted">Задай имя, роль и PIN-код из 8 цифр.</p>
 <form id="createUserForm">
@@ -95,6 +112,18 @@ const createUserButton=document.getElementById('createUserButton');
 const createUserError=document.getElementById('createUserError');
 const createUserSuccess=document.getElementById('createUserSuccess');
 const logoutButton=document.getElementById('logoutButton');
+const returnBorrower=document.getElementById('returnBorrower');
+const loadReturnDebtsButton=document.getElementById('loadReturnDebts');
+const returnDebtList=document.getElementById('returnDebtList');
+const returnFormCard=document.getElementById('returnFormCard');
+const returnSelectedInfo=document.getElementById('returnSelectedInfo');
+const returnSubmit=document.getElementById('returnSubmit');
+const returnError=document.getElementById('returnError');
+const returnSuccess=document.getElementById('returnSuccess');
+const reconcileContent=document.getElementById('reconcileContent');
+const reconcileDate=document.getElementById('reconcileDate');
+let returnDebtChoices=[];
+let borrowItemCount=0;
 
 
 function showApp(user){
@@ -195,6 +224,98 @@ loginForm.addEventListener('submit',async(event)=>{
 });
 
 
+
+function getSession(){
+  try{return JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null');}catch(e){return null;}
+}
+async function loadDebts(){
+  const session=getSession();
+  if(!session?.token) throw new Error('Сессия закончилась. Войди заново.');
+  const response=await fetch(API_URL+'?action=debts',{headers:{'X-Session-Token':session.token},cache:'no-store'});
+  const data=await response.json();
+  if(response.status===401){sessionStorage.removeItem(SESSION_KEY);showLogin();throw new Error('Сессия закончилась. Войди заново.');}
+  if(!response.ok||!data.ok) throw new Error(data.error||'Не удалось загрузить долги.');
+  return data;
+}
+async function showReturnDebts(){
+  const borrower=returnBorrower.value;returnFormCard.classList.add('hidden');returnDebtList.innerHTML='';returnDebtChoices=[];
+  if(!borrower){returnDebtList.textContent='Сначала выбери точку.';return;}
+  loadReturnDebtsButton.disabled=true;loadReturnDebtsButton.textContent='Загружаем…';
+  try{
+    const data=await loadDebts();returnDebtChoices=data.debts.filter(d=>d.borrower===borrower);
+    if(!returnDebtChoices.length){returnDebtList.textContent='У этой точки нет открытых займов.';return;}
+    returnDebtChoices.forEach((debt,index)=>{
+      const card=document.createElement('div');card.className='card';card.style.margin='9px 0';
+      const label=document.createElement('label');label.style.display='flex';label.style.alignItems='flex-start';label.style.gap='10px';
+      const check=document.createElement('input');check.type='checkbox';check.dataset.index=index;check.style.marginTop='4px';
+      const text=document.createElement('span');const strong=document.createElement('strong');strong.textContent=debt.product+' — долг '+debt.quantity+' '+debt.unit;
+      const small=document.createElement('small');small.style.display='block';small.style.color='var(--muted)';small.textContent='У кого брали: '+debt.lender;
+      text.append(strong,small);label.append(check,text);card.append(label);
+      const qty=document.createElement('input');qty.className='select';qty.style.marginTop='10px';qty.inputMode='decimal';qty.placeholder='Количество к возврату';qty.value=debt.quantity;qty.dataset.quantity=index;qty.disabled=true;
+      check.addEventListener('change',()=>{qty.disabled=!check.checked;});card.append(qty);returnDebtList.append(card);
+    });
+    const choose=document.createElement('button');choose.type='button';choose.className='primary';choose.textContent='Перейти к оформлению';choose.addEventListener('click',()=>{
+      const selected=[...returnDebtList.querySelectorAll('input[type=checkbox]:checked')];
+      if(!selected.length){returnDebtList.insertAdjacentHTML('beforeend','<p class="error">Отметь хотя бы один товар.</p>');return;}
+      const items=selected.map(c=>{const d=returnDebtChoices[Number(c.dataset.index)];return {debt:d,quantity:returnDebtList.querySelector('[data-quantity="'+c.dataset.index+'"]').value.trim()};});
+      if(items.some(x=>!/^\d+(?:[.,]\d+)?$/.test(x.quantity)||Number(x.quantity.replace(',','.'))<=0||Number(x.quantity.replace(',','.'))>Number(x.debt.quantity))){returnError.textContent='Проверь количество: оно должно быть больше нуля и не превышать остаток.';returnFormCard.classList.remove('hidden');return;}
+      returnFormCard.dataset.items=JSON.stringify(items.map(x=>({lender:x.debt.lender,product:x.debt.product,quantity:x.quantity,unit:x.debt.unit})));
+      returnSelectedInfo.innerHTML='';items.forEach(x=>{const p=document.createElement('p');p.className='listitem';p.textContent=x.debt.product+' — '+x.quantity+' '+x.debt.unit+' ('+x.debt.lender+')';returnSelectedInfo.append(p);});
+      returnError.textContent='';returnSuccess.classList.add('hidden');returnFormCard.classList.remove('hidden');
+    });returnDebtList.append(choose);
+    if(data.anomalies?.length){const warn=document.createElement('p');warn.className='error';warn.textContent='В журнале есть позиции с возвратом больше займа. Их нужно проверить.';returnDebtList.append(warn);}
+  }catch(error){returnDebtList.textContent=error.message;}
+  finally{loadReturnDebtsButton.disabled=false;loadReturnDebtsButton.textContent='Показать долги';}
+}
+async function showReconcile(){
+  reconcileContent.textContent='Загружаем сверку…';
+  try{
+    const data=await loadDebts();
+    reconcileContent.innerHTML='';
+    reconcileDate.textContent='Данные загружены: '+new Date().toLocaleString('ru-RU');
+    if(!data.debts.length){
+      const p=document.createElement('p');p.className='notice';p.textContent='Открытых займов нет. Все расчёты закрыты.';reconcileContent.append(p);
+    }else{
+      const groups={};
+      data.debts.forEach(d=>{const key=d.borrower+' → '+d.lender;(groups[key]??=[]).push(d);});
+      Object.entries(groups).forEach(([pair,items])=>{
+        const card=document.createElement('div');card.className='card';
+        const h=document.createElement('h2');h.textContent=pair;card.append(h);
+        items.forEach(d=>{const line=document.createElement('div');line.className='listitem';
+          const name=document.createElement('span');name.textContent=d.product;
+          const amount=document.createElement('strong');amount.textContent=d.quantity+' '+d.unit;
+          line.append(name,amount);card.append(line);});
+        reconcileContent.append(card);
+      });
+    }
+    if(data.anomalies?.length){
+      const warning=document.createElement('div');warning.className='error';
+      warning.textContent='Внимание: обнаружено '+data.anomalies.length+' позиций, где возвраты превышают займы. Проверь журнал.';
+      reconcileContent.append(warning);
+    }
+  }catch(error){reconcileContent.textContent=error.message;}
+}
+async function submitReturn(){
+  returnError.textContent='';returnSuccess.classList.add('hidden');
+  let items=[];try{items=JSON.parse(returnFormCard.dataset.items||'[]');}catch(e){}
+  if(!items.length){returnError.textContent='Сначала выбери товары для возврата.';return;}
+  const session=getSession();if(!session?.token){showLogin();return;}
+  const lines=items.map((x,i)=>(i+1)+'. '+x.product+' — '+x.quantity+' '+x.unit+' (точке '+x.lender+')').join('\n');
+  if(!confirm('Подтверди возврат для точки '+returnBorrower.value+':\n\n'+lines+'\n\nОформить все позиции одной заявкой?'))return;
+  returnSubmit.disabled=true;returnSubmit.textContent='Записываем…';
+  try{
+    const response=await fetch(API_URL+'?action=return-batch',{method:'POST',headers:{'Content-Type':'application/json','X-Session-Token':session.token},body:JSON.stringify({borrower:returnBorrower.value,items,request_id:(crypto.randomUUID?crypto.randomUUID():('app_'+Date.now()+'_'+Math.random().toString(36).slice(2)))})});
+    const data=await response.json();if(response.status===401){sessionStorage.removeItem(SESSION_KEY);showLogin();throw new Error('Сессия закончилась. Войди заново.');}
+    if(!response.ok||!data.ok)throw new Error(data.error||'Не удалось записать возврат.');
+    returnSuccess.textContent=data.duplicate?'Эта заявка уже была записана.':'Возвратов оформлено: '+data.count+'.';returnSuccess.classList.remove('hidden');returnFormCard.classList.add('hidden');
+    await showReturnDebts();await showReconcile();
+  }catch(error){returnError.textContent=error.message;}
+  finally{returnSubmit.disabled=false;returnSubmit.textContent='Проверить и оформить возврат';}
+}
+loadReturnDebtsButton.addEventListener('click',showReturnDebts);
+returnSubmit.addEventListener('click',submitReturn);
+document.getElementById('refreshReconcile').addEventListener('click',showReconcile);
+
 createUserForm.addEventListener('submit',async(event)=>{
   event.preventDefault();createUserError.textContent='';createUserSuccess.classList.add('hidden');
   const session=JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null');
@@ -218,47 +339,65 @@ createUserForm.addEventListener('submit',async(event)=>{
   finally{createUserButton.disabled=false;createUserButton.textContent='Добавить пользователя';}
 });
 
+function addBorrowItem(product='',quantity='',unit='шт'){
+  const wrap=document.createElement('div');wrap.className='card';wrap.style.margin='10px 0';
+  const row=document.createElement('div');row.className='row';
+  const label=document.createElement('strong');label.textContent='Товар '+(++borrowItemCount);
+  const remove=document.createElement('button');remove.type='button';remove.className='back';remove.textContent='Убрать';remove.addEventListener('click',()=>{wrap.remove();renumberBorrowItems();});
+  row.append(label,remove);
+  const p=document.createElement('input');p.className='select';p.maxLength=90;p.placeholder='Название товара';p.value=product; p.dataset.field='product';
+  const q=document.createElement('input');q.className='select';q.inputMode='decimal';q.placeholder='Количество';q.value=quantity;q.dataset.field='quantity';q.style.marginTop='8px';
+  const u=document.createElement('select');u.className='select';u.dataset.field='unit';u.style.marginTop='8px';['шт','кг','г','л','мл'].forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;u.append(o);});u.value=unit;
+  wrap.append(row,p,q,u);document.getElementById('borrowItems').append(wrap);
+}
+function renumberBorrowItems(){borrowItemCount=0;document.querySelectorAll('#borrowItems .card strong').forEach(x=>x.textContent='Товар '+(++borrowItemCount));}
+addBorrowItem();
+document.getElementById('addBorrowItem').addEventListener('click',()=>addBorrowItem());
 borrowForm.addEventListener('submit', async (event)=>{
-  event.preventDefault();
-  borrowError.textContent='';
-  borrowSuccess.classList.add('hidden');
-  const session=JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null');
-  if(!session||!session.token){
-    borrowError.textContent='Сессия закончилась. Войди в приложение заново.';
-    showLogin(); return;
-  }
-  const borrower=document.getElementById('borrower').value;
-  const lender=document.getElementById('lender').value;
-  const product=document.getElementById('borrowProduct').value.trim();
-  const quantity=document.getElementById('borrowQuantity').value.trim();
-  const unit=document.getElementById('borrowUnit').value;
-  if(!borrower||!lender||!product||!quantity){borrowError.textContent='Заполни все поля.';return;}
+  event.preventDefault();borrowError.textContent='';borrowSuccess.classList.add('hidden');
+  const session=getSession();if(!session?.token){borrowError.textContent='Сессия закончилась. Войди заново.';showLogin();return;}
+  const borrower=document.getElementById('borrower').value,lender=document.getElementById('lender').value;
+  if(!borrower||!lender){borrowError.textContent='Выбери обе точки.';return;}
   if(borrower===lender){borrowError.textContent='Точка не может занять сама у себя.';return;}
-  if(!/^\d+(?:[.,]\d+)?$/.test(quantity)||Number(quantity.replace(',','.'))<=0||Number(quantity.replace(',','.'))>100000){
-    borrowError.textContent='Проверь количество: нужно число больше нуля и не больше 100000.';return;
-  }
-  const employee=session.user?.name || decodeTokenPayload(session.token)?.sub || 'Сотрудник';
-  const summary='Проверь займ:\n\nКто занял: '+borrower+'\nУ кого занял: '+lender+'\nСотрудник: '+employee+'\nПродукт: '+product+'\nКоличество: '+quantity+' '+unit+'\n\nЗаписать эту операцию в журнал?';
-  if(!window.confirm(summary)) return;
+  const items=[...document.querySelectorAll('#borrowItems .card')].map(card=>({product:card.querySelector('[data-field="product"]').value.trim(),quantity:card.querySelector('[data-field="quantity"]').value.trim(),unit:card.querySelector('[data-field="unit"]').value}));
+  if(!items.length||items.some(x=>!x.product||!/^\d+(?:[.,]\d+)?$/.test(x.quantity)||Number(x.quantity.replace(',','.'))<=0||Number(x.quantity.replace(',','.'))>100000)){borrowError.textContent='Проверь товары и количество во всех строках.';return;}
+  const employee=session.user?.name||decodeTokenPayload(session.token)?.sub||'Сотрудник';
+  const lines=items.map((x,i)=>(i+1)+'. '+x.product+' — '+x.quantity+' '+x.unit).join('\n');
+  if(!confirm('Проверь заявку на займ:\n\nКто занял: '+borrower+'\nУ кого заняли: '+lender+'\nСотрудник: '+employee+'\n\n'+lines+'\n\nЗаписать все товары одной заявкой?'))return;
   borrowButton.disabled=true;borrowButton.textContent='Записываем…';
   try{
-    const response=await fetch(API_URL+'?action=borrow',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','X-Session-Token':session.token},
-      body:JSON.stringify({borrower,lender,product,quantity,unit,request_id:(crypto.randomUUID?crypto.randomUUID():('app_'+Date.now()+'_'+Math.random().toString(36).slice(2)))})
-    });
-    const data=await response.json();
-    if(response.status===401){sessionStorage.removeItem(SESSION_KEY);showLogin();throw new Error('Сессия закончилась. Войди заново.');}
-    if(!response.ok||!data.ok) throw new Error(data.error||'Не удалось записать займ.');
-    borrowSuccess.textContent=data.duplicate?'Эта операция уже была записана.':'Займ записан в журнал.';
-    borrowSuccess.classList.remove('hidden');borrowForm.reset();
-  }catch(error){borrowError.textContent=error.message||'Ошибка связи с сервером. Попробуй ещё раз.';}
-  finally{borrowButton.disabled=false;borrowButton.textContent='Продолжить';}
+    const response=await fetch(API_URL+'?action=borrow-batch',{method:'POST',headers:{'Content-Type':'application/json','X-Session-Token':session.token},body:JSON.stringify({borrower,lender,items,request_id:(crypto.randomUUID?crypto.randomUUID():('app_'+Date.now()+'_'+Math.random().toString(36).slice(2)))})});
+    const data=await response.json();if(response.status===401){sessionStorage.removeItem(SESSION_KEY);showLogin();throw new Error('Сессия закончилась. Войди заново.');}
+    if(!response.ok||!data.ok)throw new Error(data.error||'Не удалось записать заявку.');
+    borrowSuccess.textContent=data.duplicate?'Эта заявка уже была записана.':'Записано товаров: '+data.count+'.';borrowSuccess.classList.remove('hidden');
+    borrowForm.reset();document.getElementById('borrowItems').innerHTML='';borrowItemCount=0;addBorrowItem();
+  }catch(error){borrowError.textContent=error.message||'Ошибка связи с сервером.';}
+  finally{borrowButton.disabled=false;borrowButton.textContent='Проверить заявку';}
 });
 
 const pages=[...document.querySelectorAll('main section')];
-function showPage(id){pages.forEach(p=>p.classList.toggle('hidden',p.id!==id));document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('active',b.dataset.page===id));if(id==='users')loadUsersList();window.scrollTo({top:0,behavior:'smooth'});}
+function showPage(id){pages.forEach(p=>p.classList.toggle('hidden',p.id!==id));document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('active',b.dataset.page===id));if(id==='users')loadUsersList();if(id==='reconcile')showReconcile();window.scrollTo({top:0,behavior:'smooth'});}
 document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
-if('serviceWorker'in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+// Автообновление приложения: сессия хранится в sessionStorage и переживает перезагрузку вкладки.
+let swReloadPending=false;
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  const reloadOnControllerChange=()=>{
+    if(swReloadPending)return;
+    swReloadPending=true;
+    window.location.reload();
+  };
+  navigator.serviceWorker.addEventListener('controllerchange',reloadOnControllerChange);
+  navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'})
+    .then(registration=>{
+      // Проверяем обновление при открытии, при возвращении во вкладку и периодически.
+      const checkForUpdate=()=>registration.update().catch(()=>{});
+      checkForUpdate();
+      document.addEventListener('visibilitychange',()=>{
+        if(document.visibilityState==='visible')checkForUpdate();
+      });
+      window.setInterval(checkForUpdate,60*1000);
+    })
+    .catch(()=>{});
+}
 loadLoginUsers();if(!restoreSession())showLogin();
 </script></body></html>
