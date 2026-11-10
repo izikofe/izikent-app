@@ -398,7 +398,7 @@ createUserForm.addEventListener('submit',async(event)=>{
   if(!name||!role||!/^\d{8}$/.test(pin)){createUserError.textContent='Проверь имя, роль и PIN-код из 8 цифр.';return;}
   createUserButton.disabled=true;createUserButton.textContent='Создаём…';
   try{
-    const response=await fetch(API_URL+'?action=create-user',{method:'POST',
+    const response=await fetch(API_URL+'?action=users',{method:'POST',
       headers:{'Content-Type':'application/json','X-Session-Token':session.token},
       body:JSON.stringify({name,role,pin})});
     const data=await response.json();
