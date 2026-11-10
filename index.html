@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#607f87"><meta name="app-version" content="7.2-cakes"><meta name="description" content="ИзиКент — помощник команды ИзиКофе">
+<meta name="theme-color" content="#607f87"><meta name="app-version" content="7.4-cakes-users-coming-soon"><meta name="description" content="ИзиКент — помощник команды ИзиКофе">
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml">
 <title>ИзиКент</title>
 <style>
@@ -46,6 +46,12 @@ footer{text-align:center;color:#9a8e81;font-size:10px;padding:8px 0 18px}
 <section id="home"><div class="eyebrow">Рабочее пространство</div><h1>Главное меню</h1>
 <div class="grid"><button class="tile" data-page="loans"><div class="ico">⇄</div><div><strong>Займы и возвраты</strong><small>Занять товар, вернуть и посмотреть сверку между точками</small></div></button></div>
 <div class="grid" style="margin-top:12px"><button class="tile" data-page="cakes"><div class="ico">🎂</div><div><strong>Торты</strong><small>Записать количество тортов по торговым точкам</small></div></button></div>
+<div class="grid" style="margin-top:12px">
+<button class="tile" type="button" disabled aria-label="Отработка процентов потерь — скоро"><div class="ico">％</div><div style="flex:1"><strong>Отработка % потерь</strong><small>Учёт отработки потерь</small></div><span class="pill">Скоро</span></button>
+</div>
+<div class="grid" style="margin-top:12px">
+<button class="tile" type="button" disabled aria-label="Списание ЗЦ — скоро"><div class="ico">🧾</div><div style="flex:1"><strong>Списание ЗЦ</strong><small>Учёт списаний</small></div><span class="pill">Скоро</span></button>
+</div>
 <div class="grid" style="margin-top:12px"><button class="tile hidden" id="usersTile" data-page="users"><div class="ico">＋</div><div><strong>Пользователи</strong><small>Добавить сотрудника, PIN-код и роль</small></div></button></div>
 <div class="card"><div class="row"><h2>Обратная связь</h2><span class="pill">Остаётся в MAX</span></div><p class="muted">Сбор отзывов и ежедневные отчёты продолжают работать в существующем MAX-боте. В приложение этот раздел пока не переносим.</p></div>
 <div class="notice">Займы, возвраты и сверка задолженностей доступны в приложении. Обратная связь и ежедневные отчёты остаются в MAX-боте.</div>
@@ -93,7 +99,7 @@ footer{text-align:center;color:#9a8e81;font-size:10px;padding:8px 0 18px}
 <button class="primary" id="cakesSubmit" type="submit">Записать в таблицу</button>
 <div class="error" id="cakesError" role="alert"></div><div class="notice hidden" id="cakesSuccess" role="status"></div>
 </form></div></section>
-'''<section id="users" class="hidden"><button class="back" data-page="home">← Главное меню</button><div class="eyebrow">Управление доступом</div><h1>Пользователи</h1>
+<section id="users" class="hidden"><button class="back" data-page="home">← Главное меню</button><div class="eyebrow">Управление доступом</div><h1>Пользователи</h1>
 <div class="card"><h2>Добавить пользователя</h2><p class="muted">Задай имя, роль и PIN-код из 8 цифр.</p>
 <form id="createUserForm">
 <label class="field-label" for="newUserName">Имя сотрудника</label><input class="select" id="newUserName" type="text" maxlength="50" placeholder="Например, Анна" required>
@@ -145,6 +151,7 @@ let cakesListsLoaded=false;
 let returnDebtChoices=[];
 let borrowItemCount=0;
 
+
 function showApp(user){
   loginScreen.classList.add('hidden');
   appScreen.classList.remove('hidden');
@@ -154,6 +161,7 @@ function showApp(user){
 function showLogin(){
   appScreen.classList.add('hidden');
   loginScreen.classList.remove('hidden');
+  loadLoginUsers();
 }
 function decodeTokenPayload(token){
   try{
@@ -177,15 +185,25 @@ function restoreSession(){
 
 async function loadLoginUsers(){
   const select=document.getElementById('employee');
+  select.innerHTML='<option value="">Загружаем сотрудников…</option>';
+  select.disabled=true;
+  loginError.textContent='';
   try{
-    const response=await fetch(API_URL+'?action=users',{cache:'no-store'});
+    const response=await fetch(API_URL+'?action=users&v='+Date.now(),{cache:'no-store'});
     const data=await response.json();
-    if(!response.ok||!data.ok) throw new Error(data.error||'Ошибка');
+    if(!response.ok||!data.ok) throw new Error(data.error||'Ошибка загрузки сотрудников');
     select.innerHTML='<option value="">Выбери сотрудника</option>';
-    data.users.forEach(user=>{
-      const option=document.createElement('option');option.value=user.name;option.textContent=user.name;select.appendChild(option);
+    (data.users||[]).forEach(user=>{
+      const option=document.createElement('option');
+      option.value=user.name;option.textContent=user.name;select.appendChild(option);
     });
-  }catch(error){select.innerHTML='<option value="Максим">Максим</option><option value="Розалия">Розалия</option>';}
+    if(!data.users||!data.users.length)select.innerHTML='<option value="">Список сотрудников пуст</option>';
+  }catch(error){
+    select.innerHTML='<option value="">Не удалось загрузить сотрудников</option>';
+    loginError.textContent='Не удалось загрузить сотрудников: '+error.message;
+  }finally{
+    select.disabled=false;
+  }
 }
 async function loadUsersList(){
   const session=JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null');
@@ -204,11 +222,13 @@ async function loadUsersList(){
   }catch(error){list.textContent=error.message;}
 }
 
+
+
 async function loadCakesData(force=false){
   if(cakesListsLoaded&&!force)return;
   const session=getSession();
   if(!session?.token)throw new Error('Сессия закончилась. Войди заново.');
-  const response=await fetch(API_URL+'?action=cakes-data',{
+  const response=await fetch(API_URL+'?action=cakes-options',{
     headers:{'X-Session-Token':session.token},cache:'no-store'
   });
   const data=await response.json();
@@ -220,7 +240,7 @@ async function loadCakesData(force=false){
     (items||[]).forEach(value=>{const option=document.createElement('option');option.value=value;option.textContent=value;select.append(option);});
   };
   fill(cakeName,data.cakes,'Выбери торт');
-  fill(cakePlace,data.places,'Выбери торговую точку');
+  fill(cakePlace,data.points,'Выбери торговую точку');
   cakesListsLoaded=true;
 }
 async function openCakesPage(){
@@ -249,7 +269,7 @@ cakesForm.addEventListener('submit',async(event)=>{
     const response=await fetch(API_URL+'?action=cakes-add',{
       method:'POST',
       headers:{'Content-Type':'application/json','X-Session-Token':session.token},
-      body:JSON.stringify({cake,place,quantity})
+      body:JSON.stringify({cake,point:place,quantity})
     });
     const data=await response.json();
     if(response.status===401){sessionStorage.removeItem(SESSION_KEY);showLogin();throw new Error('Сессия закончилась. Войди заново.');}
@@ -298,6 +318,8 @@ loginForm.addEventListener('submit',async(event)=>{
   }
 });
 
+
+
 function getSession(){
   try{return JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null');}catch(e){return null;}
 }
@@ -309,7 +331,8 @@ async function loadDebts(){
   if(response.status===401){sessionStorage.removeItem(SESSION_KEY);showLogin();throw new Error('Сессия закончилась. Войди заново.');}
   if(!response.ok||!data.ok) throw new Error(data.error||'Не удалось загрузить долги.');
   return data;
-}async function showReturnDebts(){
+}
+async function showReturnDebts(){
   const borrower=returnBorrower.value;returnFormCard.classList.add('hidden');returnDebtList.innerHTML='';returnDebtChoices=[];
   if(!borrower){returnDebtList.textContent='Сначала выбери точку.';return;}
   loadReturnDebtsButton.disabled=true;loadReturnDebtsButton.textContent='Загружаем…';
@@ -398,7 +421,7 @@ createUserForm.addEventListener('submit',async(event)=>{
   if(!name||!role||!/^\d{8}$/.test(pin)){createUserError.textContent='Проверь имя, роль и PIN-код из 8 цифр.';return;}
   createUserButton.disabled=true;createUserButton.textContent='Создаём…';
   try{
-    const response=await fetch(API_URL+'?action=users',{method:'POST',
+    const response=await fetch(API_URL+'?action=create-user',{method:'POST',
       headers:{'Content-Type':'application/json','X-Session-Token':session.token},
       body:JSON.stringify({name,role,pin})});
     const data=await response.json();
