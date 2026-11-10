@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#607f87"><meta name="description" content="ИзиКент — помощник команды ИзиКофе">
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>ИзиКент — ИзиКофе</title>
+<style>
+:root{--blue:#607f87;--blue-dark:#355762;--blue-light:#dce7e7;--cream:#f6f0e6;--paper:#fffdf8;--espresso:#392820;--line:#e6ddd0;--muted:#82786f;--shadow:0 8px 24px rgba(54,43,34,.08)}
+*{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--espresso);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button{font:inherit;cursor:pointer}
+.app{max-width:520px;min-height:100vh;margin:0 auto;background:linear-gradient(180deg,#f9f5ed,#f2ece1);padding-bottom:82px}
+header{background:var(--blue);color:#fff;padding:22px 22px 25px;border-radius:0 0 28px 28px;position:relative;overflow:hidden}
+header:after{content:"";position:absolute;width:230px;height:230px;border:1px solid #ffffff40;border-radius:50%;right:-90px;top:-125px}
+.topline{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1}.brandmark img{display:block;width:118px;height:138px;object-fit:contain;object-position:center;margin:-8px 0 -10px -8px;border-radius:12px}.brand{font-size:32px;font-weight:850;font-style:italic;letter-spacing:-1.4px}.brand span{color:#f5ead8}.sub{font-size:13px;opacity:.9;margin-top:2px}.avatar{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:#ffffff30;font-size:19px}
+.hello{margin-top:23px;font-size:23px;font-weight:750}.hello-sub{font-size:14px;opacity:.9;margin-top:5px}
+main{padding:20px 16px}.eyebrow{font-size:10px;letter-spacing:1.7px;text-transform:uppercase;color:var(--muted);font-weight:750;margin:4px 2px 6px}h1{font-size:23px;margin:0 2px 15px;color:var(--blue-dark)}
+.grid{display:grid;grid-template-columns:1fr;gap:12px}.tile{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:21px 18px;min-height:120px;text-align:left;box-shadow:var(--shadow);color:var(--espresso);display:flex;align-items:center;gap:17px}.tile:active{transform:scale(.985)}.ico{font-size:31px;color:var(--blue-dark);min-width:42px;text-align:center}.tile strong{display:block;font-size:18px;line-height:1.2}.tile small{display:block;color:var(--muted);font-size:13px;line-height:1.4;margin-top:6px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:17px;margin:14px 0;box-shadow:var(--shadow)}.card h2{font-size:17px;margin:0 0 7px;color:var(--blue-dark)}.muted{color:var(--muted);font-size:13px;line-height:1.45}.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.pill{font-size:11px;padding:6px 9px;border-radius:30px;background:var(--blue-light);color:var(--blue-dark);font-weight:700}.listitem{padding:13px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px}.listitem:last-child{border:0}.back{border:0;background:transparent;color:var(--blue-dark);font-weight:750;padding:0 0 15px}.hidden{display:none!important}.notice{background:#e8eee7;color:#53644b;border-radius:14px;padding:12px;font-size:12px;line-height:1.4;margin-top:12px}
+.bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(520px,100%);display:grid;grid-template-columns:repeat(2,1fr);background:#fffdf8f2;backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:9px 8px calc(9px + env(safe-area-inset-bottom));z-index:5}.nav{border:0;background:transparent;color:var(--muted);font-size:10px;padding:5px 2px}.nav span{display:block;font-size:20px;margin-bottom:3px}.nav.active{color:var(--blue-dark);font-weight:800}
+footer{text-align:center;color:#9a8e81;font-size:10px;padding:8px 0 18px}
+@media(min-width:600px){body{padding:24px 0}.app{border-radius:28px;overflow:hidden;min-height:850px;box-shadow:0 15px 50px #34271d20}.bottom{bottom:24px;border-radius:0 0 28px 28px}}
+</style></head>
+<body><div class="app">
+<header><div class="topline"><div class="brandmark"><img src="mascot-izikofe.jpg" alt="ИзиКофе — маскот ИзиКента"><div class="sub">Операционный помощник ИзиКофе</div></div><div class="avatar">☕</div></div><div class="hello">Привет, команда!</div><div class="hello-sub">Все рабочие функции — в одном месте.</div></header>
+<main>
+<section id="home"><div class="eyebrow">Рабочее пространство</div><h1>Главное меню</h1>
+<div class="grid"><button class="tile" data-page="loans"><div class="ico">⇄</div><div><strong>Займы и возвраты</strong><small>Занять товар, вернуть и посмотреть сверку между точками</small></div></button></div>
+<div class="card"><div class="row"><h2>Обратная связь</h2><span class="pill">Остаётся в MAX</span></div><p class="muted">Сбор отзывов и ежедневные отчёты продолжают работать в существующем MAX-боте. В приложение этот раздел пока не переносим.</p></div>
+<div class="notice">В приложении пока оставляем только действующий модуль займов и возвратов. Новые функции не добавляем.</div>
+</section>
+<section id="loans" class="hidden"><button class="back" data-page="home">← Главное меню</button><div class="eyebrow">Действующая функция MAX-бота</div><h1>Займы и возвраты</h1>
+<div class="card"><h2>Операции</h2><div class="listitem"><span>📤 Занять товар</span><span class="pill">Есть в боте</span></div><div class="listitem"><span>📥 Вернуть товар</span><span class="pill">Есть в боте</span></div><div class="listitem"><span>📊 Сверка задолженностей</span><span class="pill">Есть в боте</span></div><p class="muted">Сохраняем существующую логику выбора точек, сотрудника, товара, количества и единицы измерения, а также правила возврата и сверки.</p></div>
+<div class="notice">Это экран-прототип. Подключение к действующей функции и проверку операций сделаем следующим этапом.</div></section>
+<footer>ИЗИКОФЕ · ИЗИКЕНТ · ПРОТОТИП</footer></main>
+<nav class="bottom"><button class="nav active" data-page="home"><span>⌂</span>Главная</button><button class="nav" data-page="loans"><span>⇄</span>Займы</button></nav>
+</div>
+<script>
+const pages=[...document.querySelectorAll('main section')];
+function showPage(id){pages.forEach(p=>p.classList.toggle('hidden',p.id!==id));document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('active',b.dataset.page===id));window.scrollTo({top:0,behavior:'smooth'});}
+document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
+if('serviceWorker'in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script></body></html>
