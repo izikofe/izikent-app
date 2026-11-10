@@ -2,23 +2,23 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#607f87"><meta name="app-version" content="7.5-cakes-users-fixed"><meta name="description" content="ИзиКент — помощник команды ИзиКофе">
+<meta name="theme-color" content="#607f87"><meta name="app-version" content="7.6-izikent-design10-profile"><meta name="description" content="ИзиКент — помощник команды ИзиКофе">
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml">
 <title>ИзиКент</title>
 <style>
 :root{--blue:#607f87;--blue-dark:#355762;--blue-light:#dce7e7;--cream:#f6f0e6;--paper:#fffdf8;--espresso:#392820;--line:#e6ddd0;--muted:#82786f;--shadow:0 8px 24px rgba(54,43,34,.08)}
 *{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--espresso);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input{font:inherit}button{cursor:pointer}
 .app{max-width:520px;min-height:100vh;margin:0 auto;background:linear-gradient(180deg,#f9f5ed,#f2ece1);padding-bottom:82px}
-header{background:var(--blue);color:#fff;padding:22px 22px 25px;border-radius:0 0 28px 28px;position:relative;overflow:hidden}.logout-btn{position:absolute;z-index:2;top:14px;right:14px;border:1px solid #ffffff80;background:#ffffff20;color:#fff;border-radius:20px;padding:8px 11px;font-size:12px;font-weight:700}.logout-btn:active{transform:scale(.97)}
-header:after{content:"";position:absolute;width:230px;height:230px;border:1px solid #ffffff40;border-radius:50%;right:-90px;top:-125px}
-.topline{display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
-.brandmark{width:100%;display:flex;justify-content:center;align-items:center}
-.brandmark img{display:block;width:250px;height:250px;max-width:80%;object-fit:contain;object-position:center;margin:-5px auto -12px;border-radius:0}
-.hello{margin-top:6px;font-size:23px;font-weight:750}.hello-sub{font-size:14px;opacity:.9;margin-top:5px}
+header{background:linear-gradient(135deg,var(--blue-dark),#244650);color:#fff;padding:22px 22px 31px;border-radius:0 0 30px 30px;position:relative;overflow:hidden}
+header:before{content:"";position:absolute;left:-8%;bottom:-23px;width:116%;height:48px;background:linear-gradient(180deg,#f9f5ed,#f6f0e6);border-radius:48% 52% 0 0 / 75% 80% 0 0;transform:rotate(-2deg);z-index:1}
+header:after{content:"";position:absolute;width:190px;height:190px;background:#ffffff12;border-radius:50%;right:-95px;top:-95px}
+.header-row{display:flex;align-items:flex-start;justify-content:space-between;position:relative;z-index:2;gap:12px}.brand-title{font-size:27px;line-height:1.1;font-weight:850;letter-spacing:-.7px}.brand-subtitle{font-size:14px;line-height:1.35;opacity:.9;margin-top:7px;max-width:230px}.logout-btn{border:1px solid #ffffff55;background:#ffffff18;color:#fff;border-radius:15px;padding:8px 10px;font-size:12px;font-weight:700;white-space:nowrap}.logout-btn:active{transform:scale(.97)}
+.hello{position:relative;z-index:2;margin-top:27px;font-size:22px;font-weight:800;color:#fff}.hello-sub{display:none}
 main{padding:20px 16px}.eyebrow{font-size:10px;letter-spacing:1.7px;text-transform:uppercase;color:var(--muted);font-weight:750;margin:4px 2px 6px}h1{font-size:23px;margin:0 2px 15px;color:var(--blue-dark)}
-.grid{display:grid;grid-template-columns:1fr;gap:12px}.tile{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:21px 18px;min-height:120px;text-align:left;box-shadow:var(--shadow);color:var(--espresso);display:flex;align-items:center;gap:17px;width:100%}.tile:active{transform:scale(.985)}.ico{font-size:31px;color:var(--blue-dark);min-width:42px;text-align:center}.tile strong{display:block;font-size:18px;line-height:1.2}.tile small{display:block;color:var(--muted);font-size:13px;line-height:1.4;margin-top:6px}
+.grid{display:grid;grid-template-columns:1fr;gap:12px}.tile{background:var(--paper);border:1px solid #eee7dd;border-radius:19px;padding:10px 13px 10px 10px;min-height:88px;text-align:left;box-shadow:0 5px 12px rgba(54,43,34,.11);color:var(--espresso);display:flex;align-items:center;gap:13px;width:100%;position:relative}.tile:active{transform:scale(.985)}.ico{font-size:25px;color:#fff;min-width:58px;width:58px;height:58px;border-radius:15px;display:flex;align-items:center;justify-content:center;text-align:center;background:var(--blue-dark);box-shadow:0 3px 7px #00000018}.ico.brown{background:#875637}.ico.green{background:#527f70}.ico.purple{background:#414a78}.ico.teal{background:#2f6870}.tile strong{display:block;font-size:17px;line-height:1.2}.tile small{display:none}.tile:after{content:"›";margin-left:auto;font-size:29px;line-height:1;color:#7d8b8c;padding:0 4px}.tile:disabled{opacity:.82}.tile:disabled:after{content:""}
 .card{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:17px;margin:14px 0;box-shadow:var(--shadow)}.card h2{font-size:17px;margin:0 0 7px;color:var(--blue-dark)}.muted{color:var(--muted);font-size:13px;line-height:1.45}.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.pill{font-size:11px;padding:6px 9px;border-radius:30px;background:var(--blue-light);color:var(--blue-dark);font-weight:700}.listitem{padding:13px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px}.listitem:last-child{border:0}.back{border:0;background:transparent;color:var(--blue-dark);font-weight:750;padding:0 0 15px}.hidden{display:none!important}.notice{background:#e8eee7;color:#53644b;border-radius:14px;padding:12px;font-size:12px;line-height:1.4;margin-top:12px}
-.bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(520px,100%);display:grid;grid-template-columns:repeat(2,1fr);background:#fffdf8f2;backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:9px 8px calc(9px + env(safe-area-inset-bottom));z-index:5}.nav{border:0;background:transparent;color:var(--muted);font-size:10px;padding:5px 2px}.nav span{display:block;font-size:20px;margin-bottom:3px}.nav.active{color:var(--blue-dark);font-weight:800}
+.bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(520px,100%);display:grid;grid-template-columns:repeat(2,1fr);background:#fffdf8f2;backdrop-filter:blur(12px);border:1px solid #eee7dd;border-bottom:0;border-radius:25px 25px 0 0;padding:9px 8px calc(9px + env(safe-area-inset-bottom));z-index:5;box-shadow:0 -4px 18px #39282010}.nav{border:0;background:transparent;color:#8d8984;font-size:11px;padding:5px 2px}.nav span{display:block;font-size:22px;margin-bottom:3px}.nav.active{color:var(--blue-dark);font-weight:800}
+.profile-head{display:flex;align-items:center;gap:14px;padding:18px}.profile-avatar{width:66px;height:66px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--blue);color:#fff;font-size:29px;font-weight:800;flex:none}.profile-name{font-size:21px;font-weight:800;color:var(--espresso)}.profile-role{font-size:14px;color:var(--muted);margin-top:5px}.profile-detail{display:flex;align-items:center;gap:13px;padding:15px 2px;border-bottom:1px solid var(--line)}.profile-detail:last-child{border-bottom:0}.profile-detail-icon{width:38px;height:38px;border-radius:12px;background:var(--blue-light);color:var(--blue-dark);display:flex;align-items:center;justify-content:center;font-size:19px;flex:none}.profile-detail-label{font-size:12px;color:var(--muted)}.profile-detail-value{font-size:15px;font-weight:750;margin-top:4px;color:var(--espresso)}
 footer{text-align:center;color:#9a8e81;font-size:10px;padding:8px 0 18px}
 .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:18px}.login-card{width:100%;max-width:440px;background:var(--paper);border:1px solid var(--line);border-radius:24px;padding:22px;box-shadow:var(--shadow)}.login-logo{display:block;width:190px;height:190px;object-fit:contain;margin:-5px auto 5px}.login-card h1{text-align:center;margin:0 0 7px}.login-card .muted{text-align:center;margin:0 0 20px}.field-label{display:block;font-size:13px;font-weight:700;color:var(--blue-dark);margin:14px 0 7px}.select,.pin{width:100%;border:1px solid var(--line);border-radius:13px;background:#fff;padding:14px;color:var(--espresso);outline:none}.pin{text-align:center;font-size:22px;letter-spacing:8px}.primary{width:100%;border:0;border-radius:14px;background:var(--blue-dark);color:white;font-weight:750;padding:15px;margin-top:18px}.primary:disabled{opacity:.55;cursor:wait}.error{color:#a33b32;font-size:13px;line-height:1.4;margin-top:12px;min-height:18px}.login-foot{text-align:center;color:var(--muted);font-size:11px;margin-top:18px}
 @media(min-width:600px){body{padding:24px 0}.app{border-radius:28px;overflow:hidden;min-height:850px;box-shadow:0 15px 50px #34271d20}.bottom{bottom:24px;border-radius:0 0 28px 28px}}
@@ -41,18 +41,18 @@ footer{text-align:center;color:#9a8e81;font-size:10px;padding:8px 0 18px}
   </div>
 </section>
 <div class="app hidden" id="appScreen">
-<header><button class="logout-btn" id="logoutButton" type="button">Выйти ↗</button><div class="topline"><div class="brandmark"><img src="mascot-izikent.png" alt="ИзиКент"></div></div><div class="hello" id="helloText">Привет, команда!</div><div class="hello-sub">Все рабочие функции — в одном месте.</div></header>
+<header><div class="header-row"><div><div class="brand-title">ИзиКент</div><div class="brand-subtitle">Помощник команды<br>ИзиКофе</div></div><button class="logout-btn" id="logoutButton" type="button">Выйти ↗</button></div><div class="hello" id="helloText">Привет, команда! 👋</div></header>
 <main>
 <section id="home"><div class="eyebrow">Рабочее пространство</div><h1>Главное меню</h1>
 <div class="grid"><button class="tile" data-page="loans"><div class="ico">⇄</div><div><strong>Займы и возвраты</strong><small>Занять товар, вернуть и посмотреть сверку между точками</small></div></button></div>
-<div class="grid" style="margin-top:12px"><button class="tile" data-page="cakes"><div class="ico">🎂</div><div><strong>Торты</strong><small>Записать количество тортов по торговым точкам</small></div></button></div>
+<div class="grid" style="margin-top:12px"><button class="tile" data-page="cakes"><div class="ico brown">♧</div><div><strong>Торты</strong><small>Записать количество тортов по торговым точкам</small></div></button></div>
 <div class="grid" style="margin-top:12px">
-<button class="tile" type="button" disabled aria-label="Отработка процентов потерь — скоро"><div class="ico">％</div><div style="flex:1"><strong>Отработка % потерь</strong><small>Учёт отработки потерь</small></div><span class="pill">Скоро</span></button>
+<button class="tile" type="button" disabled aria-label="Отработка процентов потерь — скоро"><div class="ico green">♙</div><div style="flex:1"><strong>Отработка % потерь</strong><small>Учёт отработки потерь</small></div><span class="pill">Скоро</span></button>
 </div>
 <div class="grid" style="margin-top:12px">
-<button class="tile" type="button" disabled aria-label="Списание ЗЦ — скоро"><div class="ico">🧾</div><div style="flex:1"><strong>Списание ЗЦ</strong><small>Учёт списаний</small></div><span class="pill">Скоро</span></button>
+<button class="tile" type="button" disabled aria-label="Списание ЗЦ — скоро"><div class="ico purple">▤</div><div style="flex:1"><strong>Списание ЗЦ</strong><small>Учёт списаний</small></div><span class="pill">Скоро</span></button>
 </div>
-<div class="grid" style="margin-top:12px"><button class="tile hidden" id="usersTile" data-page="users"><div class="ico">＋</div><div><strong>Пользователи</strong><small>Добавить сотрудника, PIN-код и роль</small></div></button></div>
+<div class="grid" style="margin-top:12px"><button class="tile hidden" id="usersTile" data-page="users"><div class="ico teal">♧</div><div><strong>Пользователи</strong><small>Добавить сотрудника, PIN-код и роль</small></div></button></div>
 <div class="card"><div class="row"><h2>Обратная связь</h2><span class="pill">Остаётся в MAX</span></div><p class="muted">Сбор отзывов и ежедневные отчёты продолжают работать в существующем MAX-боте. В приложение этот раздел пока не переносим.</p></div>
 <div class="notice">Займы, возвраты и сверка задолженностей доступны в приложении. Обратная связь и ежедневные отчёты остаются в MAX-боте.</div>
 </section>
@@ -107,8 +107,9 @@ footer{text-align:center;color:#9a8e81;font-size:10px;padding:8px 0 18px}
 <button class="primary" id="createUserButton" type="submit">Добавить пользователя</button><div class="error" id="createUserError" role="alert"></div><div class="notice hidden" id="createUserSuccess" role="status"></div>
 </form></div>
 <div class="card"><h2>Список пользователей</h2><div id="usersList" class="muted">Загружаем список…</div></div></section>
+<section id="profile" class="hidden"><div class="eyebrow">Личная информация</div><h1>Профиль</h1><div class="card profile-head"><div class="profile-avatar" id="profileAvatar">И</div><div><div class="profile-name" id="profileName">Сотрудник</div><div class="profile-role" id="profileRole">Должность не указана</div></div></div><div class="card"><div class="profile-detail"><div class="profile-detail-icon">▣</div><div><div class="profile-detail-label">Должность</div><div class="profile-detail-value" id="profileRoleValue">Не указана</div></div></div><div class="profile-detail"><div class="profile-detail-icon">▦</div><div><div class="profile-detail-label">Дата начала работы</div><div class="profile-detail-value" id="profileStartDate">Пока не указана</div></div></div><div class="profile-detail"><div class="profile-detail-icon">◷</div><div><div class="profile-detail-label">Стаж</div><div class="profile-detail-value" id="profileTenure">Рассчитается после добавления даты</div></div></div></div><p class="muted">Данные профиля будут заполняться из базы сотрудников.</p></section>
 <footer>ИЗИКОФЕ · ИЗИКЕНТ</footer></main>
-<nav class="bottom"><button class="nav active" data-page="home"><span>⌂</span>Главная</button><button class="nav" data-page="loans"><span>⇄</span>Займы</button></nav>
+<nav class="bottom"><button class="nav active" data-page="home"><span>⌂</span>Главная</button><button class="nav" data-page="profile"><span>♙</span>Профиль</button></nav>
 </div>
 <script>
 const API_URL='https://functions.yandexcloud.net/d4e9o48innf9ebn71t54';
@@ -150,11 +151,27 @@ let cakesListsLoaded=false;
 let returnDebtChoices=[];
 let borrowItemCount=0;
 
+function calculateTenure(value){
+  const start=new Date(value+'T00:00:00');
+  if(Number.isNaN(start.getTime())||start>Date.now())return 'Дата не заполнена корректно';
+  const now=new Date();let years=now.getFullYear()-start.getFullYear();let months=now.getMonth()-start.getMonth();
+  if(now.getDate()<start.getDate())months--;
+  if(months<0){years--;months+=12;}
+  const parts=[];if(years)parts.push(years+' '+(years===1?'год':years<5?'года':'лет'));if(months||!years)parts.push(months+' '+(months===1?'месяц':months<5?'месяца':'месяцев'));
+  return parts.join(' ');
+}
 function showApp(user){
   loginScreen.classList.add('hidden');
   appScreen.classList.remove('hidden');
-  document.getElementById('helloText').textContent='Привет, '+user.name+'!';
+  document.getElementById('helloText').textContent='Привет, '+user.name+'! 👋';
   usersTile.classList.toggle('hidden', user.name!=='Максим');
+  document.getElementById('profileName').textContent=user.name||'Сотрудник';
+  document.getElementById('profileAvatar').textContent=(user.name||'И').trim().charAt(0).toUpperCase();
+  const role=user.role||'Не указана';
+  document.getElementById('profileRole').textContent=role;
+  document.getElementById('profileRoleValue').textContent=role;
+  document.getElementById('profileStartDate').textContent=user.start_date||'Пока не указана';
+  document.getElementById('profileTenure').textContent=user.start_date?calculateTenure(user.start_date):'Рассчитается после добавления даты';
 }
 function showLogin(){
   appScreen.classList.add('hidden');
@@ -485,7 +502,7 @@ borrowForm.addEventListener('submit', async (event)=>{
 const pages=[...document.querySelectorAll('main section')];
 function showPage(id){
   pages.forEach(p=>p.classList.toggle('hidden',p.id!==id));
-  document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('active',b.dataset.page===id));
+  document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('active',b.dataset.page===(id==='profile'?'profile':'home')));
   if(id==='users')loadUsersList();
   if(id==='reconcile')showReconcile();
   if(id==='cakes')openCakesPage();
