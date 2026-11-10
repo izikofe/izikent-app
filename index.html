@@ -1,385 +1,447 @@
-<!doctype html>
-<html lang="ru">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#607f87">
-<meta name="description" content="ИзиКент — помощник команды ИзиКофе">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icon.svg" type="image/svg+xml">
-<title>ИзиКент</title>
-<style>
-:root{--blue:#607f87;--blue-dark:#355762;--blue-light:#dce7e7;--cream:#f6f0e6;--paper:#fffdf8;--espresso:#392820;--line:#e6ddd0;--muted:#82786f;--shadow:0 8px 24px rgba(54,43,34,.08)}
-*{box-sizing:border-box}
-body{margin:0;background:var(--cream);color:var(--espresso);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
-button,input{font:inherit}
-button{cursor:pointer}
-.app{max-width:520px;min-height:100vh;margin:0 auto;background:linear-gradient(180deg,#f9f5ed,#f2ece1);padding-bottom:82px}
-header{background:var(--blue);color:#fff;padding:22px 22px 25px;border-radius:0 0 28px 28px;position:relative;overflow:hidden}
-header:after{content:"";position:absolute;width:230px;height:230px;border:1px solid #ffffff40;border-radius:50%;right:-90px;top:-125px}
-.topline{display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
-.brandmark{width:100%;display:flex;justify-content:center;align-items:center}
-.brandmark img{display:block;width:250px;height:250px;max-width:80%;object-fit:contain;object-position:center;margin:-5px auto -12px;border-radius:0}
-.hello{margin-top:6px;font-size:23px;font-weight:750}
-.hello-sub{font-size:14px;opacity:.9;margin-top:5px}
-main{padding:20px 16px}
-.eyebrow{font-size:10px;letter-spacing:1.7px;text-transform:uppercase;color:var(--muted);font-weight:750;margin:4px 2px 6px}
-h1{font-size:23px;margin:0 2px 15px;color:var(--blue-dark)}
-.grid{display:grid;grid-template-columns:1fr;gap:12px}
-.tile{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:21px 18px;min-height:120px;text-align:left;box-shadow:var(--shadow);color:var(--espresso);display:flex;align-items:center;gap:17px;width:100%}
-.tile:active{transform:scale(.985)}
-.ico{font-size:31px;color:var(--blue-dark);min-width:42px;text-align:center}
-.tile strong{display:block;font-size:18px;line-height:1.2}
-.tile small{display:block;color:var(--muted);font-size:13px;line-height:1.4;margin-top:6px}
-.card{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:17px;margin:14px 0;box-shadow:var(--shadow)}
-.card h2{font-size:17px;margin:0 0 7px;color:var(--blue-dark)}
-.muted{color:var(--muted);font-size:13px;line-height:1.45}
-.row{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.pill{font-size:11px;padding:6px 9px;border-radius:30px;background:var(--blue-light);color:var(--blue-dark);font-weight:700}
-.listitem{padding:13px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px}
-.listitem:last-child{border:0}
-.back{border:0;background:transparent;color:var(--blue-dark);font-weight:750;padding:0 0 15px}
-.hidden{display:none!important}
-.notice{background:#e8eee7;color:#53644b;border-radius:14px;padding:12px;font-size:12px;line-height:1.4;margin-top:12px}
-.bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(520px,100%);display:grid;grid-template-columns:repeat(2,1fr);background:#fffdf8f2;backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:9px 8px calc(9px + env(safe-area-inset-bottom));z-index:5}
-.nav{border:0;background:transparent;color:var(--muted);font-size:10px;padding:5px 2px}
-.nav span{display:block;font-size:20px;margin-bottom:3px}
-.nav.active{color:var(--blue-dark);font-weight:800}
-footer{text-align:center;color:#9a8e81;font-size:10px;padding:8px 0 18px}
-.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:18px}
-.login-card{width:100%;max-width:440px;background:var(--paper);border:1px solid var(--line);border-radius:24px;padding:22px;box-shadow:var(--shadow)}
-.login-logo{display:block;width:190px;height:190px;object-fit:contain;margin:-5px auto 5px}
-.login-card h1{text-align:center;margin:0 0 7px}
-.login-card .muted{text-align:center;margin:0 0 20px}
-.field-label{display:block;font-size:13px;font-weight:700;color:var(--blue-dark);margin:14px 0 7px}
-.select,.pin{width:100%;border:1px solid var(--line);border-radius:13px;background:#fff;padding:14px;color:var(--espresso);outline:none}
-.pin{text-align:center;font-size:22px;letter-spacing:8px}
-.primary{width:100%;border:0;border-radius:14px;background:var(--blue-dark);color:white;font-weight:750;padding:15px;margin-top:18px}
-.primary:disabled{opacity:.55;cursor:wait}
-.error{color:#a33b32;font-size:13px;line-height:1.4;margin-top:12px;min-height:18px}
-.login-foot{text-align:center;color:var(--muted);font-size:11px;margin-top:18px}
-@media(min-width:600px){body{padding:24px 0}.app{border-radius:28px;overflow:hidden;min-height:850px;box-shadow:0 15px 50px #34271d20}.bottom{bottom:24px;border-radius:0 0 28px 28px}}
-</style>
-</head>
-<body>
+"""
+ИзиКент App API — версия 2 (основа авторизации).
+Отдельная Yandex Cloud Function; MAX-бот не затрагивается.
 
-<section id="loginScreen" class="login-wrap">
-  <div class="login-card">
-    <img class="login-logo" src="mascot-izikent.png" alt="ИзиКент">
-    <h1>Вход в ИзиКент</h1>
-    <p class="muted">Выбери своё имя и введи PIN-код</p>
-    <form id="loginForm">
-      <label class="field-label" for="employee">Сотрудник</label>
-      <select class="select" id="employee" required>
-        <option value="Максим">Максим</option>
-        <option value="Розалия">Розалия</option>
-      </select>
-      <label class="field-label" for="pin">PIN-код</label>
-      <input class="pin" id="pin" type="password" inputmode="numeric" pattern="[0-9]{8}" maxlength="8" minlength="8" placeholder="••••••••" autocomplete="current-password" required>
-      <button class="primary" id="loginButton" type="submit">Войти</button>
-      <div class="error" id="loginError" role="alert"></div>
-    </form>
-    <div class="login-foot">ИЗИКОФЕ · ИЗИКЕНТ</div>
-  </div>
-</section>
+Публичные:
+  GET ?action=health
+  GET ?action=places
+  POST ?action=login   JSON: {"name":"Максим","pin":"12345678"}
 
-<div class="app hidden" id="appScreen">
-<header>
-  <div class="topline"><div class="brandmark"><img src="mascot-izikent.png" alt="ИзиКент"></div></div>
-  <div class="hello" id="helloText">Привет, команда!</div>
-  <div class="hello-sub">Все рабочие функции — в одном месте.</div>
-</header>
+Защищённые:
+  GET  ?action=google-check
+  POST ?action=borrow  JSON: {"borrower":"Сиреневая","lender":"Партизанская",
+                              "product":"Молоко","quantity":"6","unit":"л",
+                              "request_id":"уникальный-id"}
+  Оба запроса требуют Authorization: Bearer <token>.
 
-<main>
-<section id="home">
-  <div class="eyebrow">Рабочее пространство</div>
-  <h1>Главное меню</h1>
-  <div class="grid">
-    <button class="tile" data-page="loans">
-      <div class="ico">⇄</div>
-      <div><strong>Займы и возвраты</strong><small>Занять товар, вернуть и посмотреть сверку между точками</small></div>
-    </button>
-  </div>
-  <div class="card">
-    <div class="row"><h2>Обратная связь</h2><span class="pill">Остаётся в MAX</span></div>
-    <p class="muted">Сбор отзывов и ежедневные отчёты продолжают работать в существующем MAX-боте. В приложение этот раздел пока не переносим.</p>
-  </div>
-  <div class="notice">В приложении пока оставляем только действующий модуль займов и возвратов. Новые функции не добавляем.</div>
-</section>
+Переменные окружения:
+  GOOGLE_SERVICE_ACCOUNT_JSON
+  MAXIM_PIN
+  ROZALIA_PIN
+  SESSION_SECRET
 
-<section id="loans" class="hidden">
-  <button class="back" data-page="home">← Главное меню</button>
-  <div class="eyebrow">Займы и возвраты</div>
-  <h1>Операции между точками</h1>
+ВНИМАНИЕ:
+- Это первый тестовый write endpoint для операции «Занять».
+- Повторная отправка с тем же request_id проверяется по скрытой колонке I.
+- Перед рабочим запуском добавьте серверное ограничение частоты входа
+  и более строгую защиту от конкурентных повторных запросов.
+"""
+import base64
+import hashlib
+import hmac
+import json
+import os
+import time
+import re
+import secrets
+from decimal import Decimal, InvalidOperation
+from datetime import datetime
+from zoneinfo import ZoneInfo
+from urllib.parse import parse_qs
 
-  <div class="card">
-    <h2>📤 Занять товар</h2>
-    <p class="muted">Заполни данные. Перед записью приложение покажет подтверждение.</p>
-    <form id="borrowForm">
-      <label class="field-label" for="borrower">Какая точка заняла?</label>
-      <select class="select" id="borrower" required>
-        <option value="">Выбери точку</option>
-        <option>Сиреневая</option>
-        <option>Партизанская</option>
-        <option>Солнечная Поляна</option>
-        <option>Георгия Исакова</option>
-      </select>
+from google.auth.transport.requests import AuthorizedSession
+from google.oauth2 import service_account
 
-      <label class="field-label" for="lender">У какой точки заняли?</label>
-      <select class="select" id="lender" required>
-        <option value="">Выбери точку</option>
-        <option>Сиреневая</option>
-        <option>Партизанская</option>
-        <option>Солнечная Поляна</option>
-        <option>Георгия Исакова</option>
-      </select>
-
-      <label class="field-label" for="borrowProduct">Продукт</label>
-      <input class="select" id="borrowProduct" type="text" maxlength="90" placeholder="Например, Молоко" required>
-
-      <label class="field-label" for="borrowQuantity">Количество</label>
-      <input class="select" id="borrowQuantity" type="text" inputmode="decimal" placeholder="Например, 6 или 1,5" required>
-
-      <label class="field-label" for="borrowUnit">Единица измерения</label>
-      <select class="select" id="borrowUnit" required>
-        <option value="шт">шт</option>
-        <option value="кг">кг</option>
-        <option value="г">г</option>
-        <option value="л">л</option>
-        <option value="мл">мл</option>
-      </select>
-
-      <button class="primary" id="borrowButton" type="submit">Продолжить</button>
-      <div class="error" id="borrowError" role="alert"></div>
-      <div class="notice hidden" id="borrowSuccess" role="status"></div>
-    </form>
-  </div>
-
-  <div class="card">
-    <h2>Другие операции</h2>
-    <div class="listitem"><span>📥 Вернуть товар</span><span class="pill">Следующий этап</span></div>
-    <div class="listitem"><span>📊 Сверка задолженностей</span><span class="pill">Следующий этап</span></div>
-    <p class="muted">Возвраты и сверку подключим отдельно, сохранив правила существующего MAX-бота.</p>
-  </div>
-</section>
-
-<footer>ИЗИКОФЕ · ИЗИКЕНТ</footer>
-</main>
-
-<nav class="bottom">
-  <button class="nav active" data-page="home"><span>⌂</span>Главная</button>
-  <button class="nav" data-page="loans"><span>⇄</span>Займы</button>
-</nav>
-</div>
-
-<script>
-const API_URL='https://functions.yandexcloud.net/d4e9o48innf9ebn71t54';
-const SESSION_KEY='izikent_session_v1';
-
-const loginScreen=document.getElementById('loginScreen');
-const appScreen=document.getElementById('appScreen');
-const loginForm=document.getElementById('loginForm');
-const loginButton=document.getElementById('loginButton');
-const loginError=document.getElementById('loginError');
-const pinInput=document.getElementById('pin');
-
-const borrowForm=document.getElementById('borrowForm');
-const borrowButton=document.getElementById('borrowButton');
-const borrowError=document.getElementById('borrowError');
-const borrowSuccess=document.getElementById('borrowSuccess');
-
-function showApp(user){
-  loginScreen.classList.add('hidden');
-  appScreen.classList.remove('hidden');
-  document.getElementById('helloText').textContent='Привет, '+user.name+'!';
+SPREADSHEET_ID = "12VvwkWePVlf_uW1roWxCyAoZb8NFWdWJbHBTrzjKcIM"
+SHEET_NAME = "ЗАЙМ"
+USERS_SHEET = "ПОЛЬЗОВАТЕЛИ"
+TIMEOUT = 20
+SESSION_TTL_SECONDS = 8 * 60 * 60
+BARNAUL_TZ = ZoneInfo("Asia/Barnaul")
+USERS = {
+    "Максим": {"role": "Шеф", "env": "MAXIM_PIN"},
+    "Розалия": {"role": "Технолог", "env": "ROZALIA_PIN"},
 }
+PLACES = ["Сиреневая", "Партизанская", "Солнечная Поляна", "Георгия Исакова"]
 
-function showLogin(){
-  appScreen.classList.add('hidden');
-  loginScreen.classList.remove('hidden');
-}
 
-function decodeTokenPayload(token){
-  try{
-    const part=token.split('.')[0].replace(/-/g,'+').replace(/_/g,'/');
-    const padded=part+'='.repeat((4-part.length%4)%4);
-    return JSON.parse(atob(padded));
-  }catch(e){return null;}
-}
-
-function restoreSession(){
-  try{
-    const session=JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null');
-    if(!session||!session.token)return false;
-    const payload=decodeTokenPayload(session.token);
-    if(!payload||!payload.exp||payload.exp*1000<=Date.now()){
-      sessionStorage.removeItem(SESSION_KEY);
-      return false;
-    }
-    showApp(session.user||{name:payload.sub});
-    return true;
-  }catch(e){
-    sessionStorage.removeItem(SESSION_KEY);
-    return false;
-  }
-}
-
-loginForm.addEventListener('submit',async(event)=>{
-  event.preventDefault();
-  loginError.textContent='';
-  const name=document.getElementById('employee').value;
-  const pin=pinInput.value.trim();
-
-  if(!/^\d{8}$/.test(pin)){
-    loginError.textContent='Введи PIN-код из 8 цифр.';
-    return;
-  }
-
-  loginButton.disabled=true;
-  loginButton.textContent='Проверяем…';
-
-  try{
-    const response=await fetch(API_URL+'?action=login',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({name,pin})
-    });
-
-    const data=await response.json();
-
-    if(!response.ok||!data.ok||!data.token){
-      loginError.textContent=data.error||'Не удалось войти. Проверь имя и PIN.';
-      return;
+def _response(status, payload):
+    return {
+        "statusCode": status,
+        "headers": {
+            "Content-Type": "application/json; charset=utf-8",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, X-Session-Token",
+            "Cache-Control": "no-store",
+        },
+        "body": json.dumps(payload, ensure_ascii=False),
+        "isBase64Encoded": False,
     }
 
-    sessionStorage.setItem(SESSION_KEY,JSON.stringify({
-      token:data.token,
-      user:data.user,
-      expiresAt:Date.now()+Number(data.expires_in||28800)*1000
-    }));
 
-    pinInput.value='';
-    showApp(data.user);
+def _secret():
+    value = os.environ.get("SESSION_SECRET", "")
+    if len(value) < 32:
+        raise RuntimeError("SESSION_SECRET не задан или слишком короткий")
+    return value.encode("utf-8")
 
-  }catch(error){
-    loginError.textContent='Не удалось связаться с сервером. Проверь интернет и попробуй ещё раз.';
-  }finally{
-    loginButton.disabled=false;
-    loginButton.textContent='Войти';
-  }
-});
 
-borrowForm.addEventListener('submit',async(event)=>{
-  event.preventDefault();
-  borrowError.textContent='';
-  borrowSuccess.classList.add('hidden');
+def _b64(data):
+    return base64.urlsafe_b64encode(data).rstrip(b"=").decode("ascii")
 
-  const session=JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null');
 
-  if(!session||!session.token){
-    borrowError.textContent='Сессия закончилась. Войди в приложение заново.';
-    showLogin();
-    return;
-  }
+def _make_token(name, role):
+    now = int(time.time())
+    payload = {"sub": name, "role": role, "iat": now, "exp": now + SESSION_TTL_SECONDS}
+    encoded = _b64(json.dumps(payload, separators=(",", ":"), ensure_ascii=False).encode("utf-8"))
+    signature = hmac.new(_secret(), encoded.encode("ascii"), hashlib.sha256).digest()
+    return encoded + "." + _b64(signature)
 
-  const borrower=document.getElementById('borrower').value;
-  const lender=document.getElementById('lender').value;
-  const product=document.getElementById('borrowProduct').value.trim();
-  const quantity=document.getElementById('borrowQuantity').value.trim();
-  const unit=document.getElementById('borrowUnit').value;
 
-  if(!borrower||!lender||!product||!quantity){
-    borrowError.textContent='Заполни все поля.';
-    return;
-  }
+def _verify_token(token):
+    try:
+        encoded, signature = token.split(".", 1)
+        expected = hmac.new(_secret(), encoded.encode("ascii"), hashlib.sha256).digest()
+        supplied = base64.urlsafe_b64decode(signature + "=" * (-len(signature) % 4))
+        if not hmac.compare_digest(expected, supplied):
+            return None
+        raw = base64.urlsafe_b64decode(encoded + "=" * (-len(encoded) % 4))
+        payload = json.loads(raw.decode("utf-8"))
+        if int(payload.get("exp", 0)) < int(time.time()):
+            return None
+        if not payload.get("sub") or not payload.get("role"):
+            return None
+        return payload
+    except Exception:
+        return None
 
-  if(borrower===lender){
-    borrowError.textContent='Точка не может занять сама у себя.';
-    return;
-  }
 
-  if(!/^\d+(?:[.,]\d+)?$/.test(quantity)||Number(quantity.replace(',','.'))<=0||Number(quantity.replace(',','.'))>100000){
-    borrowError.textContent='Проверь количество: нужно число больше нуля и не больше 100000.';
-    return;
-  }
+def _users_sheet_metadata(session):
+    url = "https://sheets.googleapis.com/v4/spreadsheets/" + SPREADSHEET_ID
+    response = session.get(url, params={"fields": "sheets.properties(sheetId,title)"}, timeout=TIMEOUT)
+    response.raise_for_status()
+    return response.json().get("sheets", [])
 
-  const employee=session.user?.name||decodeTokenPayload(session.token)?.sub||'Сотрудник';
 
-  const summary=
-    'Проверь займ:\n\n'+
-    'Кто занял: '+borrower+'\n'+
-    'У кого занял: '+lender+'\n'+
-    'Сотрудник: '+employee+'\n'+
-    'Продукт: '+product+'\n'+
-    'Количество: '+quantity+' '+unit+'\n\n'+
-    'Записать эту операцию в журнал?';
+def _write_users_values(session, range_name, values):
+    from urllib.parse import quote
+    url = "https://sheets.googleapis.com/v4/spreadsheets/" + SPREADSHEET_ID + "/values/" + quote(range_name, safe="!'")
+    response = session.put(url, params={"valueInputOption": "RAW"}, json={"values": values}, timeout=TIMEOUT)
+    response.raise_for_status()
+    return response.json()
 
-  if(!window.confirm(summary))return;
 
-  borrowButton.disabled=true;
-  borrowButton.textContent='Записываем…';
+def _ensure_users_sheet(session):
+    sheets = _users_sheet_metadata(session)
+    if any(s.get("properties", {}).get("title") == USERS_SHEET for s in sheets):
+        return
+    url = "https://sheets.googleapis.com/v4/spreadsheets/" + SPREADSHEET_ID + ":batchUpdate"
+    response = session.post(url, json={"requests": [{"addSheet": {"properties": {"title": USERS_SHEET}}}]}, timeout=TIMEOUT)
+    if response.status_code >= 400:
+        if any(s.get("properties", {}).get("title") == USERS_SHEET for s in _users_sheet_metadata(session)):
+            return
+        response.raise_for_status()
+    _write_users_values(session, "'" + USERS_SHEET + "'!A1:E1",
+                        [["Имя", "Роль", "Соль PIN", "Хеш PIN", "Активен"]])
 
-  try{
-    const response=await fetch(API_URL+'?action=borrow',{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'X-Session-Token':session.token
-      },
-      body:JSON.stringify({
-        borrower,
-        lender,
-        product,
-        quantity,
-        unit,
-        request_id:(crypto.randomUUID?crypto.randomUUID():('app_'+Date.now()+'_'+Math.random().toString(36).slice(2)))
-      })
-    });
 
-    const data=await response.json();
+def _read_values(session, range_name):
+    from urllib.parse import quote
+    url = "https://sheets.googleapis.com/v4/spreadsheets/" + SPREADSHEET_ID + "/values/" + quote(range_name, safe="!'")
+    response = session.get(url, timeout=TIMEOUT)
+    response.raise_for_status()
+    return response.json().get("values", [])
 
-    if(response.status===401){
-      sessionStorage.removeItem(SESSION_KEY);
-      showLogin();
-      throw new Error('Сессия закончилась. Войди заново.');
+
+def _append_users_values(session, values):
+    from urllib.parse import quote
+    url = "https://sheets.googleapis.com/v4/spreadsheets/" + SPREADSHEET_ID + "/values/" + quote("'" + USERS_SHEET + "'!A:E", safe="!'") + ":append"
+    response = session.post(url, params={"valueInputOption": "RAW", "insertDataOption": "INSERT_ROWS"},
+                            json={"values": values}, timeout=TIMEOUT)
+    response.raise_for_status()
+    return response.json()
+
+
+def _pin_hash(pin, salt):
+    return hashlib.pbkdf2_hmac("sha256", pin.encode("utf-8"), salt.encode("utf-8"), 240000).hex()
+
+
+def _all_users():
+    session = _google_session()
+    _ensure_users_sheet(session)
+    rows = _read_values(session, "'" + USERS_SHEET + "'!A2:E")
+    users = {
+        name: {"role": info["role"], "env": info["env"], "active": True, "builtin": True}
+        for name, info in USERS.items()
     }
+    for row in rows:
+        if len(row) < 5:
+            continue
+        name, role, salt, pin_digest, active = (row + [""] * 5)[:5]
+        name = _clean_text(name, 50)
+        role = _clean_text(role, 50)
+        if not name or not role:
+            continue
+        users[name] = {"role": role, "salt": salt, "pin_hash": pin_digest,
+                       "active": str(active).strip().upper() in ("TRUE", "1", "ДА"),
+                       "builtin": False}
+    return users
 
-    if(!response.ok||!data.ok){
-      throw new Error(data.error||'Не удалось записать займ.');
+
+def _public_users(users):
+    return [{"name": name, "role": info["role"]} for name, info in users.items() if info.get("active")]
+
+
+def _user_pin_valid(pin, info):
+    if info.get("builtin"):
+        expected = os.environ.get(info["env"], "")
+        return bool(expected) and hmac.compare_digest(pin, expected)
+    salt, digest = info.get("salt", ""), info.get("pin_hash", "")
+    return bool(salt and digest) and hmac.compare_digest(_pin_hash(pin, salt), digest)
+
+
+def _require_admin(user):
+    return bool(user and user.get("sub") == "Максим")
+
+def _google_session():
+    raw = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON", "").strip()
+    if not raw:
+        raise RuntimeError("Не задана переменная GOOGLE_SERVICE_ACCOUNT_JSON")
+    info = json.loads(raw)
+    credentials = service_account.Credentials.from_service_account_info(
+        info, scopes=["https://www.googleapis.com/auth/spreadsheets"]
+    )
+    return AuthorizedSession(credentials)
+
+
+def _read_journal():
+    url = (
+        "https://sheets.googleapis.com/v4/spreadsheets/"
+        + SPREADSHEET_ID
+        + "/values/%27"
+        + SHEET_NAME
+        + "%27!A5:I"
+    )
+    response = _google_session().get(url, timeout=TIMEOUT)
+    response.raise_for_status()
+    return response.json().get("values", [])
+
+
+def _params(event):
+    params = dict(event.get("queryStringParameters") or {})
+    raw_query = event.get("rawQueryString") or ""
+    if raw_query:
+        for key, values in parse_qs(raw_query, keep_blank_values=True).items():
+            if values and key not in params:
+                params[key] = values[-1]
+    return params
+
+
+def _body(event):
+    body = event.get("body")
+    if isinstance(body, dict):
+        return body
+    if isinstance(body, str) and body:
+        if event.get("isBase64Encoded"):
+            body = base64.b64decode(body).decode("utf-8")
+        parsed = json.loads(body)
+        return parsed if isinstance(parsed, dict) else {}
+    return {}
+
+
+def _action(event):
+    action = _params(event).get("action")
+    if action:
+        return str(action)
+    path = str(event.get("path") or event.get("rawPath") or "/").rstrip("/") or "/"
+    for suffix, name in (("/health", "health"), ("/places", "places"), ("/google-check", "google-check"), ("/users", "users")):
+        if path.endswith(suffix):
+            return name
+    return "health" if path == "/" else ""
+
+
+def _authorized_user(event):
+    headers = {str(k).lower(): v for k, v in (event.get("headers") or {}).items()}
+    token = str(headers.get("x-session-token") or "").strip()
+    if not token:
+        return None
+    return _verify_token(token)
+
+
+
+def _clean_text(value, limit):
+    return re.sub(r"\s+", " ", str(value or "")).strip()[:limit]
+
+
+def _normalize_unit(value):
+    value = _clean_text(value, 20).casefold().replace(".", "")
+    aliases = {
+        "литр": "л", "литра": "л", "литров": "л", "л": "л",
+        "килограмм": "кг", "килограмма": "кг", "килограммов": "кг", "кг": "кг",
+        "грамм": "г", "грамма": "г", "граммов": "г", "гр": "г", "г": "г",
+        "штука": "шт", "штуки": "шт", "штук": "шт", "шт": "шт",
+        "миллилитр": "мл", "миллилитров": "мл", "мл": "мл",
     }
+    if value not in aliases:
+        raise ValueError("Единица измерения: шт, кг, г, л или мл")
+    return aliases[value]
 
-    borrowSuccess.textContent=data.duplicate
-      ?'Эта операция уже была записана.'
-      :'Займ записан в журнал.';
 
-    borrowSuccess.classList.remove('hidden');
-    borrowForm.reset();
+def _validate_borrow(data, user):
+    borrower = _clean_text(data.get("borrower"), 80)
+    lender = _clean_text(data.get("lender"), 80)
+    if borrower not in PLACES or lender not in PLACES:
+        raise ValueError("Выбери точки из списка")
+    if borrower == lender:
+        raise ValueError("Точка не может занять сама у себя")
+    product = _clean_text(data.get("product"), 90)
+    if not product:
+        raise ValueError("Укажи название товара")
+    product = product[:1].upper() + product[1:]
+    try:
+        amount = Decimal(_clean_text(data.get("quantity"), 30).replace(",", "."))
+    except (InvalidOperation, ValueError):
+        raise ValueError("Количество должно быть числом")
+    if not amount.is_finite() or amount <= 0 or amount > 100000:
+        raise ValueError("Количество должно быть больше нуля")
+    quantity = format(amount.normalize(), "f")
+    unit = _normalize_unit(data.get("unit"))
+    request_id = _clean_text(data.get("request_id"), 80)
+    if not re.fullmatch(r"[A-Za-z0-9_-]{12,80}", request_id):
+        raise ValueError("Не удалось проверить номер операции. Обнови страницу и попробуй ещё раз")
+    employee = user.get("sub")
+    if not employee:
+        raise ValueError("Не удалось определить сотрудника")
+    return borrower, lender, employee, product, quantity, unit, request_id
 
-  }catch(error){
-    borrowError.textContent=error.message||'Ошибка связи с сервером. Попробуй ещё раз.';
-  }finally{
-    borrowButton.disabled=false;
-    borrowButton.textContent='Продолжить';
-  }
-});
 
-const pages=[...document.querySelectorAll('main section')];
+def _append_borrow(data, user):
+    borrower, lender, employee, product, quantity, unit, request_id = _validate_borrow(data, user)
+    rows = _read_journal()
+    marker = "APP:" + request_id
+    # Колонка I хранит скрытый ID операции, как и в существующем журнале.
+    if any(len(row) > 8 and str(row[8]) == marker for row in rows):
+        return {"duplicate": True, "message": "Эта операция уже была записана"}
+    date_text = datetime.now(BARNAUL_TZ).strftime("%d.%m.%Y")
+    row = [date_text, borrower, lender, employee, product, quantity, unit, "Заняли", marker]
+    url = (
+        "https://sheets.googleapis.com/v4/spreadsheets/"
+        + SPREADSHEET_ID
+        + "/values/%27"
+        + SHEET_NAME
+        + "%27!A:I:append"
+    )
+    response = _google_session().post(
+        url,
+        params={"valueInputOption": "RAW", "insertDataOption": "INSERT_ROWS"},
+        json={"values": [row]},
+        timeout=TIMEOUT,
+    )
+    response.raise_for_status()
+    result = response.json()
+    if not result.get("updates", {}).get("updatedRows"):
+        raise RuntimeError("Google Sheets не подтвердил добавление займа")
+    return {"duplicate": False, "message": "Займ записан", "record": {
+        "date": date_text, "borrower": borrower, "lender": lender,
+        "employee": employee, "product": product, "quantity": quantity,
+        "unit": unit, "action": "Заняли",
+    }}
 
-function showPage(id){
-  pages.forEach(p=>p.classList.toggle('hidden',p.id!==id));
-  document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('active',b.dataset.page===id));
-  window.scrollTo({top:0,behavior:'smooth'});
-}
 
-document.querySelectorAll('[data-page]').forEach(b=>{
-  b.addEventListener('click',()=>showPage(b.dataset.page));
-});
+def handler(event, context):
+    event = event if isinstance(event, dict) else {}
 
-if('serviceWorker'in navigator&&location.protocol.startsWith('http')){
-  navigator.serviceWorker.register('./sw.js').catch(()=>{});
-}
+    # Тест из консоли Yandex Cloud
+    if event.get("action") == "check_google" and not event.get("httpMethod"):
+        try:
+            rows = _read_journal()
+            return {"ok": True, "google_connected": True, "journal_rows": len(rows), "sheet": SHEET_NAME}
+        except Exception as exc:
+            return {"ok": False, "google_connected": False, "error": str(exc)[:300]}
 
-if(!restoreSession())showLogin();
-</script>
-</body>
-</html>
+    method = str(event.get("httpMethod") or event.get("requestContext", {}).get("http", {}).get("method") or "GET").upper()
+    if method == "OPTIONS":
+        return _response(204, {})
+    action = _action(event)
+
+    if action == "health" and method == "GET":
+        return _response(200, {"ok": True, "service": "izikent-app-api", "version": 2})
+    if action == "places" and method == "GET":
+        return _response(200, {"ok": True, "places": PLACES})
+
+    if action == "users" and method == "GET":
+        try:
+            return _response(200, {"ok": True, "users": _public_users(_all_users())})
+        except Exception as exc:
+            return _response(500, {"ok": False, "error": "Не удалось загрузить список пользователей: " + str(exc)[:180]})
+
+    if action == "login" and method == "POST":
+        try:
+            data = _body(event)
+        except Exception:
+            return _response(400, {"ok": False, "error": "Некорректный JSON"})
+        name = _clean_text(data.get("name"), 50)
+        pin = str(data.get("pin") or "")
+        if not name or len(pin) != 8 or not pin.isdigit():
+            return _response(401, {"ok": False, "error": "Неверное имя или PIN"})
+        try:
+            info = _all_users().get(name)
+            if not info or not info.get("active") or not _user_pin_valid(pin, info):
+                return _response(401, {"ok": False, "error": "Неверное имя или PIN"})
+            token = _make_token(name, info["role"])
+        except Exception as exc:
+            return _response(500, {"ok": False, "error": "Не удалось проверить пользователя: " + str(exc)[:180]})
+        return _response(200, {"ok": True, "token": token, "expires_in": SESSION_TTL_SECONDS,
+                               "user": {"name": name, "role": info["role"]}})
+
+    if action == "create-user" and method == "POST":
+        user = _authorized_user(event)
+        if not user:
+            return _response(401, {"ok": False, "error": "Требуется вход"})
+        if not _require_admin(user):
+            return _response(403, {"ok": False, "error": "Создавать пользователей может только Максим"})
+        try:
+            data = _body(event)
+        except Exception:
+            return _response(400, {"ok": False, "error": "Некорректный JSON"})
+        name = _clean_text(data.get("name"), 50)
+        role = _clean_text(data.get("role"), 50)
+        pin = str(data.get("pin") or "")
+        if len(name) < 2:
+            return _response(400, {"ok": False, "error": "Укажи имя сотрудника (минимум 2 символа)"})
+        if not role:
+            return _response(400, {"ok": False, "error": "Укажи роль"})
+        if len(pin) != 8 or not pin.isdigit():
+            return _response(400, {"ok": False, "error": "PIN-код должен состоять из 8 цифр"})
+        if name in USERS:
+            return _response(400, {"ok": False, "error": "Это имя уже занято"})
+        try:
+            session = _google_session()
+            _ensure_users_sheet(session)
+            if name in _all_users():
+                return _response(409, {"ok": False, "error": "Пользователь с таким именем уже существует"})
+            salt = secrets.token_hex(16)
+            _append_users_values(session, [[name, role, salt, _pin_hash(pin, salt), "TRUE"]])
+            return _response(200, {"ok": True, "message": "Пользователь добавлен",
+                                   "user": {"name": name, "role": role}})
+        except Exception as exc:
+            return _response(500, {"ok": False, "error": "Не удалось создать пользователя: " + str(exc)[:180]})
+
+    if action == "google-check" and method == "GET":
+        user = _authorized_user(event)
+        if not user:
+            return _response(401, {"ok": False, "error": "Требуется вход"})
+        try:
+            rows = _read_journal()
+            return _response(200, {
+                "ok": True, "google_connected": True, "journal_rows": len(rows),
+                "sheet": SHEET_NAME, "user": user["sub"],
+            })
+        except Exception as exc:
+            return _response(500, {"ok": False, "google_connected": False, "error": str(exc)[:300]})
+
+    if action == "borrow" and method == "POST":
+        user = _authorized_user(event)
+        if not user:
+            return _response(401, {"ok": False, "error": "Требуется вход"})
+        try:
+            data = _body(event)
+            result = _append_borrow(data, user)
+            return _response(200, {"ok": True, **result})
+        except ValueError as exc:
+            return _response(400, {"ok": False, "error": str(exc)})
+        except Exception as exc:
+            return _response(500, {"ok": False, "error": "Не удалось записать операцию: " + str(exc)[:220]})
+
+    return _response(404, {"ok": False, "error": "Not found"})
