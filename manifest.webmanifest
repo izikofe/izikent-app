@@ -1,0 +1,17 @@
+{
+  "name": "ИзиКент — ИзиКофе",
+  "short_name": "ИзиКент",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f6f0e6",
+  "theme_color": "#607f87",
+  "lang": "ru",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
