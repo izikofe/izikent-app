@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#607f87"><meta name="app-version" content="7.4-cakes-users-coming-soon"><meta name="description" content="ИзиКент — помощник команды ИзиКофе">
+<meta name="theme-color" content="#607f87"><meta name="app-version" content="7.5-cakes-users-fixed"><meta name="description" content="ИзиКент — помощник команды ИзиКофе">
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml">
 <title>ИзиКент</title>
 <style>
@@ -86,8 +86,7 @@ footer{text-align:center;color:#9a8e81;font-size:10px;padding:8px 0 18px}
 </div></section>
 <section id="reconcile" class="hidden"><button class="back" data-page="home">← Главное меню</button><div class="eyebrow">Контроль задолженностей</div><h1>Сверка</h1>
 <div class="card"><div class="row"><h2>Текущие долги</h2><button class="back" id="refreshReconcile" type="button">↻ Обновить</button></div>
-<div id="reconcileDate" class="muted"></div><div id="reconcileContent" style="margin-top:12px">Нажми «Обновить», чтобы загрузить данные.</div></div></section>
-<section id="cakes" class="hidden"><button class="back" data-page="home">← Главное меню</button><div class="eyebrow">Учёт продукции</div><h1>Торты</h1>
+<div id="reconcileDate" class="muted"></div><div id="reconcileContent" style="margin-top:12px">Нажми «Обновить», чтобы загрузить данные.</div></div></section><section id="cakes" class="hidden"><button class="back" data-page="home">← Главное меню</button><div class="eyebrow">Учёт продукции</div><h1>Торты</h1>
 <div class="card"><h2>Новая запись</h2><p class="muted">Дата поставится автоматически. Выбери торт и торговую точку, затем укажи количество целых тортов.</p>
 <form id="cakesForm">
 <label class="field-label" for="cakeName">Наименование торта</label>
@@ -151,7 +150,6 @@ let cakesListsLoaded=false;
 let returnDebtChoices=[];
 let borrowItemCount=0;
 
-
 function showApp(user){
   loginScreen.classList.add('hidden');
   appScreen.classList.remove('hidden');
@@ -189,7 +187,7 @@ async function loadLoginUsers(){
   select.disabled=true;
   loginError.textContent='';
   try{
-    const response=await fetch(API_URL+'?action=users&v='+Date.now(),{cache:'no-store'});
+    const response=await fetch(API_URL+'?action=login-users&v='+Date.now(),{cache:'no-store'});
     const data=await response.json();
     if(!response.ok||!data.ok) throw new Error(data.error||'Ошибка загрузки сотрудников');
     select.innerHTML='<option value="">Выбери сотрудника</option>';
@@ -222,13 +220,11 @@ async function loadUsersList(){
   }catch(error){list.textContent=error.message;}
 }
 
-
-
 async function loadCakesData(force=false){
   if(cakesListsLoaded&&!force)return;
   const session=getSession();
   if(!session?.token)throw new Error('Сессия закончилась. Войди заново.');
-  const response=await fetch(API_URL+'?action=cakes-options',{
+  const response=await fetch(API_URL+'?action=cakes-data',{
     headers:{'X-Session-Token':session.token},cache:'no-store'
   });
   const data=await response.json();
@@ -240,7 +236,7 @@ async function loadCakesData(force=false){
     (items||[]).forEach(value=>{const option=document.createElement('option');option.value=value;option.textContent=value;select.append(option);});
   };
   fill(cakeName,data.cakes,'Выбери торт');
-  fill(cakePlace,data.points,'Выбери торговую точку');
+  fill(cakePlace,data.places,'Выбери торговую точку');
   cakesListsLoaded=true;
 }
 async function openCakesPage(){
@@ -248,8 +244,7 @@ async function openCakesPage(){
   cakesSuccess.classList.add('hidden');
   try{await loadCakesData();}
   catch(error){cakesError.textContent=error.message;}
-}
-cakesForm.addEventListener('submit',async(event)=>{
+}cakesForm.addEventListener('submit',async(event)=>{
   event.preventDefault();
   cakesError.textContent='';
   cakesSuccess.classList.add('hidden');
@@ -287,7 +282,6 @@ logoutButton.addEventListener('click',()=>{
   loginError.textContent='';
   showPage('home');
   showLogin();
-  loadLoginUsers();
 });
 
 loginForm.addEventListener('submit',async(event)=>{
@@ -295,8 +289,10 @@ loginForm.addEventListener('submit',async(event)=>{
   loginError.textContent='';
   const name=document.getElementById('employee').value;
   const pin=pinInput.value.trim();
+  if(!name){loginError.textContent='Выбери сотрудника.';return;}
   if(!/^\d{8}$/.test(pin)){loginError.textContent='Введи PIN-код из 8 цифр.';return;}
-  loginButton.disabled=true;loginButton.textContent='Проверяем…';
+  loginButton.disabled=true;
+  loginButton.textContent='Проверяем…';
   try{
     const response=await fetch(API_URL+'?action=login',{
       method:'POST',
@@ -314,11 +310,10 @@ loginForm.addEventListener('submit',async(event)=>{
   }catch(error){
     loginError.textContent='Не удалось связаться с сервером. Проверь интернет и попробуй ещё раз.';
   }finally{
-    loginButton.disabled=false;loginButton.textContent='Войти';
+    loginButton.disabled=false;
+    loginButton.textContent='Войти';
   }
 });
-
-
 
 function getSession(){
   try{return JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null');}catch(e){return null;}
@@ -333,11 +328,16 @@ async function loadDebts(){
   return data;
 }
 async function showReturnDebts(){
-  const borrower=returnBorrower.value;returnFormCard.classList.add('hidden');returnDebtList.innerHTML='';returnDebtChoices=[];
+  const borrower=returnBorrower.value;
+  returnFormCard.classList.add('hidden');
+  returnDebtList.innerHTML='';
+  returnDebtChoices=[];
   if(!borrower){returnDebtList.textContent='Сначала выбери точку.';return;}
-  loadReturnDebtsButton.disabled=true;loadReturnDebtsButton.textContent='Загружаем…';
+  loadReturnDebtsButton.disabled=true;
+  loadReturnDebtsButton.textContent='Загружаем…';
   try{
-    const data=await loadDebts();returnDebtChoices=data.debts.filter(d=>d.borrower===borrower);
+    const data=await loadDebts();
+    returnDebtChoices=data.debts.filter(d=>d.borrower===borrower);
     if(!returnDebtChoices.length){returnDebtList.textContent='У этой точки нет открытых займов.';return;}
     returnDebtChoices.forEach((debt,index)=>{
       const card=document.createElement('div');card.className='card';card.style.margin='9px 0';
@@ -347,17 +347,26 @@ async function showReturnDebts(){
       const small=document.createElement('small');small.style.display='block';small.style.color='var(--muted)';small.textContent='У кого брали: '+debt.lender;
       text.append(strong,small);label.append(check,text);card.append(label);
       const qty=document.createElement('input');qty.className='select';qty.style.marginTop='10px';qty.inputMode='decimal';qty.placeholder='Количество к возврату';qty.value=debt.quantity;qty.dataset.quantity=index;qty.disabled=true;
-      check.addEventListener('change',()=>{qty.disabled=!check.checked;});card.append(qty);returnDebtList.append(card);
+      check.addEventListener('change',()=>{qty.disabled=!check.checked;});
+      card.append(qty);returnDebtList.append(card);
     });
-    const choose=document.createElement('button');choose.type='button';choose.className='primary';choose.textContent='Перейти к оформлению';choose.addEventListener('click',()=>{
+    const choose=document.createElement('button');choose.type='button';choose.className='primary';choose.textContent='Перейти к оформлению';
+    choose.addEventListener('click',()=>{
       const selected=[...returnDebtList.querySelectorAll('input[type=checkbox]:checked')];
       if(!selected.length){returnDebtList.insertAdjacentHTML('beforeend','<p class="error">Отметь хотя бы один товар.</p>');return;}
       const items=selected.map(c=>{const d=returnDebtChoices[Number(c.dataset.index)];return {debt:d,quantity:returnDebtList.querySelector('[data-quantity="'+c.dataset.index+'"]').value.trim()};});
-      if(items.some(x=>!/^\d+(?:[.,]\d+)?$/.test(x.quantity)||Number(x.quantity.replace(',','.'))<=0||Number(x.quantity.replace(',','.'))>Number(x.debt.quantity))){returnError.textContent='Проверь количество: оно должно быть больше нуля и не превышать остаток.';returnFormCard.classList.remove('hidden');return;}
+      if(items.some(x=>!/^\d+(?:[.,]\d+)?$/.test(x.quantity)||Number(x.quantity.replace(',','.'))<=0||Number(x.quantity.replace(',','.'))>Number(x.debt.quantity))){
+        returnError.textContent='Проверь количество: оно должно быть больше нуля и не превышать остаток.';
+        returnFormCard.classList.remove('hidden');return;
+      }
       returnFormCard.dataset.items=JSON.stringify(items.map(x=>({lender:x.debt.lender,product:x.debt.product,quantity:x.quantity,unit:x.debt.unit})));
-      returnSelectedInfo.innerHTML='';items.forEach(x=>{const p=document.createElement('p');p.className='listitem';p.textContent=x.debt.product+' — '+x.quantity+' '+x.debt.unit+' ('+x.debt.lender+')';returnSelectedInfo.append(p);});
-      returnError.textContent='';returnSuccess.classList.add('hidden');returnFormCard.classList.remove('hidden');
-    });returnDebtList.append(choose);
+      returnSelectedInfo.innerHTML='';
+      items.forEach(x=>{const p=document.createElement('p');p.className='listitem';p.textContent=x.debt.product+' — '+x.quantity+' '+x.debt.unit+' ('+x.debt.lender+')';returnSelectedInfo.append(p);});
+      returnError.textContent='';
+      returnSuccess.classList.add('hidden');
+      returnFormCard.classList.remove('hidden');
+    });
+    returnDebtList.append(choose);
     if(data.anomalies?.length){const warn=document.createElement('p');warn.className='error';warn.textContent='В журнале есть позиции с возвратом больше займа. Их нужно проверить.';returnDebtList.append(warn);}
   }catch(error){returnDebtList.textContent=error.message;}
   finally{loadReturnDebtsButton.disabled=false;loadReturnDebtsButton.textContent='Показать долги';}
@@ -376,10 +385,12 @@ async function showReconcile(){
       Object.entries(groups).forEach(([pair,items])=>{
         const card=document.createElement('div');card.className='card';
         const h=document.createElement('h2');h.textContent=pair;card.append(h);
-        items.forEach(d=>{const line=document.createElement('div');line.className='listitem';
+        items.forEach(d=>{
+          const line=document.createElement('div');line.className='listitem';
           const name=document.createElement('span');name.textContent=d.product;
           const amount=document.createElement('strong');amount.textContent=d.quantity+' '+d.unit;
-          line.append(name,amount);card.append(line);});
+          line.append(name,amount);card.append(line);
+        });
         reconcileContent.append(card);
       });
     }
@@ -391,7 +402,8 @@ async function showReconcile(){
   }catch(error){reconcileContent.textContent=error.message;}
 }
 async function submitReturn(){
-  returnError.textContent='';returnSuccess.classList.add('hidden');
+  returnError.textContent='';
+  returnSuccess.classList.add('hidden');
   let items=[];try{items=JSON.parse(returnFormCard.dataset.items||'[]');}catch(e){}
   if(!items.length){returnError.textContent='Сначала выбери товары для возврата.';return;}
   const session=getSession();if(!session?.token){showLogin();return;}
@@ -421,7 +433,7 @@ createUserForm.addEventListener('submit',async(event)=>{
   if(!name||!role||!/^\d{8}$/.test(pin)){createUserError.textContent='Проверь имя, роль и PIN-код из 8 цифр.';return;}
   createUserButton.disabled=true;createUserButton.textContent='Создаём…';
   try{
-    const response=await fetch(API_URL+'?action=create-user',{method:'POST',
+    const response=await fetch(API_URL+'?action=users',{method:'POST',
       headers:{'Content-Type':'application/json','X-Session-Token':session.token},
       body:JSON.stringify({name,role,pin})});
     const data=await response.json();
@@ -440,7 +452,7 @@ function addBorrowItem(product='',quantity='',unit='шт'){
   const label=document.createElement('strong');label.textContent='Товар '+(++borrowItemCount);
   const remove=document.createElement('button');remove.type='button';remove.className='back';remove.textContent='Убрать';remove.addEventListener('click',()=>{wrap.remove();renumberBorrowItems();});
   row.append(label,remove);
-  const p=document.createElement('input');p.className='select';p.maxLength=90;p.placeholder='Название товара';p.value=product; p.dataset.field='product';
+  const p=document.createElement('input');p.className='select';p.maxLength=90;p.placeholder='Название товара';p.value=product;p.dataset.field='product';
   const q=document.createElement('input');q.className='select';q.inputMode='decimal';q.placeholder='Количество';q.value=quantity;q.dataset.field='quantity';q.style.marginTop='8px';
   const u=document.createElement('select');u.className='select';u.dataset.field='unit';u.style.marginTop='8px';['шт','кг','г','л','мл'].forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;u.append(o);});u.value=unit;
   wrap.append(row,p,q,u);document.getElementById('borrowItems').append(wrap);
@@ -471,9 +483,15 @@ borrowForm.addEventListener('submit', async (event)=>{
 });
 
 const pages=[...document.querySelectorAll('main section')];
-function showPage(id){pages.forEach(p=>p.classList.toggle('hidden',p.id!==id));document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('active',b.dataset.page===id));if(id==='users')loadUsersList();if(id==='reconcile')showReconcile();if(id==='cakes')openCakesPage();window.scrollTo({top:0,behavior:'smooth'});}
+function showPage(id){
+  pages.forEach(p=>p.classList.toggle('hidden',p.id!==id));
+  document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('active',b.dataset.page===id));
+  if(id==='users')loadUsersList();
+  if(id==='reconcile')showReconcile();
+  if(id==='cakes')openCakesPage();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
 document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
-// Автообновление приложения: сессия хранится в sessionStorage и переживает перезагрузку вкладки.
 let swReloadPending=false;
 if('serviceWorker' in navigator && location.protocol.startsWith('http')){
   const reloadOnControllerChange=()=>{
@@ -484,7 +502,6 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
   navigator.serviceWorker.addEventListener('controllerchange',reloadOnControllerChange);
   navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'})
     .then(registration=>{
-      // Проверяем обновление при открытии, при возвращении во вкладку и периодически.
       const checkForUpdate=()=>registration.update().catch(()=>{});
       checkForUpdate();
       document.addEventListener('visibilitychange',()=>{
@@ -494,5 +511,8 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
     })
     .catch(()=>{});
 }
-loadLoginUsers();if(!restoreSession())showLogin();
-</script></body></html>
+loadLoginUsers();
+if(!restoreSession())showLogin();
+</script>
+</body>
+</html>
