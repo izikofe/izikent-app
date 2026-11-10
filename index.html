@@ -46,10 +46,6 @@ footer{text-align:center;color:#9a8e81;font-size:10px;padding:8px 0 18px}
 <section id="home"><div class="eyebrow">Рабочее пространство</div><h1>Главное меню</h1>
 <div class="grid"><button class="tile" data-page="loans"><div class="ico">⇄</div><div><strong>Займы и возвраты</strong><small>Занять товар, вернуть и посмотреть сверку между точками</small></div></button></div>
 <div class="grid" style="margin-top:12px"><button class="tile hidden" id="usersTile" data-page="users"><div class="ico">＋</div><div><strong>Пользователи</strong><small>Добавить сотрудника, PIN-код и роль</small></div></button></div>
-<div class="grid" style="margin-top:12px">
-<button class="tile" data-page="returns"><div class="ico">📥</div><div><strong>Возврат товара</strong><small>Посмотреть открытые займы и оформить возврат</small></div></button>
-<button class="tile" data-page="reconcile"><div class="ico">📊</div><div><strong>Сверка</strong><small>Посмотреть долги между точками</small></div></button>
-</div>
 <div class="card"><div class="row"><h2>Обратная связь</h2><span class="pill">Остаётся в MAX</span></div><p class="muted">Сбор отзывов и ежедневные отчёты продолжают работать в существующем MAX-боте. В приложение этот раздел пока не переносим.</p></div>
 <div class="notice">Займы, возвраты и сверка задолженностей доступны в приложении. Обратная связь и ежедневные отчёты остаются в MAX-боте.</div>
 </section>
@@ -66,7 +62,10 @@ footer{text-align:center;color:#9a8e81;font-size:10px;padding:8px 0 18px}
 <button class="primary" id="borrowButton" type="submit">Проверить заявку</button>
 <div class="error" id="borrowError" role="alert"></div><div class="notice hidden" id="borrowSuccess" role="status"></div>
 </form></div>
-<div class="card"><h2>Другие операции</h2><div class="listitem"><span>📥 Вернуть товар</span><span class="pill">Следующий этап</span></div><div class="listitem"><span>📊 Сверка задолженностей</span><span class="pill">Следующий этап</span></div><p class="muted">Возвраты и сверку подключим отдельно, сохранив правила существующего MAX-бота.</p></div></section>
+<div class="card"><h2>Другие операции</h2>
+<button class="tile" data-page="returns" style="width:100%;margin-top:10px"><div class="ico">📥</div><div><strong>Возврат товара</strong><small>Посмотреть открытые займы и оформить возврат</small></div></button>
+<button class="tile" data-page="reconcile" style="width:100%;margin-top:10px"><div class="ico">📊</div><div><strong>Сверка задолженностей</strong><small>Посмотреть текущие долги между точками</small></div></button>
+</div></section>
 <section id="returns" class="hidden"><button class="back" data-page="home">← Главное меню</button><div class="eyebrow">Займы и возвраты</div><h1>Возврат товара</h1>
 <div class="card"><h2>Открытые займы</h2><p class="muted">Выбери точку, которая брала товар. Покажем только её незакрытые долги.</p>
 <label class="field-label" for="returnBorrower">Кто брал товар?</label>
