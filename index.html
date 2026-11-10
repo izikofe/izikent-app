@@ -1,556 +1,107 @@
 <!doctype html>
 <html lang="ru">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#607f87"><meta name="app-version" content="8.0-glass-login"><meta name="description" content="ИзиКент — помощник команды ИзиКофе">
-<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#607f87">
+<meta name="app-version" content="9.0-new-api-news">
+<meta name="description" content="ИзиКент — помощник команды ИзиКофе">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
 <title>ИзиКент</title>
 <style>
-:root{--blue:#607f87;--blue-dark:#355762;--blue-light:#dce7e7;--cream:#f6f0e6;--paper:#fffdf8;--espresso:#392820;--line:#e6ddd0;--muted:#82786f;--shadow:0 8px 24px rgba(54,43,34,.08)}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 15% 8%,#f6f0e6 0,transparent 34%),radial-gradient(ellipse at 88% 38%,#7f9b99 0,transparent 38%),linear-gradient(145deg,#355762,#607f87 52%,#dce7e7);background-attachment:fixed;color:var(--espresso);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input{font:inherit}button{cursor:pointer}
-.app{max-width:520px;min-height:100vh;margin:0 auto;background:linear-gradient(180deg,#35576235,#607f8730 42%,#f6f0e655);padding-bottom:96px;backdrop-filter:blur(18px)}
-header{background:linear-gradient(135deg,#355762d9,#607f87c9);color:#fff;padding:22px 22px 28px;border-radius:0 0 30px 30px;position:relative;overflow:hidden;backdrop-filter:blur(24px);border-bottom:1px solid #ffffff55}
-header:before{display:none;content:"";position:absolute;left:-8%;bottom:-23px;width:116%;height:48px;background:linear-gradient(180deg,var(--cream),var(--cream));border-radius:48% 52% 0 0 / 75% 80% 0 0;transform:rotate(-2deg);z-index:1}
+:root{--blue:#607f87;--dark:#355762;--light:#dce7e7;--cream:#f6f0e6;--paper:#fffdf8;--ink:#392820;--line:#e6ddd0;--muted:#82786f}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 15% 8%,#f6f0e6 0,transparent 34%),radial-gradient(ellipse at 88% 38%,#7f9b99 0,transparent 38%),linear-gradient(145deg,#355762,#607f87 52%,#dce7e7);background-attachment:fixed;color:var(--ink);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:none!important}
+.app{max-width:520px;min-height:100vh;margin:0 auto;padding-bottom:100px;background:linear-gradient(180deg,#35576235,#607f8730 42%,#f6f0e655);backdrop-filter:blur(18px)}
+header{background:linear-gradient(135deg,#355762d9,#607f87c9);color:#fff;padding:22px 22px 25px;border-radius:0 0 30px 30px;position:relative;overflow:hidden;border-bottom:1px solid #ffffff55}
 header:after{content:"";position:absolute;width:190px;height:190px;background:#ffffff12;border-radius:50%;right:-95px;top:-95px}
-.home-logo{display:block;width:142px;height:142px;object-fit:contain;margin:-5px auto 2px;position:relative;z-index:2;filter:drop-shadow(0 5px 8px #18343a22)}.header-row{display:flex;align-items:flex-start;justify-content:space-between;position:relative;z-index:2;gap:12px}.header-row>div:first-child{display:none}.hello{margin-top:8px;text-align:left}.brand-title{display:none}.brand-title{font-size:27px;line-height:1.1;font-weight:850;letter-spacing:-.7px}.brand-subtitle{font-size:14px;line-height:1.35;opacity:.9;margin-top:7px;max-width:230px}.logout-btn{border:1px solid #ffffff55;background:#ffffff18;color:#fff;border-radius:15px;padding:8px 10px;font-size:12px;font-weight:700;white-space:nowrap}.logout-btn:active{transform:scale(.97)}
-.hello{position:relative;z-index:2;margin-top:27px;font-size:22px;font-weight:800;color:#fff}.hello-sub{display:block;position:relative;z-index:2;color:#ffffffd9;font-size:13px;margin-top:5px}
-main{padding:20px 16px}.eyebrow{font-size:10px;letter-spacing:1.7px;text-transform:uppercase;color:var(--muted);font-weight:750;margin:4px 2px 6px}h1{font-size:23px;margin:0 2px 15px;color:var(--blue-dark)}
-.grid{display:grid;grid-template-columns:1fr;gap:12px}.tile{background:#fffdf8a8;border:1px solid #ffffffb8;border-radius:22px;padding:10px 13px 10px 10px;min-height:88px;text-align:left;box-shadow:0 8px 22px rgba(28,55,58,.13),inset 0 1px 0 #ffffffc9;backdrop-filter:blur(20px);color:var(--espresso);display:flex;align-items:center;gap:13px;width:100%;position:relative}.tile:active{transform:scale(.985)}.ico{font-size:25px;color:#fff;min-width:58px;width:58px;height:58px;border-radius:15px;display:flex;align-items:center;justify-content:center;text-align:center;background:var(--blue-dark);box-shadow:0 3px 7px #00000018}.ico.brown{background:#7b8058}.ico.green{background:var(--blue)}.ico.purple{background:var(--blue-dark)}.ico.teal{background:#7b8058}.tile strong{display:block;font-size:17px;line-height:1.2}.tile small{display:block;color:var(--muted);font-size:12px;line-height:1.35;margin-top:5px}.tile:after{content:"›";margin-left:auto;font-size:29px;line-height:1;color:var(--blue);padding:0 4px}.tile:disabled{opacity:.82}.tile:disabled:after{content:""}
-.card{background:#fffdf8b8;border:1px solid #ffffffc7;border-radius:24px;padding:17px;margin:14px 0;box-shadow:0 10px 26px rgba(28,55,58,.13),inset 0 1px 0 #ffffffd9;backdrop-filter:blur(22px)}.card h2{font-size:17px;margin:0 0 7px;color:var(--blue-dark)}.muted{color:var(--muted);font-size:13px;line-height:1.45}.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.pill{font-size:11px;padding:6px 9px;border-radius:30px;background:var(--blue-light);color:var(--blue-dark);font-weight:700}.listitem{padding:13px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px}.listitem:last-child{border:0}.back{border:0;background:transparent;color:var(--blue-dark);font-weight:750;padding:0 0 15px}.hidden{display:none!important}.notice{background:#e8eadf;color:#596044;border-radius:14px;padding:12px;font-size:12px;line-height:1.4;margin-top:12px}
-.bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(520px,100%);display:grid;grid-template-columns:repeat(3,1fr);background:#fffdf8b8;backdrop-filter:blur(24px);backdrop-filter:blur(12px);border:1px solid var(--line);border-bottom:0;border-radius:25px 25px 0 0;padding:9px 8px calc(9px + env(safe-area-inset-bottom));z-index:5;box-shadow:0 -4px 18px #39282010}.nav{border:0;background:transparent;color:#8d8984;font-size:11px;padding:5px 2px}.nav span{display:block;font-size:22px;margin-bottom:3px}.nav.active{color:var(--blue-dark);font-weight:800}
-.news-empty{text-align:center;padding:25px 18px}.news-mark{width:58px;height:58px;border-radius:18px;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;background:var(--blue-dark);color:white;font-size:28px;box-shadow:0 8px 18px #35576235}.news-empty h2{margin:0 0 8px}.profile-head{display:flex;align-items:center;gap:14px;padding:18px}.profile-avatar{width:66px;height:66px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--blue);color:#fff;font-size:29px;font-weight:800;flex:none}.profile-name{font-size:21px;font-weight:800;color:var(--espresso)}.profile-role{font-size:14px;color:var(--muted);margin-top:5px}.profile-detail{display:flex;align-items:center;gap:13px;padding:15px 2px;border-bottom:1px solid var(--line)}.profile-detail:last-child{border-bottom:0}.profile-detail-icon{width:38px;height:38px;border-radius:12px;background:var(--blue-light);color:var(--blue-dark);display:flex;align-items:center;justify-content:center;font-size:19px;flex:none}.profile-detail-label{font-size:12px;color:var(--muted)}.profile-detail-value{font-size:15px;font-weight:750;margin-top:4px;color:var(--espresso)}
-footer{text-align:center;color:var(--muted);font-size:10px;padding:8px 0 18px}
-.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px 18px;background:radial-gradient(ellipse at 10% 12%,#f6f0e6a8,transparent 36%),radial-gradient(ellipse at 90% 80%,#dce7e7a8,transparent 40%)}.login-shell{width:100%;max-width:440px}.login-intro{color:#fff;padding:0 8px 24px}.login-intro h1{font-size:34px;line-height:1.12;letter-spacing:-.7px;color:#fff;margin:0 0 12px;text-shadow:0 3px 14px #173a4080}.login-intro p{font-size:16px;line-height:1.4;margin:0;color:#ffffffdf}.login-card{width:100%;background:#fffdf8a8;border:1px solid #ffffffc9;border-radius:30px;padding:26px 22px 22px;box-shadow:0 16px 38px #173a4033,inset 0 1px 0 #ffffffed;backdrop-filter:blur(26px);-webkit-backdrop-filter:blur(26px)}.field-label{display:block;font-size:13px;font-weight:750;color:var(--blue-dark);margin:14px 0 7px}.select,.pin{width:100%;border:1px solid #ffffffd9;border-radius:18px;background:#fffdf8b8;padding:16px;color:var(--espresso);outline:none;box-shadow:inset 0 1px 3px #35576212,0 4px 12px #35576210;backdrop-filter:blur(16px)}.select:focus,.pin:focus{border-color:var(--blue);box-shadow:0 0 0 3px #607f8730}.pin{text-align:center;font-size:22px;letter-spacing:8px}.primary{width:100%;border:1px solid #ffffff55;border-radius:18px;background:linear-gradient(135deg,#7b8058,#68764e);color:white;font-weight:800;padding:17px;margin-top:22px;box-shadow:0 8px 18px #59604440}.primary:disabled{opacity:.55;cursor:wait}.error{color:#a33b32;font-size:13px;line-height:1.4;margin-top:12px;min-height:18px}.login-foot{text-align:center;color:#655b51;font-size:11px;font-weight:700;letter-spacing:1px;margin-top:20px}
+.header-row{display:flex;justify-content:flex-end;position:relative;z-index:1}.logout{border:1px solid #ffffff55;background:#ffffff18;color:#fff;border-radius:15px;padding:8px 10px;font-size:12px;font-weight:700}
+.hello{position:relative;z-index:1;margin-top:10px;font-size:23px;font-weight:800}.hello-sub{position:relative;z-index:1;color:#ffffffd9;font-size:13px;margin-top:5px}
+main{padding:20px 16px}.eyebrow{font-size:10px;letter-spacing:1.7px;text-transform:uppercase;color:var(--muted);font-weight:750;margin:4px 2px 6px}h1{font-size:23px;margin:0 2px 15px;color:var(--dark)}
+.card{background:#fffdf8c2;border:1px solid #ffffffc7;border-radius:24px;padding:17px;margin:14px 0;box-shadow:0 10px 26px rgba(28,55,58,.13),inset 0 1px 0 #ffffffd9;backdrop-filter:blur(22px)}
+.card h2{font-size:17px;margin:0 0 7px;color:var(--dark)}.muted{color:var(--muted);font-size:13px;line-height:1.45}.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.pill{font-size:11px;padding:6px 9px;border-radius:30px;background:var(--light);color:var(--dark);font-weight:700}
+.field-label{display:block;font-size:13px;font-weight:750;color:var(--dark);margin:14px 0 7px}
+.field{width:100%;border:1px solid #ffffffd9;border-radius:15px;background:#fffdf8d9;padding:13px;color:var(--ink);outline:none;box-shadow:inset 0 1px 3px #35576212}
+textarea.field{min-height:110px;resize:vertical}.field:focus{border-color:var(--blue);box-shadow:0 0 0 3px #607f8730}
+.primary{width:100%;border:1px solid #ffffff55;border-radius:17px;background:linear-gradient(135deg,#7b8058,#68764e);color:white;font-weight:800;padding:15px;margin-top:18px;box-shadow:0 8px 18px #59604440}.primary:disabled{opacity:.55;cursor:wait}
+.secondary{border:1px solid #ffffffaa;border-radius:14px;background:#ffffff80;color:var(--dark);font-weight:750;padding:10px 13px}
+.notice{background:#e8eadf;color:#596044;border-radius:14px;padding:12px;font-size:12px;line-height:1.4;margin-top:12px}.error{color:#a33b32;font-size:13px;line-height:1.4;margin-top:12px;min-height:18px}
+.news-item{padding:15px 0;border-bottom:1px solid var(--line)}.news-item:last-child{border:0;padding-bottom:0}.news-title{font-weight:800;font-size:17px;color:var(--dark);margin:0 0 7px}.news-body{font-size:14px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}.news-meta{font-size:11px;color:var(--muted);margin-top:9px}.pin{display:inline-block;margin-right:5px}
+.profile-head{display:flex;align-items:center;gap:14px;padding:5px 0 15px}.avatar{width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--blue);color:#fff;font-size:25px;font-weight:800}.profile-name{font-size:20px;font-weight:800}.profile-role{font-size:13px;color:var(--muted);margin-top:4px}.detail{padding:12px 0;border-top:1px solid var(--line)}.detail strong{display:block;margin-top:4px;font-size:14px}
+.bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(520px,100%);display:grid;grid-template-columns:repeat(3,1fr);background:#fffdf8e8;backdrop-filter:blur(18px);border:1px solid var(--line);border-bottom:0;border-radius:25px 25px 0 0;padding:9px 8px calc(9px + env(safe-area-inset-bottom));z-index:5;box-shadow:0 -4px 18px #39282010}
+.nav{border:0;background:transparent;color:#8d8984;font-size:11px;padding:5px 2px}.nav span{display:block;font-size:21px;margin-bottom:3px}.nav.active{color:var(--dark);font-weight:800}
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px 18px}.login-shell{width:100%;max-width:440px}.login-intro{color:#fff;padding:0 8px 24px}.login-intro h1{font-size:34px;line-height:1.12;color:#fff;margin:0 0 12px}.login-intro p{font-size:16px;line-height:1.4;margin:0;color:#ffffffdf}
+.login-card{background:#fffdf8c2;border:1px solid #ffffffc9;border-radius:30px;padding:26px 22px 22px;box-shadow:0 16px 38px #173a4033,inset 0 1px 0 #ffffffed;backdrop-filter:blur(26px)}
+.select,.pin{width:100%;border:1px solid #ffffffd9;border-radius:18px;background:#fffdf8d9;padding:15px;color:var(--ink);outline:none}.pin{text-align:center;font-size:22px;letter-spacing:8px}
+.login-foot{text-align:center;color:#655b51;font-size:11px;font-weight:700;letter-spacing:1px;margin-top:20px}
 @media(min-width:600px){body{padding:24px 0}.app{border-radius:28px;overflow:hidden;min-height:850px;box-shadow:0 15px 50px #34271d20}.bottom{bottom:24px;border-radius:0 0 28px 28px}}
-
-/* Временно скрыты старые разделы: займы, возвраты, сверка и торты. */
-.tile[data-page="loans"], .tile[data-page="cakes"], #loans, #returns, #reconcile, #cakes { display:none !important; }
-</style></head>
+</style>
+</head>
 <body>
 <section id="loginScreen" class="login-wrap">
-  <div class="login-shell">
-    <div class="login-intro">
-      <h1>Добро пожаловать<br>в ИзиКент!</h1>
-      <p>Выбери своё имя и введи PIN-код</p>
-    </div>
-    <div class="login-card">
-      <form id="loginForm">
-        <label class="field-label" for="employee">Сотрудник</label>
-        <select class="select" id="employee" required><option value="">Загружаем сотрудников…</option></select>
-        <label class="field-label" for="pin">PIN-код</label>
-        <input class="pin" id="pin" type="password" inputmode="numeric" pattern="[0-9]{8}" maxlength="8" minlength="8" placeholder="••••••••" autocomplete="current-password" required>
-        <button class="primary" id="loginButton" type="submit">Войти</button>
-        <div class="error" id="loginError" role="alert"></div>
-      </form>
-      <div class="login-foot">ИЗИКОФЕ · ИЗИКЕНТ</div>
-    </div>
+ <div class="login-shell">
+  <div class="login-intro"><h1>Добро пожаловать<br>в ИзиКент!</h1><p>Выбери своё имя и введи PIN-код</p></div>
+  <div class="login-card">
+   <form id="loginForm">
+    <label class="field-label" for="employee">Сотрудник</label>
+    <select class="select" id="employee" required><option value="">Загружаем сотрудников…</option></select>
+    <label class="field-label" for="pin">PIN-код</label>
+    <input class="pin" id="pin" type="password" inputmode="numeric" pattern="[0-9]{8}" maxlength="8" minlength="8" placeholder="••••••••" autocomplete="current-password" required>
+    <button class="primary" id="loginButton" type="submit">Войти</button><div class="error" id="loginError" role="alert"></div>
+   </form><div class="login-foot">ИЗИКОФЕ · ИЗИКЕНТ</div>
   </div>
+ </div>
 </section>
 <div class="app hidden" id="appScreen">
-<header><div class="header-row"><div><div class="brand-title">ИзиКент</div><div class="brand-subtitle">Помощник команды<br>ИзиКофе</div></div><button class="logout-btn" id="logoutButton" type="button">Выйти ↗</button></div><div class="hello" id="helloText">Привет, команда! 👋</div><div class="hello-sub">Новости, обновления и важная информация — здесь.</div></header>
-<main>
-<section id="home">
- <div class="eyebrow">Рабочее пространство</div><h1>Новости</h1>
- <div class="card news-empty">
-  <div class="news-mark">✦</div>
-  <h2>Новости команды</h2>
-  <p class="muted">Здесь будут новости и объявления, доступные именно вашей должности и торговой точке.</p>
-  <div class="notice">Раздел публикации новостей подключим к правам должностей. Пока новости не публикуются из приложения.</div>
- </div>
- <div class="card">
-  <div class="row"><h2>Важное</h2><span class="pill">Для команды</span></div>
-  <p class="muted">Важные сообщения и обновления будут отображаться здесь после подключения общего раздела новостей.</p>
- </div>
-</section>
-<section id="tools" class="hidden">
- <div class="eyebrow">Рабочее пространство</div><h1>Инструменты</h1>
- <div class="grid"><button class="tile" data-page="loans"><div class="ico">⇄</div><div><strong>Займы и возвраты</strong><small>Занять товар, вернуть и посмотреть сверку между точками</small></div></button></div>
-<div class="grid" style="margin-top:12px"><button class="tile" data-page="cakes"><div class="ico brown">♧</div><div><strong>Торты</strong><small>Записать количество тортов по торговым точкам</small></div></button></div>
-<div class="grid" style="margin-top:12px">
-<button class="tile" type="button" disabled aria-label="Отработка процентов потерь — скоро"><div class="ico green">♙</div><div style="flex:1"><strong>Отработка % потерь</strong><small>Учёт отработки потерь</small></div><span class="pill">Скоро</span></button>
-</div>
-<div class="grid" style="margin-top:12px">
-<button class="tile" type="button" disabled aria-label="Списание ЗЦ — скоро"><div class="ico purple">▤</div><div style="flex:1"><strong>Списание ЗЦ</strong><small>Учёт списаний</small></div><span class="pill">Скоро</span></button>
-</div>
-<div class="grid" style="margin-top:12px"><button class="tile hidden" id="usersTile" data-page="users"><div class="ico teal">♧</div><div><strong>Пользователи</strong><small>Добавить сотрудника, PIN-код и роль</small></div></button></div>
-<div class="card"><div class="row"><h2>Обратная связь</h2><span class="pill">Остаётся в MAX</span></div><p class="muted">Сбор отзывов и ежедневные отчёты продолжают работать в существующем MAX-боте. В приложение этот раздел пока не переносим.</p></div>
-<div class="notice">Разделы займов и тортов временно отключены. Новости и управление сотрудниками подключим отдельно. Обратная связь и ежедневные отчёты остаются в MAX-боте.</div>
-</section>
-<section id="loans" class="hidden"><button class="back" data-page="home">← Главное меню</button><div class="eyebrow">Займы и возвраты</div><h1>Операции между точками</h1>
-<div class="card">
-<h2>📤 Занять товар</h2><p class="muted">Заполни данные. Перед записью приложение покажет подтверждение.</p>
-<form id="borrowForm">
-<label class="field-label" for="borrower">Какая точка заняла?</label>
-<select class="select" id="borrower" required><option value="">Выбери точку</option><option>Сиреневая</option><option>Партизанская</option><option>Солнечная Поляна</option><option>Георгия Исакова</option></select>
-<label class="field-label" for="lender">У какой точки заняли?</label>
-<select class="select" id="lender" required><option value="">Выбери точку</option><option>Сиреневая</option><option>Партизанская</option><option>Солнечная Поляна</option><option>Георгия Исакова</option></select>
-<div id="borrowItems"></div>
-<button class="back" id="addBorrowItem" type="button">＋ Добавить ещё товар</button>
-<button class="primary" id="borrowButton" type="submit">Проверить заявку</button>
-<div class="error" id="borrowError" role="alert"></div><div class="notice hidden" id="borrowSuccess" role="status"></div>
-</form></div>
-<div class="card"><h2>Другие операции</h2>
-<button class="tile" data-page="returns" style="width:100%;margin-top:10px"><div class="ico">📥</div><div><strong>Возврат товара</strong><small>Посмотреть открытые займы и оформить возврат</small></div></button>
-<button class="tile" data-page="reconcile" style="width:100%;margin-top:10px"><div class="ico">📊</div><div><strong>Сверка задолженностей</strong><small>Посмотреть текущие долги между точками</small></div></button>
-</div></section>
-<section id="returns" class="hidden"><button class="back" data-page="home">← Главное меню</button><div class="eyebrow">Займы и возвраты</div><h1>Возврат товара</h1>
-<div class="card"><h2>Открытые займы</h2><p class="muted">Выбери точку, которая брала товар. Покажем только её незакрытые долги.</p>
-<label class="field-label" for="returnBorrower">Кто брал товар?</label>
-<select class="select" id="returnBorrower"><option value="">Выбери точку</option><option>Сиреневая</option><option>Партизанская</option><option>Солнечная Поляна</option><option>Георгия Исакова</option></select>
-<button class="primary" id="loadReturnDebts" type="button">Показать долги</button>
-<div id="returnDebtList" class="muted" style="margin-top:12px">Сначала выбери точку.</div>
-</div>
-<div class="card hidden" id="returnFormCard"><h2>Состав заявки на возврат</h2><p class="muted">Отметь товары и укажи количество напротив каждого. Все позиции проверятся до записи.</p>
-<div id="returnSelectedInfo"></div>
-<button class="primary" id="returnSubmit" type="button">Проверить и оформить возврат</button><div class="error" id="returnError" role="alert"></div><div class="notice hidden" id="returnSuccess" role="status"></div>
-</div></section>
-<section id="reconcile" class="hidden"><button class="back" data-page="home">← Главное меню</button><div class="eyebrow">Контроль задолженностей</div><h1>Сверка</h1>
-<div class="card"><div class="row"><h2>Текущие долги</h2><button class="back" id="refreshReconcile" type="button">↻ Обновить</button></div>
-<div id="reconcileDate" class="muted"></div><div id="reconcileContent" style="margin-top:12px">Нажми «Обновить», чтобы загрузить данные.</div></div></section><section id="cakes" class="hidden"><button class="back" data-page="home">← Главное меню</button><div class="eyebrow">Учёт продукции</div><h1>Торты</h1>
-<div class="card"><h2>Новая запись</h2><p class="muted">Дата поставится автоматически. Выбери торт и торговую точку, затем укажи количество целых тортов.</p>
-<form id="cakesForm">
-<label class="field-label" for="cakeName">Наименование торта</label>
-<select class="select" id="cakeName" required><option value="">Загружаем список…</option></select>
-<label class="field-label" for="cakeQuantity">Количество целых тортов</label>
-<input class="select" id="cakeQuantity" type="number" min="1" step="1" inputmode="numeric" placeholder="Например, 2" required>
-<label class="field-label" for="cakePlace">Торговая точка</label>
-<select class="select" id="cakePlace" required><option value="">Загружаем список…</option></select>
-<button class="primary" id="cakesSubmit" type="submit">Записать в таблицу</button>
-<div class="error" id="cakesError" role="alert"></div><div class="notice hidden" id="cakesSuccess" role="status"></div>
-</form></div></section>
-<section id="users" class="hidden"><button class="back" data-page="home">← Главное меню</button><div class="eyebrow">Управление доступом</div><h1>Пользователи</h1>
-<div class="card"><h2>Добавить пользователя</h2><p class="muted">Задай имя, роль и PIN-код из 8 цифр.</p>
-<form id="createUserForm">
-<label class="field-label" for="newUserName">Имя сотрудника</label><input class="select" id="newUserName" type="text" maxlength="50" placeholder="Например, Анна" required>
-<label class="field-label" for="newUserRole">Роль</label><input class="select" id="newUserRole" type="text" maxlength="50" placeholder="Роль можно придумать позже" required>
-<label class="field-label" for="newUserPin">PIN-код (8 цифр)</label><input class="select" id="newUserPin" type="password" inputmode="numeric" pattern="[0-9]{8}" maxlength="8" minlength="8" placeholder="••••••••" autocomplete="new-password" required>
-<button class="primary" id="createUserButton" type="submit">Добавить пользователя</button><div class="error" id="createUserError" role="alert"></div><div class="notice hidden" id="createUserSuccess" role="status"></div>
-</form></div>
-<div class="card"><h2>Список пользователей</h2><div id="usersList" class="muted">Загружаем список…</div></div></section>
-<section id="profile" class="hidden"><div class="eyebrow">Личная информация</div><h1>Профиль</h1><div class="card profile-head"><div class="profile-avatar" id="profileAvatar">И</div><div><div class="profile-name" id="profileName">Сотрудник</div><div class="profile-role" id="profileRole">Должность не указана</div></div></div><div class="card"><div class="profile-detail"><div class="profile-detail-icon">▣</div><div><div class="profile-detail-label">Должность</div><div class="profile-detail-value" id="profileRoleValue">Не указана</div></div></div><div class="profile-detail"><div class="profile-detail-icon">▦</div><div><div class="profile-detail-label">Дата начала работы</div><div class="profile-detail-value" id="profileStartDate">Пока не указана</div></div></div><div class="profile-detail"><div class="profile-detail-icon">◷</div><div><div class="profile-detail-label">Стаж</div><div class="profile-detail-value" id="profileTenure">Рассчитается после добавления даты</div></div></div></div><p class="muted">Данные профиля будут заполняться из базы сотрудников.</p></section>
-<footer>ИЗИКОФЕ · ИЗИКЕНТ</footer></main>
-<nav class="bottom"><button class="nav active" data-page="home"><span>⌂</span>Главная</button><button class="nav" data-page="tools"><span>▦</span>Инструменты</button><button class="nav" data-page="profile"><span>♙</span>Профиль</button></nav>
+ <header><div class="header-row"><button class="logout" id="logoutButton" type="button">Выйти ↗</button></div><div class="hello" id="helloText">Привет!</div><div class="hello-sub">Новости и важная информация команды.</div></header>
+ <main>
+  <section id="homePage"><div class="eyebrow">Рабочее пространство</div><div class="row"><h1>Новости</h1><button class="secondary" id="refreshNews" type="button">↻ Обновить</button></div><div class="card" id="newsList"><p class="muted">Загружаем новости…</p></div></section>
+  <section id="publishPage" class="hidden"><div class="eyebrow">Для команды</div><h1>Публикация новости</h1>
+   <form class="card" id="newsForm">
+    <label class="field-label" for="newsTitle">Заголовок</label><input class="field" id="newsTitle" maxlength="200" required>
+    <label class="field-label" for="newsText">Текст новости</label><textarea class="field" id="newsText" maxlength="10000" required></textarea>
+    <label class="field-label" for="publicationType">Публикация</label><select class="field" id="publicationType"><option>Сразу</option><option>Запланирована</option><option>Черновик</option></select>
+    <div id="scheduleFields" class="hidden"><label class="field-label" for="publishedAt">Дата и время публикации</label><input class="field" id="publishedAt" type="datetime-local"></div>
+    <label class="field-label" for="expiresAt">Дата окончания (необязательно)</label><input class="field" id="expiresAt" class="field" type="datetime-local">
+    <label class="field-label" for="audience">Кому адресовано</label><select class="field" id="audience"><option>Все сотрудники</option><option>Выбранным сотрудникам</option><option>Выбранным должностям</option><option>Выбранным торговым точкам</option></select>
+    <label class="field-label" for="newsRoles">Должности (через запятую, необязательно)</label><input class="field" id="newsRoles" placeholder="Например: Повар, Су-шеф">
+    <label class="field-label" for="newsEmployees">Сотрудники (через запятую, необязательно)</label><input class="field" id="newsEmployees">
+    <label class="field-label" for="newsPlaces">Торговые точки (через запятую, необязательно)</label><input class="field" id="newsPlaces">
+    <label class="field-label" for="newsImage">Ссылка на изображение (необязательно)</label><input class="field" id="newsImage" type="url" placeholder="https://…">
+    <label class="field-label"><input id="newsPinned" type="checkbox"> Закрепить новость</label>
+    <button class="primary" id="publishButton" type="submit">Сохранить новость</button><div class="error" id="newsError" role="alert"></div><div class="notice hidden" id="newsSuccess" role="status"></div>
+   </form>
+  </section>
+  <section id="profilePage" class="hidden"><div class="eyebrow">Личный кабинет</div><h1>Профиль</h1><div class="card"><div class="profile-head"><div class="avatar" id="profileAvatar">И</div><div><div class="profile-name" id="profileName"></div><div class="profile-role" id="profileRole"></div></div></div><div class="detail"><span class="muted">Торговые точки</span><strong id="profilePlaces">—</strong></div><div class="detail"><span class="muted">Доступные разделы</span><strong id="profilePermissions">—</strong></div></div></section>
+ </main>
+ <nav class="bottom"><button class="nav active" data-page="homePage"><span>✦</span>Новости</button><button class="nav hidden" id="publishNav" data-page="publishPage"><span>＋</span>Публикация</button><button class="nav" data-page="profilePage"><span>♙</span>Профиль</button></nav>
 </div>
 <script>
-const API_URL='https://functions.yandexcloud.net/d4e9o48innf9ebn71t54';
-const SESSION_KEY='izikent_session_v1';
-const loginScreen=document.getElementById('loginScreen');
-const appScreen=document.getElementById('appScreen');
-const loginForm=document.getElementById('loginForm');
-const loginButton=document.getElementById('loginButton');
-const loginError=document.getElementById('loginError');
-const pinInput=document.getElementById('pin');
-const borrowForm=document.getElementById('borrowForm');
-const borrowButton=document.getElementById('borrowButton');
-const borrowError=document.getElementById('borrowError');
-const borrowSuccess=document.getElementById('borrowSuccess');
-const usersTile=document.getElementById('usersTile');
-const createUserForm=document.getElementById('createUserForm');
-const createUserButton=document.getElementById('createUserButton');
-const createUserError=document.getElementById('createUserError');
-const createUserSuccess=document.getElementById('createUserSuccess');
-const logoutButton=document.getElementById('logoutButton');
-const returnBorrower=document.getElementById('returnBorrower');
-const loadReturnDebtsButton=document.getElementById('loadReturnDebts');
-const returnDebtList=document.getElementById('returnDebtList');
-const returnFormCard=document.getElementById('returnFormCard');
-const returnSelectedInfo=document.getElementById('returnSelectedInfo');
-const returnSubmit=document.getElementById('returnSubmit');
-const returnError=document.getElementById('returnError');
-const returnSuccess=document.getElementById('returnSuccess');
-const reconcileContent=document.getElementById('reconcileContent');
-const reconcileDate=document.getElementById('reconcileDate');
-const cakesForm=document.getElementById('cakesForm');
-const cakeName=document.getElementById('cakeName');
-const cakePlace=document.getElementById('cakePlace');
-const cakeQuantity=document.getElementById('cakeQuantity');
-const cakesSubmit=document.getElementById('cakesSubmit');
-const cakesError=document.getElementById('cakesError');
-const cakesSuccess=document.getElementById('cakesSuccess');
-let cakesListsLoaded=false;
-let returnDebtChoices=[];
-let borrowItemCount=0;
-
-function calculateTenure(value){
-  const start=new Date(value+'T00:00:00');
-  if(Number.isNaN(start.getTime())||start>Date.now())return 'Дата не заполнена корректно';
-  const now=new Date();let years=now.getFullYear()-start.getFullYear();let months=now.getMonth()-start.getMonth();
-  if(now.getDate()<start.getDate())months--;
-  if(months<0){years--;months+=12;}
-  const parts=[];if(years)parts.push(years+' '+(years===1?'год':years<5?'года':'лет'));if(months||!years)parts.push(months+' '+(months===1?'месяц':months<5?'месяца':'месяцев'));
-  return parts.join(' ');
-}
-function showApp(user){
-  loginScreen.classList.add('hidden');
-  appScreen.classList.remove('hidden');
-  document.getElementById('helloText').textContent='Привет, '+user.name+'! 👋';
-  usersTile.classList.toggle('hidden', user.name!=='Максим');
-  document.getElementById('profileName').textContent=user.name||'Сотрудник';
-  document.getElementById('profileAvatar').textContent=(user.name||'И').trim().charAt(0).toUpperCase();
-  const role=user.role||'Не указана';
-  document.getElementById('profileRole').textContent=role;
-  document.getElementById('profileRoleValue').textContent=role;
-  document.getElementById('profileStartDate').textContent=user.start_date||'Пока не указана';
-  document.getElementById('profileTenure').textContent=user.start_date?calculateTenure(user.start_date):'Рассчитается после добавления даты';
-}
-function showLogin(){
-  appScreen.classList.add('hidden');
-  loginScreen.classList.remove('hidden');
-  loadLoginUsers();
-}
-function decodeTokenPayload(token){
-  try{
-    const part=token.split('.')[0].replace(/-/g,'+').replace(/_/g,'/');
-    const padded=part+'='.repeat((4-part.length%4)%4);
-    return JSON.parse(atob(padded));
-  }catch(e){return null;}
-}
-function restoreSession(){
-  try{
-    const session=JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null');
-    if(!session||!session.token)return false;
-    const payload=decodeTokenPayload(session.token);
-    if(!payload||!payload.exp||payload.exp*1000<=Date.now()){
-      sessionStorage.removeItem(SESSION_KEY);return false;
-    }
-    showApp(session.user||{name:payload.sub});
-    return true;
-  }catch(e){sessionStorage.removeItem(SESSION_KEY);return false;}
-}
-
-async function loadLoginUsers(){
-  const select=document.getElementById('employee');
-  select.innerHTML='<option value="">Загружаем сотрудников…</option>';
-  select.disabled=true;
-  loginError.textContent='';
-  try{
-    const response=await fetch(API_URL+'?action=login-users&v='+Date.now(),{cache:'no-store'});
-    const data=await response.json();
-    if(!response.ok||!data.ok) throw new Error(data.error||'Ошибка загрузки сотрудников');
-    select.innerHTML='<option value="">Выбери сотрудника</option>';
-    (data.users||[]).forEach(user=>{
-      const option=document.createElement('option');
-      option.value=user.name;option.textContent=user.name;select.appendChild(option);
-    });
-    if(!data.users||!data.users.length)select.innerHTML='<option value="">Список сотрудников пуст</option>';
-  }catch(error){
-    select.innerHTML='<option value="">Не удалось загрузить сотрудников</option>';
-    loginError.textContent='Не удалось загрузить сотрудников: '+error.message;
-  }finally{
-    select.disabled=false;
-  }
-}
-async function loadUsersList(){
-  const session=JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null');
-  const list=document.getElementById('usersList');
-  if(!session?.token){list.textContent='Сессия закончилась. Войди заново.';return;}
-  list.textContent='Загружаем список…';
-  try{
-    const response=await fetch(API_URL+'?action=users',{headers:{'X-Session-Token':session.token},cache:'no-store'});
-    const data=await response.json();if(!response.ok||!data.ok)throw new Error(data.error||'Не удалось загрузить список');
-    list.innerHTML='';
-    data.users.forEach(user=>{const item=document.createElement('div');item.className='listitem';
-      const left=document.createElement('span');left.textContent=user.name;
-      const right=document.createElement('span');right.className='pill';right.textContent=user.role;
-      item.append(left,right);list.appendChild(item);});
-    if(!data.users.length)list.textContent='Пользователей пока нет.';
-  }catch(error){list.textContent=error.message;}
-}
-
-async function loadCakesData(force=false){
-  if(cakesListsLoaded&&!force)return;
-  const session=getSession();
-  if(!session?.token)throw new Error('Сессия закончилась. Войди заново.');
-  const response=await fetch(API_URL+'?action=cakes-data',{
-    headers:{'X-Session-Token':session.token},cache:'no-store'
-  });
-  const data=await response.json();
-  if(response.status===401){sessionStorage.removeItem(SESSION_KEY);showLogin();throw new Error('Сессия закончилась. Войди заново.');}
-  if(!response.ok||!data.ok)throw new Error(data.error||'Не удалось загрузить списки тортов.');
-  const fill=(select,items,placeholder)=>{
-    select.innerHTML='';
-    const first=document.createElement('option');first.value='';first.textContent=placeholder;select.append(first);
-    (items||[]).forEach(value=>{const option=document.createElement('option');option.value=value;option.textContent=value;select.append(option);});
-  };
-  fill(cakeName,data.cakes,'Выбери торт');
-  fill(cakePlace,data.places,'Выбери торговую точку');
-  cakesListsLoaded=true;
-}
-async function openCakesPage(){
-  cakesError.textContent='';
-  cakesSuccess.classList.add('hidden');
-  try{await loadCakesData();}
-  catch(error){cakesError.textContent=error.message;}
-}cakesForm.addEventListener('submit',async(event)=>{
-  event.preventDefault();
-  cakesError.textContent='';
-  cakesSuccess.classList.add('hidden');
-  const session=getSession();
-  if(!session?.token){cakesError.textContent='Сессия закончилась. Войди заново.';showLogin();return;}
-  const cake=cakeName.value;
-  const place=cakePlace.value;
-  const quantity=cakeQuantity.value.trim();
-  if(!cake||!place||!/^[1-9]\d*$/.test(quantity)){
-    cakesError.textContent='Выбери торт и торговую точку, укажи целое количество больше нуля.';
-    return;
-  }
-  if(!confirm('Проверь запись:\n\nТорт: '+cake+'\nКоличество: '+quantity+'\nТорговая точка: '+place+'\n\nЗаписать в таблицу?'))return;
-  cakesSubmit.disabled=true;
-  cakesSubmit.textContent='Записываем…';
-  try{
-    const response=await fetch(API_URL+'?action=cakes-add',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','X-Session-Token':session.token},
-      body:JSON.stringify({cake,point:place,quantity})
-    });
-    const data=await response.json();
-    if(response.status===401){sessionStorage.removeItem(SESSION_KEY);showLogin();throw new Error('Сессия закончилась. Войди заново.');}
-    if(!response.ok||!data.ok)throw new Error(data.error||'Не удалось записать торты.');
-    cakesSuccess.textContent='Запись добавлена в таблицу «ТОРТЫ».';
-    cakesSuccess.classList.remove('hidden');
-    cakesForm.reset();
-  }catch(error){cakesError.textContent=error.message||'Ошибка связи с сервером.';}
-  finally{cakesSubmit.disabled=false;cakesSubmit.textContent='Записать в таблицу';}
-});
-
-logoutButton.addEventListener('click',()=>{
-  sessionStorage.removeItem(SESSION_KEY);
-  loginForm.reset();
-  loginError.textContent='';
-  showPage('home');
-  showLogin();
-});
-
-loginForm.addEventListener('submit',async(event)=>{
-  event.preventDefault();
-  loginError.textContent='';
-  const name=document.getElementById('employee').value;
-  const pin=pinInput.value.trim();
-  if(!name){loginError.textContent='Выбери сотрудника.';return;}
-  if(!/^\d{8}$/.test(pin)){loginError.textContent='Введи PIN-код из 8 цифр.';return;}
-  loginButton.disabled=true;
-  loginButton.textContent='Проверяем…';
-  try{
-    const response=await fetch(API_URL+'?action=login',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({name,pin})
-    });
-    const data=await response.json();
-    if(!response.ok||!data.ok||!data.token){
-      loginError.textContent=data.error||'Не удалось войти. Проверь имя и PIN.';
-      return;
-    }
-    sessionStorage.setItem(SESSION_KEY,JSON.stringify({token:data.token,user:data.user,expiresAt:Date.now()+Number(data.expires_in||28800)*1000}));
-    pinInput.value='';
-    showApp(data.user);
-  }catch(error){
-    loginError.textContent='Не удалось связаться с сервером. Проверь интернет и попробуй ещё раз.';
-  }finally{
-    loginButton.disabled=false;
-    loginButton.textContent='Войти';
-  }
-});
-
-function getSession(){
-  try{return JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null');}catch(e){return null;}
-}
-async function loadDebts(){
-  const session=getSession();
-  if(!session?.token) throw new Error('Сессия закончилась. Войди заново.');
-  const response=await fetch(API_URL+'?action=debts',{headers:{'X-Session-Token':session.token},cache:'no-store'});
-  const data=await response.json();
-  if(response.status===401){sessionStorage.removeItem(SESSION_KEY);showLogin();throw new Error('Сессия закончилась. Войди заново.');}
-  if(!response.ok||!data.ok) throw new Error(data.error||'Не удалось загрузить долги.');
-  return data;
-}
-async function showReturnDebts(){
-  const borrower=returnBorrower.value;
-  returnFormCard.classList.add('hidden');
-  returnDebtList.innerHTML='';
-  returnDebtChoices=[];
-  if(!borrower){returnDebtList.textContent='Сначала выбери точку.';return;}
-  loadReturnDebtsButton.disabled=true;
-  loadReturnDebtsButton.textContent='Загружаем…';
-  try{
-    const data=await loadDebts();
-    returnDebtChoices=data.debts.filter(d=>d.borrower===borrower);
-    if(!returnDebtChoices.length){returnDebtList.textContent='У этой точки нет открытых займов.';return;}
-    returnDebtChoices.forEach((debt,index)=>{
-      const card=document.createElement('div');card.className='card';card.style.margin='9px 0';
-      const label=document.createElement('label');label.style.display='flex';label.style.alignItems='flex-start';label.style.gap='10px';
-      const check=document.createElement('input');check.type='checkbox';check.dataset.index=index;check.style.marginTop='4px';
-      const text=document.createElement('span');const strong=document.createElement('strong');strong.textContent=debt.product+' — долг '+debt.quantity+' '+debt.unit;
-      const small=document.createElement('small');small.style.display='block';small.style.color='var(--muted)';small.textContent='У кого брали: '+debt.lender;
-      text.append(strong,small);label.append(check,text);card.append(label);
-      const qty=document.createElement('input');qty.className='select';qty.style.marginTop='10px';qty.inputMode='decimal';qty.placeholder='Количество к возврату';qty.value=debt.quantity;qty.dataset.quantity=index;qty.disabled=true;
-      check.addEventListener('change',()=>{qty.disabled=!check.checked;});
-      card.append(qty);returnDebtList.append(card);
-    });
-    const choose=document.createElement('button');choose.type='button';choose.className='primary';choose.textContent='Перейти к оформлению';
-    choose.addEventListener('click',()=>{
-      const selected=[...returnDebtList.querySelectorAll('input[type=checkbox]:checked')];
-      if(!selected.length){returnDebtList.insertAdjacentHTML('beforeend','<p class="error">Отметь хотя бы один товар.</p>');return;}
-      const items=selected.map(c=>{const d=returnDebtChoices[Number(c.dataset.index)];return {debt:d,quantity:returnDebtList.querySelector('[data-quantity="'+c.dataset.index+'"]').value.trim()};});
-      if(items.some(x=>!/^\d+(?:[.,]\d+)?$/.test(x.quantity)||Number(x.quantity.replace(',','.'))<=0||Number(x.quantity.replace(',','.'))>Number(x.debt.quantity))){
-        returnError.textContent='Проверь количество: оно должно быть больше нуля и не превышать остаток.';
-        returnFormCard.classList.remove('hidden');return;
-      }
-      returnFormCard.dataset.items=JSON.stringify(items.map(x=>({lender:x.debt.lender,product:x.debt.product,quantity:x.quantity,unit:x.debt.unit})));
-      returnSelectedInfo.innerHTML='';
-      items.forEach(x=>{const p=document.createElement('p');p.className='listitem';p.textContent=x.debt.product+' — '+x.quantity+' '+x.debt.unit+' ('+x.debt.lender+')';returnSelectedInfo.append(p);});
-      returnError.textContent='';
-      returnSuccess.classList.add('hidden');
-      returnFormCard.classList.remove('hidden');
-    });
-    returnDebtList.append(choose);
-    if(data.anomalies?.length){const warn=document.createElement('p');warn.className='error';warn.textContent='В журнале есть позиции с возвратом больше займа. Их нужно проверить.';returnDebtList.append(warn);}
-  }catch(error){returnDebtList.textContent=error.message;}
-  finally{loadReturnDebtsButton.disabled=false;loadReturnDebtsButton.textContent='Показать долги';}
-}
-async function showReconcile(){
-  reconcileContent.textContent='Загружаем сверку…';
-  try{
-    const data=await loadDebts();
-    reconcileContent.innerHTML='';
-    reconcileDate.textContent='Данные загружены: '+new Date().toLocaleString('ru-RU');
-    if(!data.debts.length){
-      const p=document.createElement('p');p.className='notice';p.textContent='Открытых займов нет. Все расчёты закрыты.';reconcileContent.append(p);
-    }else{
-      const groups={};
-      data.debts.forEach(d=>{const key=d.borrower+' → '+d.lender;(groups[key]??=[]).push(d);});
-      Object.entries(groups).forEach(([pair,items])=>{
-        const card=document.createElement('div');card.className='card';
-        const h=document.createElement('h2');h.textContent=pair;card.append(h);
-        items.forEach(d=>{
-          const line=document.createElement('div');line.className='listitem';
-          const name=document.createElement('span');name.textContent=d.product;
-          const amount=document.createElement('strong');amount.textContent=d.quantity+' '+d.unit;
-          line.append(name,amount);card.append(line);
-        });
-        reconcileContent.append(card);
-      });
-    }
-    if(data.anomalies?.length){
-      const warning=document.createElement('div');warning.className='error';
-      warning.textContent='Внимание: обнаружено '+data.anomalies.length+' позиций, где возвраты превышают займы. Проверь журнал.';
-      reconcileContent.append(warning);
-    }
-  }catch(error){reconcileContent.textContent=error.message;}
-}
-async function submitReturn(){
-  returnError.textContent='';
-  returnSuccess.classList.add('hidden');
-  let items=[];try{items=JSON.parse(returnFormCard.dataset.items||'[]');}catch(e){}
-  if(!items.length){returnError.textContent='Сначала выбери товары для возврата.';return;}
-  const session=getSession();if(!session?.token){showLogin();return;}
-  const lines=items.map((x,i)=>(i+1)+'. '+x.product+' — '+x.quantity+' '+x.unit+' (точке '+x.lender+')').join('\n');
-  if(!confirm('Подтверди возврат для точки '+returnBorrower.value+':\n\n'+lines+'\n\nОформить все позиции одной заявкой?'))return;
-  returnSubmit.disabled=true;returnSubmit.textContent='Записываем…';
-  try{
-    const response=await fetch(API_URL+'?action=return-batch',{method:'POST',headers:{'Content-Type':'application/json','X-Session-Token':session.token},body:JSON.stringify({borrower:returnBorrower.value,items,request_id:(crypto.randomUUID?crypto.randomUUID():('app_'+Date.now()+'_'+Math.random().toString(36).slice(2)))})});
-    const data=await response.json();if(response.status===401){sessionStorage.removeItem(SESSION_KEY);showLogin();throw new Error('Сессия закончилась. Войди заново.');}
-    if(!response.ok||!data.ok)throw new Error(data.error||'Не удалось записать возврат.');
-    returnSuccess.textContent=data.duplicate?'Эта заявка уже была записана.':'Возвратов оформлено: '+data.count+'.';returnSuccess.classList.remove('hidden');returnFormCard.classList.add('hidden');
-    await showReturnDebts();await showReconcile();
-  }catch(error){returnError.textContent=error.message;}
-  finally{returnSubmit.disabled=false;returnSubmit.textContent='Проверить и оформить возврат';}
-}
-loadReturnDebtsButton.addEventListener('click',showReturnDebts);
-returnSubmit.addEventListener('click',submitReturn);
-document.getElementById('refreshReconcile').addEventListener('click',showReconcile);
-
-createUserForm.addEventListener('submit',async(event)=>{
-  event.preventDefault();createUserError.textContent='';createUserSuccess.classList.add('hidden');
-  const session=JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null');
-  if(!session?.token){createUserError.textContent='Сессия закончилась. Войди заново.';showLogin();return;}
-  const name=document.getElementById('newUserName').value.trim();
-  const role=document.getElementById('newUserRole').value.trim();
-  const pin=document.getElementById('newUserPin').value.trim();
-  if(!name||!role||!/^\d{8}$/.test(pin)){createUserError.textContent='Проверь имя, роль и PIN-код из 8 цифр.';return;}
-  createUserButton.disabled=true;createUserButton.textContent='Создаём…';
-  try{
-    const response=await fetch(API_URL+'?action=users',{method:'POST',
-      headers:{'Content-Type':'application/json','X-Session-Token':session.token},
-      body:JSON.stringify({name,role,pin})});
-    const data=await response.json();
-    if(response.status===401){sessionStorage.removeItem(SESSION_KEY);showLogin();throw new Error('Сессия закончилась. Войди заново.');}
-    if(!response.ok||!data.ok)throw new Error(data.error||'Не удалось создать пользователя');
-    createUserSuccess.textContent='Пользователь '+data.user.name+' добавлен.';
-    createUserSuccess.classList.remove('hidden');createUserForm.reset();
-    await loadUsersList();await loadLoginUsers();
-  }catch(error){createUserError.textContent=error.message;}
-  finally{createUserButton.disabled=false;createUserButton.textContent='Добавить пользователя';}
-});
-
-function addBorrowItem(product='',quantity='',unit='шт'){
-  const wrap=document.createElement('div');wrap.className='card';wrap.style.margin='10px 0';
-  const row=document.createElement('div');row.className='row';
-  const label=document.createElement('strong');label.textContent='Товар '+(++borrowItemCount);
-  const remove=document.createElement('button');remove.type='button';remove.className='back';remove.textContent='Убрать';remove.addEventListener('click',()=>{wrap.remove();renumberBorrowItems();});
-  row.append(label,remove);
-  const p=document.createElement('input');p.className='select';p.maxLength=90;p.placeholder='Название товара';p.value=product;p.dataset.field='product';
-  const q=document.createElement('input');q.className='select';q.inputMode='decimal';q.placeholder='Количество';q.value=quantity;q.dataset.field='quantity';q.style.marginTop='8px';
-  const u=document.createElement('select');u.className='select';u.dataset.field='unit';u.style.marginTop='8px';['шт','кг','г','л','мл'].forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;u.append(o);});u.value=unit;
-  wrap.append(row,p,q,u);document.getElementById('borrowItems').append(wrap);
-}
-function renumberBorrowItems(){borrowItemCount=0;document.querySelectorAll('#borrowItems .card strong').forEach(x=>x.textContent='Товар '+(++borrowItemCount));}
-addBorrowItem();
-document.getElementById('addBorrowItem').addEventListener('click',()=>addBorrowItem());
-borrowForm.addEventListener('submit', async (event)=>{
-  event.preventDefault();borrowError.textContent='';borrowSuccess.classList.add('hidden');
-  const session=getSession();if(!session?.token){borrowError.textContent='Сессия закончилась. Войди заново.';showLogin();return;}
-  const borrower=document.getElementById('borrower').value,lender=document.getElementById('lender').value;
-  if(!borrower||!lender){borrowError.textContent='Выбери обе точки.';return;}
-  if(borrower===lender){borrowError.textContent='Точка не может занять сама у себя.';return;}
-  const items=[...document.querySelectorAll('#borrowItems .card')].map(card=>({product:card.querySelector('[data-field="product"]').value.trim(),quantity:card.querySelector('[data-field="quantity"]').value.trim(),unit:card.querySelector('[data-field="unit"]').value}));
-  if(!items.length||items.some(x=>!x.product||!/^\d+(?:[.,]\d+)?$/.test(x.quantity)||Number(x.quantity.replace(',','.'))<=0||Number(x.quantity.replace(',','.'))>100000)){borrowError.textContent='Проверь товары и количество во всех строках.';return;}
-  const employee=session.user?.name||decodeTokenPayload(session.token)?.sub||'Сотрудник';
-  const lines=items.map((x,i)=>(i+1)+'. '+x.product+' — '+x.quantity+' '+x.unit).join('\n');
-  if(!confirm('Проверь заявку на займ:\n\nКто занял: '+borrower+'\nУ кого заняли: '+lender+'\nСотрудник: '+employee+'\n\n'+lines+'\n\nЗаписать все товары одной заявкой?'))return;
-  borrowButton.disabled=true;borrowButton.textContent='Записываем…';
-  try{
-    const response=await fetch(API_URL+'?action=borrow-batch',{method:'POST',headers:{'Content-Type':'application/json','X-Session-Token':session.token},body:JSON.stringify({borrower,lender,items,request_id:(crypto.randomUUID?crypto.randomUUID():('app_'+Date.now()+'_'+Math.random().toString(36).slice(2)))})});
-    const data=await response.json();if(response.status===401){sessionStorage.removeItem(SESSION_KEY);showLogin();throw new Error('Сессия закончилась. Войди заново.');}
-    if(!response.ok||!data.ok)throw new Error(data.error||'Не удалось записать заявку.');
-    borrowSuccess.textContent=data.duplicate?'Эта заявка уже была записана.':'Записано товаров: '+data.count+'.';borrowSuccess.classList.remove('hidden');
-    borrowForm.reset();document.getElementById('borrowItems').innerHTML='';borrowItemCount=0;addBorrowItem();
-  }catch(error){borrowError.textContent=error.message||'Ошибка связи с сервером.';}
-  finally{borrowButton.disabled=false;borrowButton.textContent='Проверить заявку';}
-});
-
-const pages=[...document.querySelectorAll('main section')];
-function showPage(id){
-  pages.forEach(p=>p.classList.toggle('hidden',p.id!==id));
-  const activeTab=id==='profile'?'profile':(id==='home'?'home':'tools');
-  document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('active',b.dataset.page===activeTab));
-  if(id==='users')loadUsersList();
-  if(id==='reconcile')showReconcile();
-  if(id==='cakes')openCakesPage();
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
-let swReloadPending=false;
-if('serviceWorker' in navigator && location.protocol.startsWith('http')){
-  const reloadOnControllerChange=()=>{
-    if(swReloadPending)return;
-    swReloadPending=true;
-    window.location.reload();
-  };
-  navigator.serviceWorker.addEventListener('controllerchange',reloadOnControllerChange);
-  navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'})
-    .then(registration=>{
-      const checkForUpdate=()=>registration.update().catch(()=>{});
-      checkForUpdate();
-      document.addEventListener('visibilitychange',()=>{
-        if(document.visibilityState==='visible')checkForUpdate();
-      });
-      window.setInterval(checkForUpdate,60*1000);
-    })
-    .catch(()=>{});
-}
-loadLoginUsers();
-if(!restoreSession())showLogin();
+const API_URL='https://functions.yandexcloud.net/d4eg87r5uv033mv47vuq';
+const SESSION_KEY='izikent_session_v2';
+const $=id=>document.getElementById(id);
+let currentUser=null;
+function showLogin(){ $('appScreen').classList.add('hidden');$('loginScreen').classList.remove('hidden'); }
+function showApp(user){currentUser=user;$('loginScreen').classList.add('hidden');$('appScreen').classList.remove('hidden');$('helloText').textContent='Привет, '+user.name+'!';$('profileName').textContent=user.name;$('profileRole').textContent=user.role;$('profileAvatar').textContent=(user.name||'И').trim().charAt(0).toUpperCase();$('profilePlaces').textContent=(user.points||[]).join(', ')||'Не назначены';const p=user.permissions||{};const allowed=Object.keys(p).filter(k=>p[k]);$('profilePermissions').textContent=allowed.join(', ')||'Нет доступных разделов';$('publishNav').classList.toggle('hidden',!p['Публикация новостей']);loadNews();}
+function setPage(id){['homePage','publishPage','profilePage'].forEach(x=>$(x).classList.toggle('hidden',x!==id));document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('active',b.dataset.page===id));if(id==='homePage')loadNews();window.scrollTo({top:0,behavior:'smooth'});}
+document.querySelectorAll('.nav').forEach(b=>b.addEventListener('click',()=>setPage(b.dataset.page)));
+function getSession(){try{return JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null')}catch(e){return null}}
+function clearSession(){sessionStorage.removeItem(SESSION_KEY);currentUser=null;showLogin();}
+async function api(action,{method='GET',body=null,auth=true}={}){const s=getSession();const headers={};if(body!==null)headers['Content-Type']='application/json';if(auth&&s?.token)headers['X-Session-Token']=s.token;const response=await fetch(API_URL+'?action='+encodeURIComponent(action),{method,headers,body:body===null?undefined:JSON.stringify(body),cache:'no-store'});let data={};try{data=await response.json()}catch(e){throw new Error('Сервер вернул неверный ответ.')}if(response.status===401){clearSession();throw new Error(data.error||'Сессия закончилась. Войди заново.')}if(!response.ok||!data.ok)throw new Error(data.error||'Ошибка запроса.');return data;}
+async function loadLoginUsers(){try{const data=await api('login-users',{auth:false});const select=$('employee');select.innerHTML='<option value="">Выбери сотрудника</option>';(data.users||[]).forEach(u=>{const o=document.createElement('option');o.value=u.name;o.textContent=u.name;select.append(o);});}catch(e){$('employee').innerHTML='<option value="">Не удалось загрузить список</option>';$('loginError').textContent=e.message;}}
+$('loginForm').addEventListener('submit',async e=>{e.preventDefault();$('loginError').textContent='';const name=$('employee').value,pin=$('pin').value.trim();if(!name||!/^\d{8}$/.test(pin)){$('loginError').textContent='Выбери сотрудника и введи PIN из 8 цифр.';return;}$('loginButton').disabled=true;$('loginButton').textContent='Проверяем…';try{const data=await api('login',{method:'POST',auth:false,body:{name,pin}});sessionStorage.setItem(SESSION_KEY,JSON.stringify({token:data.token,user:data.user,expiresAt:Date.now()+Number(data.expires_in||28800)*1000}));$('pin').value='';showApp(data.user);}catch(err){$('loginError').textContent=err.message;}finally{$('loginButton').disabled=false;$('loginButton').textContent='Войти';}});
+function escapeHtml(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function formatDate(value){return value||'';}
+async function loadNews(){const list=$('newsList');list.innerHTML='<p class="muted">Загружаем новости…</p>';try{const data=await api('news');if(!data.news?.length){list.innerHTML='<div class="news-empty"><div class="news-mark">✦</div><h2>Пока новостей нет</h2><p class="muted">Здесь появятся новости и объявления команды.</p></div>';return;}list.innerHTML='';data.news.forEach(n=>{const article=document.createElement('article');article.className='news-item';const image=n.image&&/^https?:\/\//i.test(n.image)?'<img src="'+escapeHtml(n.image)+'" alt="" style="width:100%;max-height:220px;object-fit:cover;border-radius:15px;margin:8px 0">':'';article.innerHTML=(n.pinned?'<div class="muted pin">📌 Закреплено</div>':'')+'<h2 class="news-title">'+escapeHtml(n.title)+'</h2>'+image+'<div class="news-body">'+escapeHtml(n.text)+'</div><div class="news-meta">'+escapeHtml(n.author)+' · '+escapeHtml(formatDate(n.published_at))+'</div>';list.append(article);});}catch(e){list.innerHTML='<p class="error">'+escapeHtml(e.message)+'</p>';}}
+$('refreshNews').addEventListener('click',loadNews);
+$('publicationType').addEventListener('change',()=>{$('scheduleFields').classList.toggle('hidden',$('publicationType').value!=='Запланирована');});
+function toSheetDate(value){if(!value)return '';const d=new Date(value);if(Number.isNaN(d.getTime()))return '';const pad=n=>String(n).padStart(2,'0');return pad(d.getDate())+'.'+pad(d.getMonth()+1)+'.'+d.getFullYear()+' '+pad(d.getHours())+':'+pad(d.getMinutes());}
+$('newsForm').addEventListener('submit',async e=>{e.preventDefault();$('newsError').textContent='';$('newsSuccess').classList.add('hidden');const publication_type=$('publicationType').value;const published_at=toSheetDate($('publishedAt').value);const expires_at=toSheetDate($('expiresAt').value);if(publication_type==='Запланирована'&&!published_at){$('newsError').textContent='Укажи дату и время публикации.';return;}const body={title:$('newsTitle').value.trim(),text:$('newsText').value.trim(),publication_type,published_at,expires_at,audience:$('audience').value,roles:$('newsRoles').value.trim(),employees:$('newsEmployees').value.trim(),places:$('newsPlaces').value.trim(),pinned:$('newsPinned').checked,image:$('newsImage').value.trim()};$('publishButton').disabled=true;$('publishButton').textContent='Сохраняем…';try{const data=await api('news-create',{method:'POST',body});$('newsSuccess').textContent='Новость сохранена. Статус: '+data.status+'.';$('newsSuccess').classList.remove('hidden');$('newsForm').reset();$('scheduleFields').classList.add('hidden');if(publication_type!=='Черновик'){setPage('homePage');}else{$('newsSuccess').textContent='Черновик сохранён.';}}catch(err){$('newsError').textContent=err.message;}finally{$('publishButton').disabled=false;$('publishButton').textContent='Сохранить новость';}});
+$('logoutButton').addEventListener('click',clearSession);
+async function restoreSession(){const s=getSession();if(!s?.token||!s.expiresAt||s.expiresAt<=Date.now()){clearSession();return;}try{const data=await api('me');sessionStorage.setItem(SESSION_KEY,JSON.stringify({...s,user:data.user}));showApp(data.user);}catch(e){clearSession();}}
+loadLoginUsers();restoreSession();
+if('serviceWorker'in navigator&&location.protocol.startsWith('http')){navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).catch(()=>{});}
 </script>
 </body>
 </html>
