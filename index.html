@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#607f87"><meta name="app-version" content="7.9-glass-news-tools"><meta name="description" content="ИзиКент — помощник команды ИзиКофе">
+<meta name="theme-color" content="#607f87"><meta name="app-version" content="8.0-glass-login"><meta name="description" content="ИзиКент — помощник команды ИзиКофе">
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml">
 <title>ИзиКент</title>
 <style>
@@ -20,24 +20,27 @@ main{padding:20px 16px}.eyebrow{font-size:10px;letter-spacing:1.7px;text-transfo
 .bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(520px,100%);display:grid;grid-template-columns:repeat(3,1fr);background:#fffdf8b8;backdrop-filter:blur(24px);backdrop-filter:blur(12px);border:1px solid var(--line);border-bottom:0;border-radius:25px 25px 0 0;padding:9px 8px calc(9px + env(safe-area-inset-bottom));z-index:5;box-shadow:0 -4px 18px #39282010}.nav{border:0;background:transparent;color:#8d8984;font-size:11px;padding:5px 2px}.nav span{display:block;font-size:22px;margin-bottom:3px}.nav.active{color:var(--blue-dark);font-weight:800}
 .news-empty{text-align:center;padding:25px 18px}.news-mark{width:58px;height:58px;border-radius:18px;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;background:var(--blue-dark);color:white;font-size:28px;box-shadow:0 8px 18px #35576235}.news-empty h2{margin:0 0 8px}.profile-head{display:flex;align-items:center;gap:14px;padding:18px}.profile-avatar{width:66px;height:66px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--blue);color:#fff;font-size:29px;font-weight:800;flex:none}.profile-name{font-size:21px;font-weight:800;color:var(--espresso)}.profile-role{font-size:14px;color:var(--muted);margin-top:5px}.profile-detail{display:flex;align-items:center;gap:13px;padding:15px 2px;border-bottom:1px solid var(--line)}.profile-detail:last-child{border-bottom:0}.profile-detail-icon{width:38px;height:38px;border-radius:12px;background:var(--blue-light);color:var(--blue-dark);display:flex;align-items:center;justify-content:center;font-size:19px;flex:none}.profile-detail-label{font-size:12px;color:var(--muted)}.profile-detail-value{font-size:15px;font-weight:750;margin-top:4px;color:var(--espresso)}
 footer{text-align:center;color:var(--muted);font-size:10px;padding:8px 0 18px}
-.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:18px}.login-card{width:100%;max-width:440px;background:var(--paper);border:1px solid var(--line);border-radius:24px;padding:22px;box-shadow:var(--shadow)}.login-logo{display:block;width:190px;height:190px;object-fit:contain;margin:-5px auto 5px}.login-card h1{text-align:center;margin:0 0 7px}.login-card .muted{text-align:center;margin:0 0 20px}.field-label{display:block;font-size:13px;font-weight:700;color:var(--blue-dark);margin:14px 0 7px}.select,.pin{width:100%;border:1px solid var(--line);border-radius:13px;background:#fff;padding:14px;color:var(--espresso);outline:none}.pin{text-align:center;font-size:22px;letter-spacing:8px}.primary{width:100%;border:0;border-radius:14px;background:var(--blue-dark);color:white;font-weight:750;padding:15px;margin-top:18px}.primary:disabled{opacity:.55;cursor:wait}.error{color:#a33b32;font-size:13px;line-height:1.4;margin-top:12px;min-height:18px}.login-foot{text-align:center;color:var(--muted);font-size:11px;margin-top:18px}
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px 18px;background:radial-gradient(ellipse at 10% 12%,#f6f0e6a8,transparent 36%),radial-gradient(ellipse at 90% 80%,#dce7e7a8,transparent 40%)}.login-shell{width:100%;max-width:440px}.login-intro{color:#fff;padding:0 8px 24px}.login-intro h1{font-size:34px;line-height:1.12;letter-spacing:-.7px;color:#fff;margin:0 0 12px;text-shadow:0 3px 14px #173a4080}.login-intro p{font-size:16px;line-height:1.4;margin:0;color:#ffffffdf}.login-card{width:100%;background:#fffdf8a8;border:1px solid #ffffffc9;border-radius:30px;padding:26px 22px 22px;box-shadow:0 16px 38px #173a4033,inset 0 1px 0 #ffffffed;backdrop-filter:blur(26px);-webkit-backdrop-filter:blur(26px)}.field-label{display:block;font-size:13px;font-weight:750;color:var(--blue-dark);margin:14px 0 7px}.select,.pin{width:100%;border:1px solid #ffffffd9;border-radius:18px;background:#fffdf8b8;padding:16px;color:var(--espresso);outline:none;box-shadow:inset 0 1px 3px #35576212,0 4px 12px #35576210;backdrop-filter:blur(16px)}.select:focus,.pin:focus{border-color:var(--blue);box-shadow:0 0 0 3px #607f8730}.pin{text-align:center;font-size:22px;letter-spacing:8px}.primary{width:100%;border:1px solid #ffffff55;border-radius:18px;background:linear-gradient(135deg,#7b8058,#68764e);color:white;font-weight:800;padding:17px;margin-top:22px;box-shadow:0 8px 18px #59604440}.primary:disabled{opacity:.55;cursor:wait}.error{color:#a33b32;font-size:13px;line-height:1.4;margin-top:12px;min-height:18px}.login-foot{text-align:center;color:#655b51;font-size:11px;font-weight:700;letter-spacing:1px;margin-top:20px}
 @media(min-width:600px){body{padding:24px 0}.app{border-radius:28px;overflow:hidden;min-height:850px;box-shadow:0 15px 50px #34271d20}.bottom{bottom:24px;border-radius:0 0 28px 28px}}
 </style></head>
 <body>
 <section id="loginScreen" class="login-wrap">
-  <div class="login-card">
-    
-    <h1>Вход в ИзиКент</h1>
-    <p class="muted">Выбери своё имя и введи PIN-код</p>
-    <form id="loginForm">
-      <label class="field-label" for="employee">Сотрудник</label>
-      <select class="select" id="employee" required><option value="">Загружаем сотрудников…</option></select>
-      <label class="field-label" for="pin">PIN-код</label>
-      <input class="pin" id="pin" type="password" inputmode="numeric" pattern="[0-9]{8}" maxlength="8" minlength="8" placeholder="••••••••" autocomplete="current-password" required>
-      <button class="primary" id="loginButton" type="submit">Войти</button>
-      <div class="error" id="loginError" role="alert"></div>
-    </form>
-    <div class="login-foot">ИЗИКОФЕ · ИЗИКЕНТ</div>
+  <div class="login-shell">
+    <div class="login-intro">
+      <h1>Добро пожаловать<br>в ИзиКент!</h1>
+      <p>Выбери своё имя и введи PIN-код</p>
+    </div>
+    <div class="login-card">
+      <form id="loginForm">
+        <label class="field-label" for="employee">Сотрудник</label>
+        <select class="select" id="employee" required><option value="">Загружаем сотрудников…</option></select>
+        <label class="field-label" for="pin">PIN-код</label>
+        <input class="pin" id="pin" type="password" inputmode="numeric" pattern="[0-9]{8}" maxlength="8" minlength="8" placeholder="••••••••" autocomplete="current-password" required>
+        <button class="primary" id="loginButton" type="submit">Войти</button>
+        <div class="error" id="loginError" role="alert"></div>
+      </form>
+      <div class="login-foot">ИЗИКОФЕ · ИЗИКЕНТ</div>
+    </div>
   </div>
 </section>
 <div class="app hidden" id="appScreen">
