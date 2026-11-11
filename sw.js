@@ -1,4 +1,4 @@
-const CACHE_NAME = "izikent-v7-4";
+const CACHE_NAME = "izikent-v8-0-main-news";
 const APP_SHELL = [
   "./",
   "./index.html",
