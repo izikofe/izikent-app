@@ -268,7 +268,7 @@ async function loadUsersList(){
     const rolePlaceholder=document.createElement('option');rolePlaceholder.value='';rolePlaceholder.textContent=roles.length?'Выбери должность':'Должности не найдены';newUserRole.append(rolePlaceholder);
     roles.forEach(role=>{const option=document.createElement('option');option.value=role;option.textContent=role;newUserRole.append(option);});
     if(roles.includes(selectedRole))newUserRole.value=selectedRole;
-    data.users.forEach(user=>{
+    data.users.filter(user=>user.active!==false).forEach(user=>{
       const item=document.createElement('div');item.className='card';item.style.margin='8px 0';
       const name=document.createElement('strong');name.textContent=user.name;item.append(name);
       const select=document.createElement('select');select.className='select';select.style.marginTop='8px';
@@ -280,7 +280,18 @@ async function loadUsersList(){
         const result=await res.json();if(!res.ok||!result.ok)throw new Error(result.error||'Не удалось изменить должность');
         save.textContent='Сохранено';user.role=select.value;
       }catch(e){alert(e.message);}finally{save.disabled=false;}});
-      item.append(save);list.append(item);
+      item.append(save);
+      const remove=document.createElement('button');remove.type='button';remove.className='secondary';remove.textContent='Удалить сотрудника';remove.style.cssText='margin:8px 0 0 8px;color:#a43d36';
+      remove.addEventListener('click',async()=>{
+        if(!confirm('Отключить сотрудника «'+user.name+'»? Он больше не сможет войти в приложение. История записей сохранится.'))return;
+        remove.disabled=true;remove.textContent='Отключаем…';
+        try{
+          const res=await fetch(API_URL+'?action=users',{method:'POST',headers:{'Content-Type':'application/json','X-Session-Token':session.token},body:JSON.stringify({mode:'delete',name:user.name})});
+          const result=await res.json();if(!res.ok||!result.ok)throw new Error(result.error||'Не удалось отключить сотрудника');
+          item.remove();
+        }catch(e){alert(e.message);remove.disabled=false;remove.textContent='Удалить сотрудника';}
+      });
+      item.append(remove);list.append(item);
     });
     const roleName=document.getElementById('editRoleName'), holder=document.getElementById('rolePermissions');
     holder.innerHTML='';
