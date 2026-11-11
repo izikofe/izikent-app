@@ -124,7 +124,7 @@ footer{text-align:center;color:var(--muted);font-size:10px;padding:8px 0 18px}
 <div class="card"><h2>Добавить пользователя</h2><p class="muted">Задай имя, роль и PIN-код из 8 цифр.</p>
 <form id="createUserForm">
 <label class="field-label" for="newUserName">Имя сотрудника</label><input class="select" id="newUserName" type="text" maxlength="50" placeholder="Например, Анна" required>
-<label class="field-label" for="newUserRole">Роль</label><input class="select" id="newUserRole" type="text" maxlength="50" placeholder="Роль можно придумать позже" required>
+<label class="field-label" for="newUserRole">Должность</label><select class="select" id="newUserRole" required><option value="">Загружаем должности…</option></select>
 <label class="field-label" for="newUserPin">PIN-код (8 цифр)</label><input class="select" id="newUserPin" type="password" inputmode="numeric" pattern="[0-9]{8}" maxlength="8" minlength="8" placeholder="••••••••" autocomplete="new-password" required>
 <button class="primary" id="createUserButton" type="submit">Добавить пользователя</button><div class="error" id="createUserError" role="alert"></div><div class="notice hidden" id="createUserSuccess" role="status"></div>
 </form></div>
@@ -262,6 +262,12 @@ async function loadUsersList(){
     const data=await response.json();if(!response.ok||!data.ok)throw new Error(data.error||'Не удалось загрузить список');
     usersEditorData=data;list.innerHTML='';
     const roles=Object.keys(data.roles||{});
+    const newUserRole=document.getElementById('newUserRole');
+    const selectedRole=newUserRole.value;
+    newUserRole.innerHTML='';
+    const rolePlaceholder=document.createElement('option');rolePlaceholder.value='';rolePlaceholder.textContent=roles.length?'Выбери должность':'Должности не найдены';newUserRole.append(rolePlaceholder);
+    roles.forEach(role=>{const option=document.createElement('option');option.value=role;option.textContent=role;newUserRole.append(option);});
+    if(roles.includes(selectedRole))newUserRole.value=selectedRole;
     data.users.forEach(user=>{
       const item=document.createElement('div');item.className='card';item.style.margin='8px 0';
       const name=document.createElement('strong');name.textContent=user.name;item.append(name);
