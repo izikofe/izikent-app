@@ -128,7 +128,8 @@ footer{text-align:center;color:var(--muted);font-size:10px;padding:8px 0 18px}
 <label class="field-label" for="newUserPin">PIN-код (8 цифр)</label><input class="select" id="newUserPin" type="password" inputmode="numeric" pattern="[0-9]{8}" maxlength="8" minlength="8" placeholder="••••••••" autocomplete="new-password" required>
 <button class="primary" id="createUserButton" type="submit">Добавить пользователя</button><div class="error" id="createUserError" role="alert"></div><div class="notice hidden" id="createUserSuccess" role="status"></div>
 </form></div>
-<div class="card"><h2>Список пользователей</h2><div id="usersList" class="muted">Загружаем список…</div></div></section>
+<div class="card"><h2>Список пользователей</h2><p class="muted">Выбери должность сотрудника и сохрани изменения.</p><div id="usersList" class="muted">Загружаем список…</div></div>
+<div class="card"><h2>Должности и доступы</h2><p class="muted">Настрой доступы для каждой должности. Изменения применятся ко всем сотрудникам с этой должностью.</p><label class="field-label" for="editRoleName">Должность</label><input class="select" id="editRoleName" maxlength="100" placeholder="Например, Бариста"><div id="rolePermissions"></div><button class="primary" id="saveRoleButton" type="button">Сохранить должность и доступы</button><div class="error" id="roleEditorError"></div><div class="notice hidden" id="roleEditorSuccess"></div></div></section>
 <section id="profile" class="hidden"><div class="eyebrow">Личная информация</div><h1>Профиль</h1><div class="card profile-head"><div class="profile-avatar" id="profileAvatar">И</div><div><div class="profile-name" id="profileName">Сотрудник</div><div class="profile-role" id="profileRole">Должность не указана</div></div></div><div class="card"><div class="profile-detail"><div class="profile-detail-icon">▣</div><div><div class="profile-detail-label">Должность</div><div class="profile-detail-value" id="profileRoleValue">Не указана</div></div></div><div class="profile-detail"><div class="profile-detail-icon">▦</div><div><div class="profile-detail-label">Дата начала работы</div><div class="profile-detail-value" id="profileStartDate">Пока не указана</div></div></div><div class="profile-detail"><div class="profile-detail-icon">◷</div><div><div class="profile-detail-label">Стаж</div><div class="profile-detail-value" id="profileTenure">Рассчитается после добавления даты</div></div></div></div><p class="muted">Данные профиля будут заполняться из базы сотрудников.</p></section>
 <footer>ИЗИКОФЕ · ИЗИКЕНТ</footer></main>
 <nav class="bottom"><button class="nav active" data-page="home"><span class="glass-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="4" width="14" height="18" rx="2.5"/><path d="M10 9h8M10 13h8M10 17h5"/></svg></span>Новости</button><button class="nav" data-page="tools"><span class="glass-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg></span>Инструменты</button><button class="nav" data-page="profile"><span class="glass-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c.7-4 3.4-6 8-6s7.3 2 8 6z"/></svg></span>Профиль</button></nav>
@@ -249,6 +250,8 @@ async function loadLoginUsers(){
   }catch(error){select.innerHTML='<option value="">Не удалось загрузить сотрудников</option>';loginError.textContent='Не удалось загрузить активных сотрудников: '+error.message;}
   finally{select.disabled=false;}
 }
+const permissionNames=['Главная','Торты','Займы','Возвраты','Сверка','Пользователи','Управление базой','Публикация новостей'];
+let usersEditorData=null;
 async function loadUsersList(){
   const session=JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null');
   const list=document.getElementById('usersList');
@@ -257,14 +260,49 @@ async function loadUsersList(){
   try{
     const response=await fetch(API_URL+'?action=users',{headers:{'X-Session-Token':session.token},cache:'no-store'});
     const data=await response.json();if(!response.ok||!data.ok)throw new Error(data.error||'Не удалось загрузить список');
-    list.innerHTML='';
-    data.users.forEach(user=>{const item=document.createElement('div');item.className='listitem';
-      const left=document.createElement('span');left.textContent=user.name;
-      const right=document.createElement('span');right.className='pill';right.textContent=user.role;
-      item.append(left,right);list.appendChild(item);});
-    if(!data.users.length)list.textContent='Пользователей пока нет.';
+    usersEditorData=data;list.innerHTML='';
+    const roles=Object.keys(data.roles||{});
+    data.users.forEach(user=>{
+      const item=document.createElement('div');item.className='card';item.style.margin='8px 0';
+      const name=document.createElement('strong');name.textContent=user.name;item.append(name);
+      const select=document.createElement('select');select.className='select';select.style.marginTop='8px';
+      roles.forEach(role=>{const o=document.createElement('option');o.value=role;o.textContent=role;o.selected=role===user.role;select.append(o);});
+      item.append(select);
+      const save=document.createElement('button');save.type='button';save.className='secondary';save.textContent='Сохранить должность';save.style.marginTop='8px';
+      save.addEventListener('click',async()=>{save.disabled=true;try{
+        const res=await fetch(API_URL+'?action=users',{method:'POST',headers:{'Content-Type':'application/json','X-Session-Token':session.token},body:JSON.stringify({mode:'role',name:user.name,role:select.value})});
+        const result=await res.json();if(!res.ok||!result.ok)throw new Error(result.error||'Не удалось изменить должность');
+        save.textContent='Сохранено';user.role=select.value;
+      }catch(e){alert(e.message);}finally{save.disabled=false;}});
+      item.append(save);list.append(item);
+    });
+    const roleName=document.getElementById('editRoleName'), holder=document.getElementById('rolePermissions');
+    holder.innerHTML='';
+    roles.forEach(role=>{
+      const btn=document.createElement('button');btn.type='button';btn.className='secondary';btn.textContent=role;btn.style.margin='4px';
+      btn.addEventListener('click',()=>{roleName.value=role;renderRolePermissions(data.roles[role]);});
+      holder.append(btn);
+    });
+    roleName.value='';renderRolePermissions({});
   }catch(error){list.textContent=error.message;}
 }
+function renderRolePermissions(values){
+  const holder=document.getElementById('rolePermissions');holder.querySelectorAll('label.permission-row').forEach(x=>x.remove());
+  permissionNames.forEach(name=>{const label=document.createElement('label');label.className='permission-row';label.style.cssText='display:flex;gap:10px;align-items:center;padding:8px 0';
+    const input=document.createElement('input');input.type='checkbox';input.dataset.permission=name;input.checked=!!values[name];
+    const span=document.createElement('span');span.textContent=name;label.append(input,span);holder.append(label);});
+}
+document.getElementById('saveRoleButton').addEventListener('click',async()=>{
+  const session=getSession(),role=document.getElementById('editRoleName').value.trim(),error=document.getElementById('roleEditorError'),success=document.getElementById('roleEditorSuccess');
+  error.textContent='';success.classList.add('hidden');
+  if(!session?.token||!role){error.textContent='Укажи должность.';return;}
+  const permissions={};document.querySelectorAll('[data-permission]').forEach(x=>permissions[x.dataset.permission]=x.checked);
+  const button=document.getElementById('saveRoleButton');button.disabled=true;
+  try{const response=await fetch(API_URL+'?action=users',{method:'POST',headers:{'Content-Type':'application/json','X-Session-Token':session.token},body:JSON.stringify({role,permissions})});
+    const data=await response.json();if(!response.ok||!data.ok)throw new Error(data.error||'Не удалось сохранить доступы');
+    success.textContent='Должность и доступы сохранены.';success.classList.remove('hidden');await loadUsersList();
+  }catch(e){error.textContent=e.message;}finally{button.disabled=false;}
+});
 
 async function loadCakesData(force=false){
   if(cakesListsLoaded&&!force)return;
