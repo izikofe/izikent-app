@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#607f87"><meta name="app-version" content="11.0-smart-fixed-menu"><meta name="description" content="ИзиКент — помощник команды ИзиКофе">
+<meta name="theme-color" content="#607f87"><meta name="app-version" content="11.1-live-permissions"><meta name="description" content="ИзиКент — помощник команды ИзиКофе">
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml">
 <title>ИзиКент</title>
 <style>
@@ -564,7 +564,7 @@ function newsTimestamp(value){
 async function loadNews(){
  const list=document.getElementById('newsList');if(!list)return;list.innerHTML='<p class="muted">Загружаем новости…</p>';
  try{
-  const data=await newsApi('news');const session=getNewsSession();const canPublish=!!session?.newsUser?.permissions?.['Публикация новостей'];
+  const data=await newsApi('news');const me=await newsApi('me');const canPublish=!!me.user?.permissions?.['Публикация новостей'];
   document.getElementById('composeToggle').classList.toggle('hidden',!canPublish);
   if(!data.news?.length){list.innerHTML='<div class="news-empty"><div class="news-mark">✦</div><h2>Пока новостей нет</h2><p class="muted">Здесь появятся новости и объявления команды.</p></div>';return;}
   list.innerHTML='';
