@@ -334,7 +334,7 @@ loginForm.addEventListener('submit',async(event)=>{
  event.preventDefault();loginError.textContent='';
  const name=document.getElementById('employee').value,pin=pinInput.value.trim();
  if(!name){loginError.textContent='Выбери сотрудника.';return;}
- if(!/^\\d{8}$/.test(pin)){loginError.textContent='Введи PIN-код из 8 цифр.';return;}
+ if(!/^\d{8}$/.test(pin)){loginError.textContent='Введи PIN-код из 8 цифр.';return;}
  loginButton.disabled=true;loginButton.textContent='Проверяем…';
  try{
   const response=await fetch(API_URL+'?action=login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,pin}),cache:'no-store'});
