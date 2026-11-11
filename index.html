@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#607f87"><meta name="app-version" content="11.5-current-staff-login"><meta name="description" content="ИзиКент — помощник команды ИзиКофе">
+<meta name="theme-color" content="#607f87"><meta name="app-version" content="12.0-unified-api"><meta name="description" content="ИзиКент — помощник команды ИзиКофе">
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml">
 <title>ИзиКент</title>
 <style>
@@ -66,8 +66,8 @@ footer{text-align:center;color:var(--muted);font-size:10px;padding:8px 0 18px}
 </section>
 <section id="tools" class="hidden">
  <div class="eyebrow">Рабочее пространство</div><h1>Инструменты</h1>
- <div class="grid"><button class="tile" data-page="loans"><div class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="#315966" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h16l-3-3m3 3-3 3M21 16H5l3 3m-3-3 3-3"/></g></svg></div><div><strong>Займы и возвраты</strong><small>Занять товар, вернуть и посмотреть сверку между точками</small></div></button></div>
-<div class="grid" style="margin-top:12px"><button class="tile" data-page="cakes"><div class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="#315966" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 13h10v6H7zM7 13c-2-1-2-4 0-5 1-.5 2 0 2.5 1C10 7 11 6 12 6s2 1 2.5 3c.5-1 1.5-1.5 2.5-1 2 1 2 4 0 5M9 19v2m6-2v2"/></g></svg></div><div><strong>Торты</strong><small>Записать количество тортов по торговым точкам</small></div></button></div>
+ <div class="grid"><button class="tile" id="loansTile" data-page="loans"><div class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="#315966" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h16l-3-3m3 3-3 3M21 16H5l3 3m-3-3 3-3"/></g></svg></div><div><strong>Займы и возвраты</strong><small>Занять товар, вернуть и посмотреть сверку между точками</small></div></button></div>
+<div class="grid" style="margin-top:12px"><button class="tile" id="cakesTile" data-page="cakes"><div class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="#315966" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 13h10v6H7zM7 13c-2-1-2-4 0-5 1-.5 2 0 2.5 1C10 7 11 6 12 6s2 1 2.5 3c.5-1 1.5-1.5 2.5-1 2 1 2 4 0 5M9 19v2m6-2v2"/></g></svg></div><div><strong>Торты</strong><small>Записать количество тортов по торговым точкам</small></div></button></div>
 <div class="grid" style="margin-top:12px">
 <button class="tile" type="button" disabled aria-label="Отработка процентов потерь — скоро"><div class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="#315966" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m12 6 1.5 4.5L18 12l-4.5 1.5L12 18l-1.5-4.5L6 12l4.5-1.5z"/></g></svg></div><div style="flex:1"><strong>Отработка % потерь</strong><small>Учёт отработки потерь</small></div><span class="pill">Скоро</span></button>
 </div>
@@ -92,8 +92,8 @@ footer{text-align:center;color:var(--muted);font-size:10px;padding:8px 0 18px}
 <div class="error" id="borrowError" role="alert"></div><div class="notice hidden" id="borrowSuccess" role="status"></div>
 </form></div>
 <div class="card"><h2>Другие операции</h2>
-<button class="tile" data-page="returns" style="width:100%;margin-top:10px"><div class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="#315966" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m-4-4 4 4 4-4"/><path d="M4 17v3h16v-3"/></g></svg></div><div><strong>Возврат товара</strong><small>Посмотреть открытые займы и оформить возврат</small></div></button>
-<button class="tile" data-page="reconcile" style="width:100%;margin-top:10px"><div class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="#315966" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10m5 10V4m5 16v-7m5 7V7"/></g></svg></div><div><strong>Сверка задолженностей</strong><small>Посмотреть текущие долги между точками</small></div></button>
+<button class="tile" id="returnTile" data-page="returns" style="width:100%;margin-top:10px"><div class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="#315966" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m-4-4 4 4 4-4"/><path d="M4 17v3h16v-3"/></g></svg></div><div><strong>Возврат товара</strong><small>Посмотреть открытые займы и оформить возврат</small></div></button>
+<button class="tile" id="reconcileTile" data-page="reconcile" style="width:100%;margin-top:10px"><div class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="#315966" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10m5 10V4m5 16v-7m5 7V7"/></g></svg></div><div><strong>Сверка задолженностей</strong><small>Посмотреть текущие долги между точками</small></div></button>
 </div></section>
 <section id="returns" class="hidden"><button class="back" data-page="home">← Главное меню</button><div class="eyebrow">Займы и возвраты</div><h1>Возврат товара</h1>
 <div class="card"><h2>Открытые займы</h2><p class="muted">Выбери точку, которая брала товар. Покажем только её незакрытые долги.</p>
@@ -134,8 +134,8 @@ footer{text-align:center;color:var(--muted);font-size:10px;padding:8px 0 18px}
 <nav class="bottom"><button class="nav active" data-page="home"><span class="glass-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="4" width="14" height="18" rx="2.5"/><path d="M10 9h8M10 13h8M10 17h5"/></svg></span>Новости</button><button class="nav" data-page="tools"><span class="glass-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg></span>Инструменты</button><button class="nav" data-page="profile"><span class="glass-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c.7-4 3.4-6 8-6s7.3 2 8 6z"/></svg></span>Профиль</button></nav>
 </div>
 <script>
-const API_URL='https://functions.yandexcloud.net/d4e9o48innf9ebn71t54';
-const NEWS_API_URL='https://functions.yandexcloud.net/d4eg87r5uv033mv47vuq';
+const API_URL='https://functions.yandexcloud.net/d4eg87r5uv033mv47vuq';
+const NEWS_API_URL=API_URL;
 const SESSION_KEY='izikent_session_v1';
 const loginScreen=document.getElementById('loginScreen');
 const appScreen=document.getElementById('appScreen');
@@ -184,18 +184,31 @@ function calculateTenure(value){
   return parts.join(' ');
 }
 function showApp(user){
-  loginScreen.classList.add('hidden');
-  appScreen.classList.remove('hidden');
-  document.getElementById('helloText').textContent='Привет, '+user.name+'! 👋';
-  usersTile.classList.toggle('hidden', user.name!=='Максим');
-  document.getElementById('profileName').textContent=user.name||'Сотрудник';
-  document.getElementById('profileAvatar').textContent=(user.name||'И').trim().charAt(0).toUpperCase();
-  const role=user.role||'Не указана';
-  document.getElementById('profileRole').textContent=role;
-  document.getElementById('profileRoleValue').textContent=role;
-  document.getElementById('profileStartDate').textContent=user.start_date||'Пока не указана';
-  document.getElementById('profileTenure').textContent=user.start_date?calculateTenure(user.start_date):'Рассчитается после добавления даты';
-  loadNews();
+ loginScreen.classList.add('hidden');appScreen.classList.remove('hidden');
+ document.getElementById('helloText').textContent='Привет, '+user.name+'! 👋';
+ document.getElementById('profileName').textContent=user.name||'Сотрудник';
+ document.getElementById('profileAvatar').textContent=(user.name||'И').trim().charAt(0).toUpperCase();
+ const role=user.role||'Не указана';
+ document.getElementById('profileRole').textContent=role;document.getElementById('profileRoleValue').textContent=role;
+ document.getElementById('profileStartDate').textContent=user.start_date||'Пока не указана';
+ document.getElementById('profileTenure').textContent=user.start_date?calculateTenure(user.start_date):'Рассчитается после добавления даты';
+ refreshAccessRights();loadNews();loadPlaces();
+}
+async function refreshAccessRights(){
+ try{
+  const me=await newsApi('me');const p=me.user?.permissions||{};
+  const owner=me.user?.name==='Максим'||me.user?.role==='Шеф-повар';
+  const allowed=k=>owner||p[k]===true;
+  window.izikentPermissions={...p,owner};
+  document.getElementById('cakesTile')?.classList.toggle('hidden',!allowed('Торты'));
+  document.getElementById('loansTile')?.classList.toggle('hidden',!allowed('Займы'));
+  document.getElementById('returnTile')?.classList.toggle('hidden',!allowed('Возвраты'));
+  document.getElementById('reconcileTile')?.classList.toggle('hidden',!allowed('Сверка'));
+  document.getElementById('usersTile')?.classList.toggle('hidden',!allowed('Пользователи'));
+ }catch(e){window.izikentPermissions={};['cakesTile','loansTile','returnTile','reconcileTile','usersTile'].forEach(id=>document.getElementById(id)?.classList.add('hidden'));}
+}
+async function loadPlaces(){
+ try{const d=await newsApi('places');const names=d.places||[];['borrower','lender','returnBorrower'].forEach(id=>{const el=document.getElementById(id);if(!el)return;const previous=el.value;el.innerHTML='<option value="">Выбери точку</option>';names.forEach(n=>{const o=document.createElement('option');o.value=n;o.textContent=n;el.append(o);});if(names.includes(previous))el.value=previous;});}catch(e){}
 }
 function showLogin(){
   appScreen.classList.add('hidden');
@@ -227,7 +240,7 @@ async function loadLoginUsers(){
   select.innerHTML='<option value="">Загружаем сотрудников…</option>';
   select.disabled=true;loginError.textContent='';
   try{
-    const response=await fetch(NEWS_API_URL+'?action=login-users&v='+Date.now(),{cache:'no-store'});
+    const response=await fetch(API_URL+'?action=login-users&v='+Date.now(),{cache:'no-store'});
     const data=await response.json();
     if(!response.ok||!data.ok)throw new Error(data.error||'Ошибка загрузки активных сотрудников');
     select.innerHTML='<option value="">Выбери сотрудника</option>';
@@ -318,26 +331,20 @@ logoutButton.addEventListener('click',()=>{
 });
 
 loginForm.addEventListener('submit',async(event)=>{
-  event.preventDefault();loginError.textContent='';
-  const name=document.getElementById('employee').value;
-  const pin=pinInput.value.trim();
-  if(!name){loginError.textContent='Выбери сотрудника.';return;}
-  if(!/^\\d{8}$/.test(pin)){loginError.textContent='Введи PIN-код из 8 цифр.';return;}
-  loginButton.disabled=true;loginButton.textContent='Проверяем…';
-  try{
-    const nr=await fetch(NEWS_API_URL+'?action=login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,pin}),cache:'no-store'});
-    const nd=await nr.json();
-    if(!nr.ok||!nd.ok||!nd.token)throw new Error(nd.error||'Не удалось войти. Проверь имя и PIN.');
-    let legacyToken=null,legacyUser=null;
-    try{
-      const lr=await fetch(API_URL+'?action=login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,pin}),cache:'no-store'});
-      const ld=await lr.json();if(lr.ok&&ld.ok&&ld.token){legacyToken=ld.token;legacyUser=ld.user;}
-    }catch(_){}
-    const expiresAt=Date.now()+Number(nd.expires_in||28800)*1000;
-    sessionStorage.setItem(SESSION_KEY,JSON.stringify({token:legacyToken,user:legacyUser||nd.user,expiresAt,newsToken:nd.token,newsUser:nd.user,newsExpiresAt:expiresAt}));
-    pinInput.value='';showApp(nd.user);
-  }catch(error){loginError.textContent=error.message||'Не удалось связаться с сервером. Проверь интернет и попробуй ещё раз.';}
-  finally{loginButton.disabled=false;loginButton.textContent='Войти';}
+ event.preventDefault();loginError.textContent='';
+ const name=document.getElementById('employee').value,pin=pinInput.value.trim();
+ if(!name){loginError.textContent='Выбери сотрудника.';return;}
+ if(!/^\\d{8}$/.test(pin)){loginError.textContent='Введи PIN-код из 8 цифр.';return;}
+ loginButton.disabled=true;loginButton.textContent='Проверяем…';
+ try{
+  const response=await fetch(API_URL+'?action=login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,pin}),cache:'no-store'});
+  const data=await response.json();
+  if(!response.ok||!data.ok||!data.token)throw new Error(data.error||'Не удалось войти. Проверь имя и PIN.');
+  const expiresAt=Date.now()+Number(data.expires_in||28800)*1000;
+  sessionStorage.setItem(SESSION_KEY,JSON.stringify({token:data.token,user:data.user,expiresAt,newsToken:data.token,newsUser:data.user,newsExpiresAt:expiresAt}));
+  pinInput.value='';showApp(data.user);
+ }catch(error){loginError.textContent=error.message||'Не удалось связаться с сервером.';}
+ finally{loginButton.disabled=false;loginButton.textContent='Войти';}
 });
 
 function getSession(){
@@ -509,6 +516,9 @@ borrowForm.addEventListener('submit', async (event)=>{
 
 const pages=[...document.querySelectorAll('main section')];
 function showPage(id){
+  const rights=window.izikentPermissions||{},owner=!!rights.owner;
+  const needed={loans:'Займы',returns:'Возвраты',reconcile:'Сверка',cakes:'Торты',users:'Пользователи'};
+  if(needed[id]&&!owner&&rights[needed[id]]!==true){showPage('tools');return;}
   pages.forEach(p=>p.classList.toggle('hidden',p.id!==id));
   const activeTab=id==='profile'?'profile':(id==='home'?'home':'tools');
   document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('active',b.dataset.page===activeTab));
@@ -540,8 +550,8 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
 loadLoginUsers();
 if(!restoreSession())showLogin();
 
-function getNewsSession(){const x=getSession();return x?.newsToken&&x.newsExpiresAt>Date.now()?x:null;}
-async function newsApi(action,{method='GET',body=null}={}){const session=getNewsSession();if(!session)throw new Error('Новости пока недоступны: не удалось войти в новый сервис. Проверь доступ сотрудника.');const headers={'X-Session-Token':session.newsToken};if(body!==null)headers['Content-Type']='application/json';const response=await fetch(NEWS_API_URL+'?action='+encodeURIComponent(action),{method,headers,body:body===null?undefined:JSON.stringify(body),cache:'no-store'});let data={};try{data=await response.json()}catch(_){throw new Error('Сервер новостей вернул неверный ответ.')}if(!response.ok||!data.ok)throw new Error(data.error||'Ошибка сервиса новостей.');return data;}
+function getNewsSession(){const x=getSession();return x?.token?x:null;}
+async function newsApi(action,{method='GET',body=null}={}){const session=getNewsSession();if(!session)throw new Error('Новости пока недоступны: не удалось войти в новый сервис. Проверь доступ сотрудника.');const headers={'X-Session-Token':session.token};if(body!==null)headers['Content-Type']='application/json';const response=await fetch(NEWS_API_URL+'?action='+encodeURIComponent(action),{method,headers,body:body===null?undefined:JSON.stringify(body),cache:'no-store'});let data={};try{data=await response.json()}catch(_){throw new Error('Сервер новостей вернул неверный ответ.')}if(!response.ok||!data.ok)throw new Error(data.error||'Ошибка сервиса новостей.');return data;}
 function escNews(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function newsDate(v){return v||'';}
 function newsTimestamp(value){
