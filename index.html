@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#607f87"><meta name="app-version" content="11.4-login-list-fix"><meta name="description" content="ИзиКент — помощник команды ИзиКофе">
+<meta name="theme-color" content="#607f87"><meta name="app-version" content="11.5-current-staff-login"><meta name="description" content="ИзиКент — помощник команды ИзиКофе">
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml">
 <title>ИзиКент</title>
 <style>
@@ -212,12 +212,12 @@ function decodeTokenPayload(token){
 function restoreSession(){
   try{
     const session=JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null');
-    if(!session||!session.token)return false;
-    const payload=decodeTokenPayload(session.token);
-    if(!payload||!payload.exp||payload.exp*1000<=Date.now()){
-      sessionStorage.removeItem(SESSION_KEY);return false;
-    }
-    showApp(session.user||{name:payload.sub});
+    if(!session)return false;
+    const legacyPayload=session.token?decodeTokenPayload(session.token):null;
+    const legacyValid=!!legacyPayload?.exp&&legacyPayload.exp*1000>Date.now();
+    const newsValid=!!session.newsToken&&Number(session.newsExpiresAt||0)>Date.now();
+    if(!legacyValid&&!newsValid){sessionStorage.removeItem(SESSION_KEY);return false;}
+    showApp(session.newsUser||session.user||{name:legacyPayload?.sub||'Сотрудник'});
     return true;
   }catch(e){sessionStorage.removeItem(SESSION_KEY);return false;}
 }
@@ -227,7 +227,7 @@ async function loadLoginUsers(){
   select.innerHTML='<option value="">Загружаем сотрудников…</option>';
   select.disabled=true;loginError.textContent='';
   try{
-    const response=await fetch(API_URL+'?action=login-users&v='+Date.now(),{cache:'no-store'});
+    const response=await fetch(NEWS_API_URL+'?action=login-users&v='+Date.now(),{cache:'no-store'});
     const data=await response.json();
     if(!response.ok||!data.ok)throw new Error(data.error||'Ошибка загрузки активных сотрудников');
     select.innerHTML='<option value="">Выбери сотрудника</option>';
@@ -318,36 +318,26 @@ logoutButton.addEventListener('click',()=>{
 });
 
 loginForm.addEventListener('submit',async(event)=>{
-  event.preventDefault();
-  loginError.textContent='';
+  event.preventDefault();loginError.textContent='';
   const name=document.getElementById('employee').value;
   const pin=pinInput.value.trim();
   if(!name){loginError.textContent='Выбери сотрудника.';return;}
-  if(!/^\d{8}$/.test(pin)){loginError.textContent='Введи PIN-код из 8 цифр.';return;}
-  loginButton.disabled=true;
-  loginButton.textContent='Проверяем…';
+  if(!/^\\d{8}$/.test(pin)){loginError.textContent='Введи PIN-код из 8 цифр.';return;}
+  loginButton.disabled=true;loginButton.textContent='Проверяем…';
   try{
-    const response=await fetch(API_URL+'?action=login',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({name,pin})
-    });
-    const data=await response.json();
-    if(!response.ok||!data.ok||!data.token){
-      loginError.textContent=data.error||'Не удалось войти. Проверь имя и PIN.';
-      return;
-    }
-    let newsToken=null,newsUser=null,newsExpiresAt=0;
-    try{const nr=await fetch(NEWS_API_URL+'?action=login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,pin})});const nd=await nr.json();if(nr.ok&&nd.ok&&nd.token){newsToken=nd.token;newsUser=nd.user;newsExpiresAt=Date.now()+Number(nd.expires_in||28800)*1000;}}catch(_){}
-    sessionStorage.setItem(SESSION_KEY,JSON.stringify({token:data.token,user:data.user,expiresAt:Date.now()+Number(data.expires_in||28800)*1000,newsToken,newsUser,newsExpiresAt}));
-    pinInput.value='';
-    showApp(data.user);
-  }catch(error){
-    loginError.textContent='Не удалось связаться с сервером. Проверь интернет и попробуй ещё раз.';
-  }finally{
-    loginButton.disabled=false;
-    loginButton.textContent='Войти';
-  }
+    const nr=await fetch(NEWS_API_URL+'?action=login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,pin}),cache:'no-store'});
+    const nd=await nr.json();
+    if(!nr.ok||!nd.ok||!nd.token)throw new Error(nd.error||'Не удалось войти. Проверь имя и PIN.');
+    let legacyToken=null,legacyUser=null;
+    try{
+      const lr=await fetch(API_URL+'?action=login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,pin}),cache:'no-store'});
+      const ld=await lr.json();if(lr.ok&&ld.ok&&ld.token){legacyToken=ld.token;legacyUser=ld.user;}
+    }catch(_){}
+    const expiresAt=Date.now()+Number(nd.expires_in||28800)*1000;
+    sessionStorage.setItem(SESSION_KEY,JSON.stringify({token:legacyToken,user:legacyUser||nd.user,expiresAt,newsToken:nd.token,newsUser:nd.user,newsExpiresAt:expiresAt}));
+    pinInput.value='';showApp(nd.user);
+  }catch(error){loginError.textContent=error.message||'Не удалось связаться с сервером. Проверь интернет и попробуй ещё раз.';}
+  finally{loginButton.disabled=false;loginButton.textContent='Войти';}
 });
 
 function getSession(){
