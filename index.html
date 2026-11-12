@@ -2,9 +2,9 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#607f87"><meta name="app-version" content="12.0-unified-api"><meta name="description" content="ИзиКент — помощник команды ИзиКофе">
+<meta name="theme-color" content="#607f87"><meta name="app-version" content="12.0-unified-api"><meta name="description" content="Рабочий кабинет">
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml">
-<title>ИзиКент</title>
+<title>Рабочий кабинет</title>
 <style>
 :root{--blue:#607f87;--blue-dark:#355762;--blue-light:#dce7e7;--cream:#f6f0e6;--paper:#fffdf8;--espresso:#392820;--line:#e6ddd0;--muted:#82786f;--shadow:0 8px 24px rgba(54,43,34,.08)}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 15% 8%,#f6f0e6 0,transparent 34%),radial-gradient(ellipse at 88% 38%,#7f9b99 0,transparent 38%),linear-gradient(145deg,#355762,#607f87 52%,#dce7e7);background-attachment:fixed;color:var(--espresso);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input{font:inherit}button{cursor:pointer}
@@ -44,7 +44,7 @@ footer{text-align:center;color:var(--muted);font-size:10px;padding:8px 0 18px}
 <section id="loginScreen" class="login-wrap">
   <div class="login-shell">
     <div class="login-intro">
-      <h1>Добро пожаловать<br>в ИзиКент!</h1>
+      <h1>Добро пожаловать!</h1>
       <p>Выбери своё имя и введи PIN-код</p>
     </div>
     <div class="login-card">
@@ -56,15 +56,13 @@ footer{text-align:center;color:var(--muted);font-size:10px;padding:8px 0 18px}
         <button class="primary" id="loginButton" type="submit">Войти</button>
         <div class="error" id="loginError" role="alert"></div>
       </form>
-      <div class="login-foot">ИЗИКОФЕ · ИЗИКЕНТ</div>
     </div>
   </div>
 </section>
 <div class="app hidden" id="appScreen">
-<header><div class="header-row"><div><div class="brand-title">ИзиКент</div><div class="brand-subtitle">Помощник команды<br>ИзиКофе</div></div><button class="logout-btn" id="logoutButton" type="button">Выйти ↗</button></div><div class="hello" id="helloText">Привет, команда! 👋</div><div class="hello-sub">Новости, обновления и важная информация — здесь.</div></header>
+<header><div class="header-row"><div></div><button class="logout-btn" id="logoutButton" type="button">Выйти ↗</button></div><div class="hello" id="helloText">Привет, команда! 👋</div></header>
 <main>
 <section id="home">
- <div class="eyebrow">Рабочее пространство</div>
  <div class="row"><h1>Новости</h1><button class="secondary refresh-button" id="refreshNews" type="button" aria-label="Обновить новости" title="Обновить новости"><span class="glass-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.9-3L3 11" fill="none" stroke="#71899a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 5v6h6M4 13a8 8 0 0 0 14.9 3L21 13" fill="none" stroke="#71899a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 19v-6h-6" fill="none" stroke="#71899a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button></div>
  <button class="primary compose-toggle hidden" id="composeToggle" type="button">＋ Написать новость</button>
  <form class="card hidden" id="newsForm">
@@ -80,7 +78,7 @@ footer{text-align:center;color:var(--muted);font-size:10px;padding:8px 0 18px}
  <div class="card" id="newsList"><div class="news-empty"><div class="news-mark">✦</div><h2>Новости команды</h2><p class="muted">Загружаем новости…</p></div></div>
 </section>
 <section id="tools" class="hidden">
- <div class="eyebrow">Рабочее пространство</div><h1>Инструменты</h1>
+ <h1>Инструменты</h1>
  <div class="grid"><button class="tile" id="loansTile" data-page="loans"><div class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="#315966" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h16l-3-3m3 3-3 3M21 16H5l3 3m-3-3 3-3"/></g></svg></div><div><strong>Займы и возвраты</strong><small>Занять товар, вернуть и посмотреть сверку между точками</small></div></button></div>
 <div class="grid" style="margin-top:12px"><button class="tile" id="cakesTile" data-page="cakes"><div class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="#315966" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 13h10v6H7zM7 13c-2-1-2-4 0-5 1-.5 2 0 2.5 1C10 7 11 6 12 6s2 1 2.5 3c.5-1 1.5-1.5 2.5-1 2 1 2 4 0 5M9 19v2m6-2v2"/></g></svg></div><div><strong>Торты</strong><small>Записать количество тортов по торговым точкам</small></div></button></div>
 <div class="grid" style="margin-top:12px">
@@ -146,7 +144,7 @@ footer{text-align:center;color:var(--muted);font-size:10px;padding:8px 0 18px}
 <div class="card"><h2>Список пользователей</h2><p class="muted">Выбери должность сотрудника и сохрани изменения.</p><div id="usersList" class="muted">Загружаем список…</div></div>
 <div class="card"><h2>Должности и доступы</h2><p class="muted">Настрой доступы для каждой должности. Изменения применятся ко всем сотрудникам с этой должностью.</p><label class="field-label" for="editRoleName">Должность</label><input class="select" id="editRoleName" maxlength="100" placeholder="Например, Бариста"><div id="rolePermissions"></div><button class="user-action save role-save-action" id="saveRoleButton" type="button" aria-label="Сохранить должность и доступы" title="Сохранить должность и доступы"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h12l4 4v14H3V3z"/><path d="M7 3v6h10V3M7 21v-8h10v8"/></svg></button><div class="error" id="roleEditorError"></div><div class="notice hidden" id="roleEditorSuccess"></div></div></section>
 <section id="profile" class="hidden"><div class="eyebrow">Личная информация</div><h1>Профиль</h1><div class="card profile-head"><div class="profile-avatar" id="profileAvatar">И</div><div><div class="profile-name" id="profileName">Сотрудник</div><div class="profile-role" id="profileRole">Должность не указана</div></div></div><div class="card"><div class="profile-detail"><div class="profile-detail-icon">▣</div><div><div class="profile-detail-label">Должность</div><div class="profile-detail-value" id="profileRoleValue">Не указана</div></div></div><div class="profile-detail"><div class="profile-detail-icon">▦</div><div><div class="profile-detail-label">Дата начала работы</div><div class="profile-detail-value" id="profileStartDate">Пока не указана</div></div></div><div class="profile-detail"><div class="profile-detail-icon">◷</div><div><div class="profile-detail-label">Стаж</div><div class="profile-detail-value" id="profileTenure">Рассчитается после добавления даты</div></div></div></div><p class="muted">Данные профиля будут заполняться из базы сотрудников.</p></section>
-<footer>ИЗИКОФЕ · ИЗИКЕНТ</footer></main>
+</main>
 <nav class="bottom"><button class="nav active" data-page="home"><span class="glass-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="4" width="14" height="18" rx="2.5"/><path d="M10 9h8M10 13h8M10 17h5"/></svg></span>Новости</button><button class="nav" data-page="tools"><span class="glass-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg></span>Инструменты</button><button class="nav" data-page="profile"><span class="glass-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c.7-4 3.4-6 8-6s7.3 2 8 6z"/></svg></span>Профиль</button></nav>
 </div>
 <script>
