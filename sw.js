@@ -1,9 +1,9 @@
-const CACHE_NAME = "izikent-v8-8-glass-icon";
+const CACHE_NAME = "izikent-v8-9-approved-icon";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
-  "./icon.svg"
+  "./icon-approved.png"
 ];
 
 self.addEventListener("install", (event) => {
