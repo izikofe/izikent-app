@@ -8,9 +8,9 @@
   "lang": "ru",
   "icons": [
     {
-      "src": "icon-approved.png?v=10",
+      "src": "icon-rounded.svg?v=11",
       "sizes": "any",
-      "type": "image/png",
+      "type": "image/svg+xml",
       "purpose": "any"
     }
   ]

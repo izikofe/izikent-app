@@ -1,9 +1,10 @@
-const CACHE_NAME = "izikent-v8-9-approved-icon";
+const CACHE_NAME = "izikent-v8-10-rounded-icon";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
-  "./icon-approved.png"
+  "./icon-approved.png",
+  "./icon-rounded.svg"
 ];
 
 self.addEventListener("install", (event) => {
