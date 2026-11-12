@@ -1,4 +1,4 @@
-const CACHE_NAME = "izikent-v8-3-persistent-session";
+const CACHE_NAME = "izikent-v8-4-clean-interface";
 const APP_SHELL = [
   "./",
   "./index.html",
