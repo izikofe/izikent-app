@@ -20,6 +20,21 @@ main{padding:20px 16px}.eyebrow{font-size:10px;letter-spacing:1.7px;text-transfo
 .bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);transition:transform .06s ease-out,opacity .06s ease-out;will-change:transform;width:min(520px,100%);display:grid;grid-template-columns:repeat(3,1fr);background:#fffdf8b8;backdrop-filter:blur(24px);backdrop-filter:blur(12px);border:1px solid var(--line);border-bottom:0;border-radius:25px 25px 0 0;padding:9px 8px calc(9px + env(safe-area-inset-bottom));z-index:5;box-shadow:0 -4px 18px #39282010}.nav{border:0;background:transparent;color:#8d8984;font-size:11px;padding:5px 2px;display:flex;flex-direction:column;align-items:center;gap:3px}.nav .glass-icon{display:flex;width:36px;height:36px;align-items:center;justify-content:center;border-radius:13px;background:linear-gradient(145deg,#ffffffd9,#dce5eb8c);border:1px solid #ffffffed;box-shadow:0 4px 10px #607f8726,inset 0 1px 2px #fff}.glass-icon svg{width:26px;height:26px;fill:url(#glassFill);stroke:#8da3b5;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 2px 2px #607f8740)}.nav.active{color:var(--blue-dark);font-weight:800}.nav.active .glass-icon{background:linear-gradient(145deg,#fff,#d6e2eb);box-shadow:0 4px 12px #607f8740,inset 0 1px 3px #fff}
 .refresh-button{flex:0 0 50px;width:50px;height:50px;min-width:50px;padding:0;display:flex;align-items:center;justify-content:center;align-self:center;position:relative;top:0;margin:0;line-height:0;border-radius:16px;background:linear-gradient(145deg,#ffffffd9,#dce5eb8c);box-shadow:0 4px 10px #607f8726,inset 0 1px 2px #fff}.refresh-button .glass-icon{display:flex;width:28px;height:28px;align-items:center;justify-content:center;pointer-events:none;line-height:0;margin:0;padding:0}.refresh-button svg{display:block;width:24px;height:24px;margin:0;fill:none;stroke:#71899a;stroke-width:1.8}.compose-toggle{margin:0 0 12px}.cancel-compose{width:100%;min-height:54px;margin-top:8px;display:flex;align-items:center;justify-content:center;text-align:center;padding:15px;font-size:16px}.news-textarea{min-height:110px;resize:vertical}.important-option{display:flex;align-items:center;gap:10px;margin:14px 0;padding:12px 14px;border:1px solid #ffffffd9;border-radius:14px;background:linear-gradient(145deg,#ffffffb8,#dce7e98c);color:var(--blue-dark);font-size:14px;font-weight:750}.important-option input{width:18px;height:18px;accent-color:#71899a;flex:none}.news-menu-trigger{position:absolute;top:12px;right:0;width:27px;height:27px;border:1px solid #ffffffd9;border-radius:12px;background:linear-gradient(145deg,#ffffffed,#dce7e9b8);color:#547181;font-size:17px;line-height:1;padding:0;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px #35576220;z-index:2}.news-menu{position:absolute;top:43px;right:0;z-index:4;padding:5px;border:1px solid #ffffffdf;border-radius:13px;background:#f4f7f7f2;box-shadow:0 8px 20px #23424a30;backdrop-filter:blur(16px)}.news-delete{border:0;background:transparent;color:#a43d36;font-weight:700;padding:9px 15px;border-radius:9px}.news-delete:disabled{opacity:.5}.news-item{position:relative;padding:15px 0;border-bottom:1px solid var(--line)}.news-item:last-child{border:0;padding-bottom:0}.news-title{display:flex;align-items:center;gap:7px;padding-right:32px;font-weight:800;font-size:17px;color:var(--blue-dark);margin:0 0 7px}.news-title svg{width:20px;height:20px;flex:none;fill:none;stroke:#8da3b5;stroke-width:1.4}.news-body{font-size:14px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}.news-meta{font-size:11px;color:var(--muted);margin-top:9px}.pinned-label{display:inline-flex;align-items:center;color:#607f8d;font-size:12px;font-weight:800;white-space:nowrap;margin-left:5px;padding:3px 7px;border-radius:8px;background:linear-gradient(145deg,#ffffffed,#dce7e9b8);border:1px solid #ffffffed;box-shadow:0 2px 6px #35576220}.news-empty{text-align:center;padding:25px 18px}.news-mark{width:58px;height:58px;border-radius:18px;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;background:var(--blue-dark);color:white;font-size:28px;box-shadow:0 8px 18px #35576235}.news-empty h2{margin:0 0 8px}.profile-head{display:flex;align-items:center;gap:14px;padding:18px}.profile-avatar{width:66px;height:66px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--blue);color:#fff;font-size:29px;font-weight:800;flex:none}.profile-name{font-size:21px;font-weight:800;color:var(--espresso)}.profile-role{font-size:14px;color:var(--muted);margin-top:5px}.profile-detail{display:flex;align-items:center;gap:13px;padding:15px 2px;border-bottom:1px solid var(--line)}.profile-detail:last-child{border-bottom:0}.profile-detail-icon{width:38px;height:38px;border-radius:12px;background:var(--blue-light);color:var(--blue-dark);display:flex;align-items:center;justify-content:center;font-size:19px;flex:none}.profile-detail-label{font-size:12px;color:var(--muted)}.profile-detail-value{font-size:15px;font-weight:750;margin-top:4px;color:var(--espresso)}
 footer{text-align:center;color:var(--muted);font-size:10px;padding:8px 0 18px}
+
+.user-actions{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
+.user-action{width:48px;height:48px;padding:0;border:1px solid #ffffffdf;border-radius:15px;display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#ffffffd9,#dce7eb9c);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 5px 13px #35576225,inset 0 1px 2px #fff;transition:transform .16s ease,box-shadow .16s ease,filter .16s ease}
+.user-action:hover{transform:translateY(-2px);box-shadow:0 8px 17px #35576235,inset 0 1px 3px #fff;filter:brightness(1.04)}
+.user-action:active{transform:scale(.95)}
+.user-action:disabled{opacity:.55;cursor:wait;transform:none}
+.user-action svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.user-action.save{color:#087f86;border-color:#75dce0;background:linear-gradient(145deg,#e9ffffc9,#8ce4e49c);box-shadow:0 5px 14px #36c8cb38,inset 0 1px 2px #fff}
+.user-action.edit{color:#176b9a;border-color:#8bd5ff;background:linear-gradient(145deg,#f0fbffc9,#a9ddff9c);box-shadow:0 5px 14px #55b8ef38,inset 0 1px 2px #fff}
+.user-action.delete{color:#b53632;border-color:#ffaaa3;background:linear-gradient(145deg,#fff2f0d9,#ffc0b99c);box-shadow:0 5px 14px #e8797038,inset 0 1px 2px #fff}
+.user-name-edit{width:100%;margin-top:8px}
+.user-name-edit input{width:100%}
+.user-edit-error{margin-top:7px;color:#a43d36;font-size:12px}
+@media(prefers-reduced-motion:reduce){.user-action{transition:none}}
+
 .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px 18px;background:radial-gradient(ellipse at 10% 12%,#f6f0e6a8,transparent 36%),radial-gradient(ellipse at 90% 80%,#dce7e7a8,transparent 40%)}.login-shell{width:100%;max-width:440px}.login-intro{color:#fff;padding:0 8px 24px}.login-intro h1{font-size:34px;line-height:1.12;letter-spacing:-.7px;color:#fff;margin:0 0 12px;text-shadow:0 3px 14px #173a4080}.login-intro p{font-size:16px;line-height:1.4;margin:0;color:#ffffffdf}.login-card{width:100%;background:#fffdf8a8;border:1px solid #ffffffc9;border-radius:30px;padding:26px 22px 22px;box-shadow:0 16px 38px #173a4033,inset 0 1px 0 #ffffffed;backdrop-filter:blur(26px);-webkit-backdrop-filter:blur(26px)}.field-label{display:block;font-size:13px;font-weight:750;color:var(--blue-dark);margin:14px 0 7px}.select,.pin{width:100%;border:1px solid #ffffffd9;border-radius:18px;background:#fffdf8b8;padding:16px;color:var(--espresso);outline:none;box-shadow:inset 0 1px 3px #35576212,0 4px 12px #35576210;backdrop-filter:blur(16px)}.select:focus,.pin:focus{border-color:var(--blue);box-shadow:0 0 0 3px #607f8730}.pin{text-align:center;font-size:22px;letter-spacing:8px}.primary{width:100%;border:1px solid #ffffff55;border-radius:18px;background:linear-gradient(135deg,#7b8058,#68764e);color:white;font-weight:800;padding:17px;margin-top:22px;box-shadow:0 8px 18px #59604440}.primary:disabled{opacity:.55;cursor:wait}.error{color:#a33b32;font-size:13px;line-height:1.4;margin-top:12px;min-height:18px}.login-foot{text-align:center;color:#655b51;font-size:11px;font-weight:700;letter-spacing:1px;margin-top:20px}
 .bottom.bottom-hidden{transform:translateX(-50%);opacity:1;pointer-events:auto}@media(min-width:600px){body{padding:24px 0}.app{border-radius:28px;overflow:hidden;min-height:850px;box-shadow:0 15px 50px #34271d20}.bottom{bottom:24px;border-radius:0 0 28px 28px}}
 
@@ -274,24 +289,55 @@ async function loadUsersList(){
       const select=document.createElement('select');select.className='select';select.style.marginTop='8px';
       roles.forEach(role=>{const o=document.createElement('option');o.value=role;o.textContent=role;o.selected=role===user.role;select.append(o);});
       item.append(select);
-      const save=document.createElement('button');save.type='button';save.className='secondary';save.textContent='Сохранить должность';save.style.marginTop='8px';
+
+      const actions=document.createElement('div');actions.className='user-actions';
+      const makeIconButton=(kind,label,svg)=>{const button=document.createElement('button');button.type='button';button.className='user-action '+kind;button.title=label;button.setAttribute('aria-label',label);button.innerHTML=svg;return button;};
+      const save=makeIconButton('save','Сохранить должность','<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h12l4 4v14H3V3z"/><path d="M7 3v6h10V3M7 21v-8h10v8"/></svg>');
       save.addEventListener('click',async()=>{save.disabled=true;try{
         const res=await fetch(API_URL+'?action=users',{method:'POST',headers:{'Content-Type':'application/json','X-Session-Token':session.token},body:JSON.stringify({mode:'role',name:user.name,role:select.value})});
         const result=await res.json();if(!res.ok||!result.ok)throw new Error(result.error||'Не удалось изменить должность');
-        save.textContent='Сохранено';user.role=select.value;
+        user.role=select.value;save.title='Должность сохранена';save.setAttribute('aria-label','Должность сохранена');
       }catch(e){alert(e.message);}finally{save.disabled=false;}});
-      item.append(save);
-      const remove=document.createElement('button');remove.type='button';remove.className='secondary';remove.textContent='Удалить сотрудника';remove.style.cssText='margin:8px 0 0 8px;color:#a43d36';
+      actions.append(save);
+
+      const edit=makeIconButton('edit','Редактировать имя','<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 16.5-.8 4.3 4.3-.8L20 7.5 16.5 4 4 16.5z"/><path d="m14.8 5.7 3.5 3.5"/></svg>');
+      edit.addEventListener('click',()=>{
+        if(item.querySelector('.user-name-edit'))return;
+        const editor=document.createElement('div');editor.className='user-name-edit';
+        const input=document.createElement('input');input.className='select';input.type='text';input.maxLength=50;input.value=user.name;input.setAttribute('aria-label','Новое имя сотрудника');
+        const editActions=document.createElement('div');editActions.className='user-actions';
+        const confirmEdit=makeIconButton('save','Сохранить новое имя','<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>');
+        const cancelEdit=makeIconButton('delete','Отменить изменение','<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>');
+        const error=document.createElement('div');error.className='user-edit-error';
+        cancelEdit.addEventListener('click',()=>editor.remove());
+        confirmEdit.addEventListener('click',async()=>{
+          const newName=input.value.trim();
+          error.textContent='';
+          if(!newName){error.textContent='Имя не может быть пустым.';return;}
+          if(newName===user.name){editor.remove();return;}
+          confirmEdit.disabled=true;cancelEdit.disabled=true;
+          try{
+            const res=await fetch(API_URL+'?action=users',{method:'POST',headers:{'Content-Type':'application/json','X-Session-Token':session.token},body:JSON.stringify({mode:'rename',old_name:user.name,name:newName})});
+            const result=await res.json();if(!res.ok||!result.ok)throw new Error(result.error||'Не удалось изменить имя сотрудника');
+            user.name=result.user?.name||newName;name.textContent=user.name;editor.remove();
+            await loadLoginUsers();
+          }catch(e){error.textContent=e.message;confirmEdit.disabled=false;cancelEdit.disabled=false;}
+        });
+        editActions.append(confirmEdit,cancelEdit);editor.append(input,editActions,error);name.insertAdjacentElement('afterend',editor);input.focus();input.select();
+      });
+      actions.append(edit);
+
+      const remove=makeIconButton('delete','Отключить сотрудника','<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m3 0-1 14H7L6 7m4 4v6m4-6v6"/></svg>');
       remove.addEventListener('click',async()=>{
         if(!confirm('Отключить сотрудника «'+user.name+'»? Он больше не сможет войти в приложение. История записей сохранится.'))return;
-        remove.disabled=true;remove.textContent='Отключаем…';
+        remove.disabled=true;
         try{
           const res=await fetch(API_URL+'?action=users',{method:'POST',headers:{'Content-Type':'application/json','X-Session-Token':session.token},body:JSON.stringify({mode:'delete',name:user.name})});
           const result=await res.json();if(!res.ok||!result.ok)throw new Error(result.error||'Не удалось отключить сотрудника');
           item.remove();
-        }catch(e){alert(e.message);remove.disabled=false;remove.textContent='Удалить сотрудника';}
+        }catch(e){alert(e.message);remove.disabled=false;}
       });
-      item.append(remove);list.append(item);
+      actions.append(remove);item.append(actions);list.append(item);
     });
     const roleName=document.getElementById('editRoleName'), holder=document.getElementById('rolePermissions');
     holder.innerHTML='';
