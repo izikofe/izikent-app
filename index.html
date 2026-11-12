@@ -30,7 +30,7 @@ footer{text-align:center;color:var(--muted);font-size:10px;padding:8px 0 18px}
 .user-action.save{color:#087f86;border-color:#75dce0;background:linear-gradient(145deg,#e9ffffc9,#8ce4e49c);box-shadow:0 5px 14px #36c8cb38,inset 0 1px 2px #fff}
 .user-action.edit{color:#176b9a;border-color:#8bd5ff;background:linear-gradient(145deg,#f0fbffc9,#a9ddff9c);box-shadow:0 5px 14px #55b8ef38,inset 0 1px 2px #fff}
 .user-action.delete{color:#b53632;border-color:#ffaaa3;background:linear-gradient(145deg,#fff2f0d9,#ffc0b99c);box-shadow:0 5px 14px #e8797038,inset 0 1px 2px #fff}
-.user-name-edit{width:100%;margin-top:8px}
+.role-save-action{margin-top:12px}.news-delete.user-action{width:40px;height:40px;margin:0;padding:0;border-radius:13px}.news-delete.user-action svg{width:21px;height:21px}.user-name-edit{width:100%;margin-top:8px}
 .user-name-edit input{width:100%}
 .user-edit-error{margin-top:7px;color:#a43d36;font-size:12px}
 @media(prefers-reduced-motion:reduce){.user-action{transition:none}}
@@ -144,7 +144,7 @@ footer{text-align:center;color:var(--muted);font-size:10px;padding:8px 0 18px}
 <button class="primary" id="createUserButton" type="submit">Добавить пользователя</button><div class="error" id="createUserError" role="alert"></div><div class="notice hidden" id="createUserSuccess" role="status"></div>
 </form></div>
 <div class="card"><h2>Список пользователей</h2><p class="muted">Выбери должность сотрудника и сохрани изменения.</p><div id="usersList" class="muted">Загружаем список…</div></div>
-<div class="card"><h2>Должности и доступы</h2><p class="muted">Настрой доступы для каждой должности. Изменения применятся ко всем сотрудникам с этой должностью.</p><label class="field-label" for="editRoleName">Должность</label><input class="select" id="editRoleName" maxlength="100" placeholder="Например, Бариста"><div id="rolePermissions"></div><button class="primary" id="saveRoleButton" type="button">Сохранить должность и доступы</button><div class="error" id="roleEditorError"></div><div class="notice hidden" id="roleEditorSuccess"></div></div></section>
+<div class="card"><h2>Должности и доступы</h2><p class="muted">Настрой доступы для каждой должности. Изменения применятся ко всем сотрудникам с этой должностью.</p><label class="field-label" for="editRoleName">Должность</label><input class="select" id="editRoleName" maxlength="100" placeholder="Например, Бариста"><div id="rolePermissions"></div><button class="user-action save role-save-action" id="saveRoleButton" type="button" aria-label="Сохранить должность и доступы" title="Сохранить должность и доступы"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h12l4 4v14H3V3z"/><path d="M7 3v6h10V3M7 21v-8h10v8"/></svg></button><div class="error" id="roleEditorError"></div><div class="notice hidden" id="roleEditorSuccess"></div></div></section>
 <section id="profile" class="hidden"><div class="eyebrow">Личная информация</div><h1>Профиль</h1><div class="card profile-head"><div class="profile-avatar" id="profileAvatar">И</div><div><div class="profile-name" id="profileName">Сотрудник</div><div class="profile-role" id="profileRole">Должность не указана</div></div></div><div class="card"><div class="profile-detail"><div class="profile-detail-icon">▣</div><div><div class="profile-detail-label">Должность</div><div class="profile-detail-value" id="profileRoleValue">Не указана</div></div></div><div class="profile-detail"><div class="profile-detail-icon">▦</div><div><div class="profile-detail-label">Дата начала работы</div><div class="profile-detail-value" id="profileStartDate">Пока не указана</div></div></div><div class="profile-detail"><div class="profile-detail-icon">◷</div><div><div class="profile-detail-label">Стаж</div><div class="profile-detail-value" id="profileTenure">Рассчитается после добавления даты</div></div></div></div><p class="muted">Данные профиля будут заполняться из базы сотрудников.</p></section>
 <footer>ИЗИКОФЕ · ИЗИКЕНТ</footer></main>
 <nav class="bottom"><button class="nav active" data-page="home"><span class="glass-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="4" width="14" height="18" rx="2.5"/><path d="M10 9h8M10 13h8M10 17h5"/></svg></span>Новости</button><button class="nav" data-page="tools"><span class="glass-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg></span>Инструменты</button><button class="nav" data-page="profile"><span class="glass-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c.7-4 3.4-6 8-6s7.3 2 8 6z"/></svg></span>Профиль</button></nav>
@@ -673,7 +673,7 @@ async function loadNews(){
   sortedNews.forEach(n=>{
    const article=document.createElement('article');article.className='news-item';
    const image=n.image&&(n.image.startsWith('https://')||n.image.startsWith('http://'))?'<img src="'+escNews(n.image)+'" alt="" style="width:100%;max-height:220px;object-fit:cover;border-radius:15px;margin:8px 0">':'';
-   const menu=canPublish?'<button class="news-menu-trigger" type="button" aria-label="Действия с новостью" title="Действия">⋮</button><div class="news-menu hidden"><button class="news-delete" type="button">Удалить</button></div>':'';
+   const menu=canPublish?'<button class="news-menu-trigger" type="button" aria-label="Действия с новостью" title="Действия">⋮</button><div class="news-menu hidden"><button class="news-delete user-action delete" type="button" aria-label="Удалить новость" title="Удалить новость"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m3 0-1 14H7L6 7m4 4v6m4-6v6"/></svg></button></div>':'';
    article.dataset.newsId=n.id||'';
    article.innerHTML=menu+'<h2 class="news-title"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2.5"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>'+escNews(n.title)+'</span>'+(n.pinned?'<span class="pinned-label">ВАЖНО 🔥</span>':'')+'</h2>'+image+'<div class="news-body">'+escNews(n.text)+'</div><div class="news-meta">'+escNews(n.author)+' · '+escNews(newsDate(n.published_at))+'</div>';
    list.append(article);
@@ -687,9 +687,9 @@ document.getElementById('newsList').addEventListener('click',async e=>{
  const article=del.closest('.news-item');const id=article?.dataset.newsId;
  if(!id){alert('У новости нет ID. Удаление невозможно.');return;}
  if(!confirm('Удалить эту новость? Восстановить её будет нельзя.'))return;
- del.disabled=true;del.textContent='Удаляем…';
+ del.disabled=true;del.title='Удаляем…';del.setAttribute('aria-label','Удаляем новость');
  try{await newsApi('news-delete',{method:'POST',body:{id}});article.remove();}
- catch(err){alert(err.message);del.disabled=false;del.textContent='Удалить';}
+ catch(err){alert(err.message);del.disabled=false;del.title='Удалить новость';del.setAttribute('aria-label','Удалить новость');}
 });
 document.addEventListener('click',e=>{if(!e.target.closest('.news-menu-trigger')&&!e.target.closest('.news-menu'))document.querySelectorAll('.news-menu').forEach(m=>m.classList.add('hidden'));});
 document.getElementById('refreshNews').addEventListener('click',loadNews);
