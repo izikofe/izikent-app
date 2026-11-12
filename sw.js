@@ -1,4 +1,4 @@
-const CACHE_NAME = "izikent-v8-11-transparent-edges";
+const CACHE_NAME = "izikent-v8-12-embedded-rounded-icon";
 const APP_SHELL = [
   "./",
   "./index.html",
