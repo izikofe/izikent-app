@@ -1,4 +1,4 @@
-const CACHE_NAME = "izikent-v8-6-birthdays";
+const CACHE_NAME = "izikent-v8-7-profile-pin";
 const APP_SHELL = [
   "./",
   "./index.html",
