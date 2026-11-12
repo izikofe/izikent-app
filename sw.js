@@ -1,4 +1,4 @@
-const CACHE_NAME = "izikent-v8-1-user-glass-actions";
+const CACHE_NAME = "izikent-v8-2-unified-action-icons";
 const APP_SHELL = [
   "./",
   "./index.html",
