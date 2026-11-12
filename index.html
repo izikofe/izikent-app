@@ -200,7 +200,7 @@ function calculateTenure(value){
   return parts.join(' ');
 }
 function showApp(user){
- loginScreen.classList.add('hidden');appScreen.classList.remove('hidden');
+ loginScreen.classList.add('hidden');loginScreen.style.display='none';appScreen.classList.remove('hidden');appScreen.style.display='block';document.querySelector('.bottom').classList.remove('hidden');document.querySelector('.bottom').style.display='grid';
  document.getElementById('helloText').textContent='Привет, '+user.name+'! 👋';
  document.getElementById('profileName').textContent=user.name||'Сотрудник';
  document.getElementById('profileAvatar').textContent=(user.name||'И').trim().charAt(0).toUpperCase();
@@ -228,8 +228,9 @@ async function loadPlaces(){
  try{const d=await newsApi('places');const names=d.places||[];['borrower','lender','returnBorrower'].forEach(id=>{const el=document.getElementById(id);if(!el)return;const previous=el.value;el.innerHTML='<option value="">Выбери точку</option>';names.forEach(n=>{const o=document.createElement('option');o.value=n;o.textContent=n;el.append(o);});if(names.includes(previous))el.value=previous;});}catch(e){}
 }
 function showLogin(){
-  appScreen.classList.add('hidden');
-  loginScreen.classList.remove('hidden');
+  appScreen.classList.add('hidden');appScreen.style.display='none';
+  document.querySelector('.bottom').classList.add('hidden');document.querySelector('.bottom').style.display='none';
+  loginScreen.classList.remove('hidden');loginScreen.style.display='flex';
   loadLoginUsers();
 }
 function decodeTokenPayload(token){
