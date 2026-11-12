@@ -153,6 +153,8 @@ footer{text-align:center;color:var(--muted);font-size:10px;padding:8px 0 18px}
 const API_URL='https://functions.yandexcloud.net/d4eg87r5uv033mv47vuq';
 const NEWS_API_URL=API_URL;
 const SESSION_KEY='izikent_session_v1';
+// Переносим активную сессию из старого временного хранилища в постоянное.
+try{if(!localStorage.getItem(SESSION_KEY)){const previousSession=window.sessionStorage.getItem(SESSION_KEY);if(previousSession)localStorage.setItem(SESSION_KEY,previousSession);}}catch(e){}
 const loginScreen=document.getElementById('loginScreen');
 const appScreen=document.getElementById('appScreen');
 const loginForm=document.getElementById('loginForm');
@@ -240,15 +242,15 @@ function decodeTokenPayload(token){
 }
 function restoreSession(){
   try{
-    const session=JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null');
+    const session=JSON.parse(localStorage.getItem(SESSION_KEY)||'null');
     if(!session)return false;
     const legacyPayload=session.token?decodeTokenPayload(session.token):null;
     const legacyValid=!!legacyPayload?.exp&&legacyPayload.exp*1000>Date.now();
     const newsValid=!!session.newsToken&&Number(session.newsExpiresAt||0)>Date.now();
-    if(!legacyValid&&!newsValid){sessionStorage.removeItem(SESSION_KEY);return false;}
+    if(!legacyValid&&!newsValid){localStorage.removeItem(SESSION_KEY);return false;}
     showApp(session.newsUser||session.user||{name:legacyPayload?.sub||'Сотрудник'});
     return true;
-  }catch(e){sessionStorage.removeItem(SESSION_KEY);return false;}
+  }catch(e){localStorage.removeItem(SESSION_KEY);return false;}
 }
 
 async function loadLoginUsers(){
@@ -268,7 +270,7 @@ async function loadLoginUsers(){
 const permissionNames=['Главная','Торты','Займы','Возвраты','Сверка','Пользователи','Управление базой','Публикация новостей'];
 let usersEditorData=null;
 async function loadUsersList(){
-  const session=JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null');
+  const session=JSON.parse(localStorage.getItem(SESSION_KEY)||'null');
   const list=document.getElementById('usersList');
   if(!session?.token){list.textContent='Сессия закончилась. Войди заново.';return;}
   list.textContent='Загружаем список…';
@@ -375,7 +377,7 @@ async function loadCakesData(force=false){
     headers:{'X-Session-Token':session.token},cache:'no-store'
   });
   const data=await response.json();
-  if(response.status===401){sessionStorage.removeItem(SESSION_KEY);showLogin();throw new Error('Сессия закончилась. Войди заново.');}
+  if(response.status===401){localStorage.removeItem(SESSION_KEY);showLogin();throw new Error('Сессия закончилась. Войди заново.');}
   if(!response.ok||!data.ok)throw new Error(data.error||'Не удалось загрузить списки тортов.');
   const fill=(select,items,placeholder)=>{
     select.innerHTML='';
@@ -414,7 +416,7 @@ async function openCakesPage(){
       body:JSON.stringify({cake,point:place,quantity})
     });
     const data=await response.json();
-    if(response.status===401){sessionStorage.removeItem(SESSION_KEY);showLogin();throw new Error('Сессия закончилась. Войди заново.');}
+    if(response.status===401){localStorage.removeItem(SESSION_KEY);showLogin();throw new Error('Сессия закончилась. Войди заново.');}
     if(!response.ok||!data.ok)throw new Error(data.error||'Не удалось записать торты.');
     cakesSuccess.textContent='Запись добавлена в таблицу «ТОРТЫ».';
     cakesSuccess.classList.remove('hidden');
@@ -424,7 +426,7 @@ async function openCakesPage(){
 });
 
 logoutButton.addEventListener('click',()=>{
-  sessionStorage.removeItem(SESSION_KEY);
+  localStorage.removeItem(SESSION_KEY);
   loginForm.reset();
   loginError.textContent='';
   showPage('home');
@@ -442,21 +444,21 @@ loginForm.addEventListener('submit',async(event)=>{
   const data=await response.json();
   if(!response.ok||!data.ok||!data.token)throw new Error(data.error||'Не удалось войти. Проверь имя и PIN.');
   const expiresAt=Date.now()+Number(data.expires_in||28800)*1000;
-  sessionStorage.setItem(SESSION_KEY,JSON.stringify({token:data.token,user:data.user,expiresAt,newsToken:data.token,newsUser:data.user,newsExpiresAt:expiresAt}));
+  localStorage.setItem(SESSION_KEY,JSON.stringify({token:data.token,user:data.user,expiresAt,newsToken:data.token,newsUser:data.user,newsExpiresAt:expiresAt}));
   pinInput.value='';showApp(data.user);
  }catch(error){loginError.textContent=error.message||'Не удалось связаться с сервером.';}
  finally{loginButton.disabled=false;loginButton.textContent='Войти';}
 });
 
 function getSession(){
-  try{return JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null');}catch(e){return null;}
+  try{return JSON.parse(localStorage.getItem(SESSION_KEY)||'null');}catch(e){return null;}
 }
 async function loadDebts(){
   const session=getSession();
   if(!session?.token) throw new Error('Сессия закончилась. Войди заново.');
   const response=await fetch(API_URL+'?action=debts',{headers:{'X-Session-Token':session.token},cache:'no-store'});
   const data=await response.json();
-  if(response.status===401){sessionStorage.removeItem(SESSION_KEY);showLogin();throw new Error('Сессия закончилась. Войди заново.');}
+  if(response.status===401){localStorage.removeItem(SESSION_KEY);showLogin();throw new Error('Сессия закончилась. Войди заново.');}
   if(!response.ok||!data.ok) throw new Error(data.error||'Не удалось загрузить долги.');
   return data;
 }
@@ -545,7 +547,7 @@ async function submitReturn(){
   returnSubmit.disabled=true;returnSubmit.textContent='Записываем…';
   try{
     const response=await fetch(API_URL+'?action=return-batch',{method:'POST',headers:{'Content-Type':'application/json','X-Session-Token':session.token},body:JSON.stringify({borrower:returnBorrower.value,items,request_id:(crypto.randomUUID?crypto.randomUUID():('app_'+Date.now()+'_'+Math.random().toString(36).slice(2)))})});
-    const data=await response.json();if(response.status===401){sessionStorage.removeItem(SESSION_KEY);showLogin();throw new Error('Сессия закончилась. Войди заново.');}
+    const data=await response.json();if(response.status===401){localStorage.removeItem(SESSION_KEY);showLogin();throw new Error('Сессия закончилась. Войди заново.');}
     if(!response.ok||!data.ok)throw new Error(data.error||'Не удалось записать возврат.');
     returnSuccess.textContent=data.duplicate?'Эта заявка уже была записана.':'Возвратов оформлено: '+data.count+'.';returnSuccess.classList.remove('hidden');returnFormCard.classList.add('hidden');
     await showReturnDebts();await showReconcile();
@@ -558,7 +560,7 @@ document.getElementById('refreshReconcile').addEventListener('click',showReconci
 
 createUserForm.addEventListener('submit',async(event)=>{
   event.preventDefault();createUserError.textContent='';createUserSuccess.classList.add('hidden');
-  const session=JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null');
+  const session=JSON.parse(localStorage.getItem(SESSION_KEY)||'null');
   if(!session?.token){createUserError.textContent='Сессия закончилась. Войди заново.';showLogin();return;}
   const name=document.getElementById('newUserName').value.trim();
   const role=document.getElementById('newUserRole').value.trim();
@@ -570,7 +572,7 @@ createUserForm.addEventListener('submit',async(event)=>{
       headers:{'Content-Type':'application/json','X-Session-Token':session.token},
       body:JSON.stringify({name,role,pin})});
     const data=await response.json();
-    if(response.status===401){sessionStorage.removeItem(SESSION_KEY);showLogin();throw new Error('Сессия закончилась. Войди заново.');}
+    if(response.status===401){localStorage.removeItem(SESSION_KEY);showLogin();throw new Error('Сессия закончилась. Войди заново.');}
     if(!response.ok||!data.ok)throw new Error(data.error||'Не удалось создать пользователя');
     createUserSuccess.textContent='Пользователь '+data.user.name+' добавлен.';
     createUserSuccess.classList.remove('hidden');createUserForm.reset();
@@ -607,7 +609,7 @@ borrowForm.addEventListener('submit', async (event)=>{
   borrowButton.disabled=true;borrowButton.textContent='Записываем…';
   try{
     const response=await fetch(API_URL+'?action=borrow-batch',{method:'POST',headers:{'Content-Type':'application/json','X-Session-Token':session.token},body:JSON.stringify({borrower,lender,items,request_id:(crypto.randomUUID?crypto.randomUUID():('app_'+Date.now()+'_'+Math.random().toString(36).slice(2)))})});
-    const data=await response.json();if(response.status===401){sessionStorage.removeItem(SESSION_KEY);showLogin();throw new Error('Сессия закончилась. Войди заново.');}
+    const data=await response.json();if(response.status===401){localStorage.removeItem(SESSION_KEY);showLogin();throw new Error('Сессия закончилась. Войди заново.');}
     if(!response.ok||!data.ok)throw new Error(data.error||'Не удалось записать заявку.');
     borrowSuccess.textContent=data.duplicate?'Эта заявка уже была записана.':'Записано товаров: '+data.count+'.';borrowSuccess.classList.remove('hidden');
     borrowForm.reset();document.getElementById('borrowItems').innerHTML='';borrowItemCount=0;addBorrowItem();
