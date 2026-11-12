@@ -10,7 +10,7 @@
     {
       "src": "icon-approved.png?v=10",
       "sizes": "any",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any"
     }
   ]
