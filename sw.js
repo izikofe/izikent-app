@@ -1,10 +1,11 @@
-const CACHE_NAME = "izikent-v8-14-rounded-transparent";
+const CACHE_NAME = "izikent-v8-15-original-approved-png";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
   "./icon-approved.png",
-  "./icon-rounded.svg"
+  "./icon-rounded.svg",
+  "./icon-approved.png"
 ];
 
 self.addEventListener("install", (event) => {
