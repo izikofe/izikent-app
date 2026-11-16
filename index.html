@@ -387,6 +387,7 @@ async function refreshAccessRights(force=false){
    document.getElementById('knowledgeContent')?.classList.add('hidden');
   }
   console.warn('Не удалось обновить права доступа:',lastError);
+  window.setTimeout(()=>refreshAccessRights(true),15000);
   return false;
  })();
  try{return await accessRightsRequest;}
