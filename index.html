@@ -171,10 +171,10 @@ footer{text-align:center;color:var(--muted);font-size:10px;padding:8px 0 18px}
 <div class="error" id="cakesError" role="alert"></div><div class="notice hidden" id="cakesSuccess" role="status"></div>
 </form></div></section>
 <section id="users" class="hidden"><button class="back" data-page="home">← Главное меню</button><div class="eyebrow">Управление доступом</div><h1>Пользователи</h1>
-<div class="card"><h2>Добавить пользователя</h2><p class="muted">Задай имя, роль и PIN-код из 8 цифр.</p>
+<div class="card"><h2>Добавить пользователя</h2><p class="muted">Задай имя и PIN-код из 8 цифр. Должность можно назначить позже.</p>
 <form id="createUserForm">
 <label class="field-label" for="newUserName">Имя сотрудника</label><input class="select" id="newUserName" type="text" maxlength="50" placeholder="Например, Анна" required>
-<label class="field-label" for="newUserRole">Должность</label><select class="select" id="newUserRole" required><option value="">Загружаем должности…</option></select>
+
 <label class="field-label" for="newUserPin">PIN-код (8 цифр)</label><input class="select" id="newUserPin" type="password" inputmode="numeric" pattern="[0-9]{8}" maxlength="8" minlength="8" placeholder="••••••••" autocomplete="new-password" required>
 <button class="primary" id="createUserButton" type="submit">Добавить пользователя</button><div class="error" id="createUserError" role="alert"></div><div class="notice hidden" id="createUserSuccess" role="status"></div>
 </form></div>
@@ -319,16 +319,12 @@ async function loadUsersList(){
     const data=await response.json();if(!response.ok||!data.ok)throw new Error(data.error||'Не удалось загрузить список');
     usersEditorData=data;list.innerHTML='';
     const roles=Object.keys(data.roles||{});
-    const newUserRole=document.getElementById('newUserRole');
-    const selectedRole=newUserRole.value;
-    newUserRole.innerHTML='';
-    const rolePlaceholder=document.createElement('option');rolePlaceholder.value='';rolePlaceholder.textContent=roles.length?'Выбери должность':'Должности не найдены';newUserRole.append(rolePlaceholder);
-    roles.forEach(role=>{const option=document.createElement('option');option.value=role;option.textContent=role;newUserRole.append(option);});
-    if(roles.includes(selectedRole))newUserRole.value=selectedRole;
+    
     data.users.filter(user=>user.active!==false).forEach(user=>{
       const item=document.createElement('div');item.className='card';item.style.margin='8px 0';
       const name=document.createElement('strong');name.textContent=user.name;item.append(name);
       const select=document.createElement('select');select.className='select';select.style.marginTop='8px';
+      const unassigned=document.createElement('option');unassigned.value='';unassigned.textContent='Должность не назначена';unassigned.selected=!user.role;select.append(unassigned);
       roles.forEach(role=>{const o=document.createElement('option');o.value=role;o.textContent=role;o.selected=role===user.role;select.append(o);});
       item.append(select);
 
@@ -603,14 +599,13 @@ createUserForm.addEventListener('submit',async(event)=>{
   const session=JSON.parse(localStorage.getItem(SESSION_KEY)||'null');
   if(!session?.token){createUserError.textContent='Сессия закончилась. Войди заново.';showLogin();return;}
   const name=document.getElementById('newUserName').value.trim();
-  const role=document.getElementById('newUserRole').value.trim();
   const pin=document.getElementById('newUserPin').value.trim();
-  if(!name||!role||!/^\d{8}$/.test(pin)){createUserError.textContent='Проверь имя, роль и PIN-код из 8 цифр.';return;}
+  if(!name||!role||!/^\d{8}$/.test(pin)){createUserError.textContent='Проверь имя и PIN-код из 8 цифр.';return;}
   createUserButton.disabled=true;createUserButton.textContent='Создаём…';
   try{
     const response=await fetch(API_URL+'?action=users',{method:'POST',
       headers:{'Content-Type':'application/json','X-Session-Token':session.token},
-      body:JSON.stringify({mode:'create',name,role,pin})});
+      body:JSON.stringify({mode:'create',name,pin})});
     const data=await response.json();
     if(response.status===401){localStorage.removeItem(SESSION_KEY);showLogin();throw new Error('Сессия закончилась. Войди заново.');}
     if(!response.ok||!data.ok)throw new Error(data.error||'Не удалось создать пользователя');
