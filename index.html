@@ -920,22 +920,26 @@ borrowForm.addEventListener('submit', async (event)=>{
 });
 
 const pages=[...document.querySelectorAll('main section')];
-const APP_BASE='/izikent-app';
-const pagePaths={home:APP_BASE+'/home',tools:APP_BASE+'/tools',profile:APP_BASE+'/profile',knowledge:APP_BASE+'/knowledge',loans:APP_BASE+'/loans',returns:APP_BASE+'/returns',reconcile:APP_BASE+'/reconcile',cakes:APP_BASE+'/cakes',users:APP_BASE+'/users'};
-const pathPages=Object.fromEntries(Object.entries(pagePaths).map(([page,path])=>[path.slice(APP_BASE.length),page]));
+const APP_BASE='/izikent-app/';
+const pagePaths={home:'#/home',tools:'#/tools',profile:'#/profile',knowledge:'#/knowledge',loans:'#/loans',returns:'#/returns',reconcile:'#/reconcile',cakes:'#/cakes',users:'#/users'};
+const pathPages=Object.fromEntries(Object.entries(pagePaths).map(([page,path])=>[path.slice(1),page]));
 function requestedPageFromUrl(){
-  let pathname=location.pathname;
+  const hash=location.hash.replace(/^#/, '');
+  if(hash.startsWith('/'))return pathPages[hash]||'home';
   const fallback=new URLSearchParams(location.search).get('__route');
   if(fallback){
     try{
       const restored=new URL(fallback,location.origin);
-      pathname=restored.pathname;
-      history.replaceState({page:pathPages[pathname.startsWith(APP_BASE+'/')?pathname.slice(APP_BASE.length):pathname]||'home'},'',pathname+restored.search+restored.hash);
+      const legacyPath=restored.pathname.startsWith(APP_BASE)?restored.pathname.slice(APP_BASE.length):restored.pathname.replace(/^\//,'');
+      const page=pathPages['/'+legacyPath.replace(/^\//,'')]||'home';
+      history.replaceState({page},'',APP_BASE+pagePaths[page]);
+      return page;
     }catch(e){}
   }
-  if(pathname===APP_BASE||pathname===APP_BASE+'/')return 'home';
-  if(pathname.startsWith(APP_BASE+'/'))pathname=pathname.slice(APP_BASE.length);
-  return pathPages[pathname.replace(/\/$/,'')]||'home';
+  let pathname=location.pathname;
+  if(pathname===APP_BASE.slice(0,-1)||pathname===APP_BASE)return 'home';
+  if(pathname.startsWith(APP_BASE))pathname=pathname.slice(APP_BASE.length);
+  return pathPages['/'+pathname.replace(/^\//,'').replace(/\/$/,'')]||'home';
 }
 let pendingPageId=requestedPageFromUrl();
 function showPage(id,options={}){
@@ -944,7 +948,7 @@ function showPage(id,options={}){
   const needed={knowledge:'База знаний',loans:'Займы',returns:'Возвраты',reconcile:'Сверка',cakes:'Торты',users:'Пользователи'};
   if(needed[id]&&!accessRightsLoaded){pendingPageId=id;return;}
   if(needed[id]&&!owner&&rights[needed[id]]!==true&&id!=='knowledge'){
-    history.replaceState({page:'tools'},'',pagePaths.tools);
+    history.replaceState({page:'tools'},'',APP_BASE+pagePaths.tools);
     showPage('tools',{updateUrl:false});
     return;
   }
@@ -957,7 +961,7 @@ function showPage(id,options={}){
   document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('active',b.dataset.page===activeTab));
   if(options.updateUrl!==false){
     const method=options.replaceUrl?'replaceState':'pushState';
-    history[method]({page:id},'',pagePaths[id]);
+    history[method]({page:id},'',APP_BASE+pagePaths[id]);
   }
   if(id==='users')loadUsersList();
   if(id==='knowledge'&&(rights['База знаний']===true||owner))loadKnowledge();
