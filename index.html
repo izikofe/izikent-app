@@ -674,7 +674,7 @@ loadLoginUsers();
 if(!restoreSession())showLogin();
 
 function getNewsSession(){const x=getSession();return x?.token?x:null;}
-async function newsApi(action,{method='GET',body=null}={}){const session=getNewsSession();if(!session)throw new Error('Новости пока недоступны: не удалось войти в новый сервис. Проверь доступ сотрудника.');const headers={'X-Session-Token':session.token};if(body!==null)headers['Content-Type']='application/json';const response=await fetch(NEWS_API_URL+'?action='+encodeURIComponent(action),{method,headers,body:body===null?undefined:JSON.stringify(body),cache:'no-store'});let data={};try{data=await response.json()}catch(_){throw new Error('Сервер новостей вернул неверный ответ.')}if(!response.ok||!data.ok)throw new Error(data.error||'Ошибка сервиса новостей.');return data;}
+async function newsApi(action,{method='GET',body=null}={}){const session=getNewsSession();if(!session)throw new Error('Новости пока недоступны: не удалось войти в новый сервис. Проверь доступ сотрудника.');const headers={'X-Session-Token':session.token};if(body!==null)headers['Content-Type']='application/json';const response=await fetch(NEWS_API_URL+'?action='+encodeURIComponent(action),{method,headers,body:body===null?undefined:JSON.stringify(body),cache:'no-store'});let data={};try{data=await response.json()}catch(_){throw new Error('Сервер новостей вернул неверный ответ.')}if(!response.ok||!data.ok)throw new Error((data.error||'Ошибка сервиса новостей.')+(data.diagnostic?'\nДиагностика: '+data.diagnostic:''));return data;}
 function escNews(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function newsDate(v){return v||'';}
 function newsTimestamp(value){
