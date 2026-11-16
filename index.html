@@ -932,7 +932,7 @@ function requestedPageFromUrl(){
       history.replaceState({page:pathPages[pathname]||'home'},'',pathname+restored.search+restored.hash);
     }catch(e){}
   }
-  return pathPages[pathname.replace(/\\/$/,'')]||'home';
+  return pathPages[pathname.replace(/\/$/,'')]||'home';
 }
 let pendingPageId=requestedPageFromUrl();
 function showPage(id,options={}){
