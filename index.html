@@ -382,7 +382,7 @@ async function loadLoginUsers(){
   }catch(error){select.innerHTML='<option value="">Не удалось загрузить сотрудников</option>';loginError.textContent='Не удалось загрузить активных сотрудников: '+error.message;}
   finally{select.disabled=false;}
 }
-const permissionNames=['База знаний','Торты','Займы','Возвраты','Сверка','Пользователи','Управление базой','Публикация новостей'];
+const permissionNames=['База знаний','Торты','Внесение тортов','Подтверждение пересорта тортов','Займы','Возвраты','Сверка','Пользователи','Управление базой','Публикация новостей'];
 let usersEditorData=null;
 async function loadUsersList(){
   const session=getSession();
