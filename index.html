@@ -29,6 +29,12 @@ footer{text-align:center;color:var(--muted);font-size:10px;padding:8px 0 18px}
 #myCakeRecords .cake-edit-save,#myCakeRecords .cake-edit-cancel{width:auto;min-width:42px;padding:0 13px;font-size:13px;gap:6px}
 #myCakeRecords .cake-edit-save svg,#myCakeRecords .cake-edit-cancel svg{width:17px;height:17px}
 #myCakeRecords .cake-edit-input{max-width:115px;margin-top:7px}
+#myCakeRecords .cake-edit-panel{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:9px}
+#myCakeRecords .cake-edit-save,#myCakeRecords .cake-edit-cancel{height:40px;border-radius:13px;font-size:13px;font-weight:700;letter-spacing:.01em}
+#myCakeRecords .cake-edit-save{background:linear-gradient(145deg,#eaffffed,#9ce8e8c9);border:1px solid #75dce0;color:#08777d;box-shadow:0 5px 13px #36c8cb35,inset 0 1px 2px #fff}
+#myCakeRecords .cake-edit-cancel{background:linear-gradient(145deg,#ffffffdf,#dce7ebbd);border:1px solid #ffffffdf;color:#365b65;box-shadow:0 5px 13px #35576225,inset 0 1px 2px #fff}
+#myCakeRecords .cake-edit-save.is-loading{opacity:.65}
+
 
 .user-action{width:48px;height:48px;padding:0;border:1px solid #ffffffdf;border-radius:15px;display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#ffffffd9,#dce7eb9c);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 5px 13px #35576225,inset 0 1px 2px #fff;transition:transform .16s ease,box-shadow .16s ease,filter .16s ease}
 .user-action:hover{transform:translateY(-2px);box-shadow:0 8px 17px #35576235,inset 0 1px 3px #fff;filter:brightness(1.04)}
@@ -549,28 +555,33 @@ document.getElementById('cakeCatalogForm').addEventListener('submit',async event
 });
 async function loadMyCakeRecords(){
  const holder=document.getElementById('myCakeRecords');const session=getSession();if(!session?.token)throw new Error('Сессия закончилась. Войди заново.');
- const response=await fetchWithRetry(API_URL+'?action=cakes-records',{headers:{'X-Session-Token':session.token},cache:'no-store'});const data=await response.json();if(!response.ok||!data.ok)throw new Error(data.error||'Не удалось загрузить записи.');
- holder.innerHTML='';if(!data.records?.length){holder.textContent='Пока нет ожидающих записей.';return;}
- const icon=(d)=>'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="'+d+'"/></svg>';
- data.records.forEach(item=>{
-  const row=document.createElement('div');row.className='listitem';const info=document.createElement('div');info.style.minWidth='0';info.style.flex='1';const title=document.createElement('strong');title.textContent=item.cake+' — '+item.whole+' шт. ('+item.pieces+' кусочков)';const meta=document.createElement('div');meta.className='muted';meta.textContent=item.point+' · '+item.created_at;info.append(title,meta);
-  const actions=document.createElement('div');actions.className='user-actions';actions.style.marginTop='0';
-  const edit=document.createElement('button');edit.type='button';edit.className='user-action edit';edit.title='Изменить запись';edit.setAttribute('aria-label','Изменить запись');edit.innerHTML=icon('M4 16.5 3 21l4.5-1L20 7.5 16.5 4 4 16.5ZM14.5 6l3.5 3.5');
-  edit.addEventListener('click',()=>{
-   if(row.querySelector('[data-cake-edit]'))return;
-   const editor=document.createElement('div');editor.style.cssText='display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px';
-   const input=document.createElement('input');input.type='number';input.min='1';input.step='1';input.value=String(item.whole);input.className='select cake-edit-input';input.setAttribute('data-cake-edit','1');
-   const preview=document.createElement('span');preview.className='muted';preview.textContent='= '+(item.whole*10)+' кусочков';
-   input.addEventListener('input',()=>{const n=Number(input.value);preview.textContent=Number.isInteger(n)&&n>0?'= '+(n*10)+' кусочков':'Укажи целое число';});
-   const save=document.createElement('button');save.type='button';save.className='user-action save cake-edit-save';save.innerHTML=icon('M5 12.5 9.5 17 19 7');save.append(document.createTextNode('Сохранить'));
-   const cancel=document.createElement('button');cancel.type='button';cancel.className='user-action cake-edit-cancel';cancel.innerHTML=icon('M6 6l12 12M18 6 6 18');cancel.append(document.createTextNode('Отмена'));
-   save.addEventListener('click',async()=>{const quantity=input.value.trim();if(!/^[1-9]\d*$/.test(quantity)){alert('Укажи целое число больше нуля.');return;}save.disabled=true;try{const resp=await fetch(API_URL+'?action=cakes-record-update',{method:'POST',headers:{'Content-Type':'application/json','X-Session-Token':session.token},body:JSON.stringify({id:item.id,cake:item.cake,point:item.point,quantity})});const result=await resp.json();if(!resp.ok||!result.ok)throw new Error(result.error||'Не удалось изменить запись.');await loadMyCakeRecords();}catch(e){alert(e.message);save.disabled=false;}});
-   cancel.addEventListener('click',()=>editor.remove());editor.append(input,preview,save,cancel);info.append(editor);input.focus();
+ const renderRecords=(records)=>{
+  holder.innerHTML='';
+  if(!records?.length){holder.textContent='Пока нет ожидающих записей.';return;}
+  const icon=(d)=>'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="'+d+'"/></svg>';
+  records.forEach(item=>{
+   const row=document.createElement('div');row.className='listitem';const info=document.createElement('div');info.style.minWidth='0';info.style.flex='1';const title=document.createElement('strong');title.textContent=item.cake+' — '+item.whole+' шт. ('+item.pieces+' кусочков)';const meta=document.createElement('div');meta.className='muted';meta.textContent=item.point+' · '+item.created_at;info.append(title,meta);
+   const actions=document.createElement('div');actions.className='user-actions';actions.style.marginTop='0';
+   const edit=document.createElement('button');edit.type='button';edit.className='user-action edit';edit.title='Изменить запись';edit.setAttribute('aria-label','Изменить запись');edit.innerHTML=icon('M4 16.5 3 21l4.5-1L20 7.5 16.5 4 4 16.5ZM14.5 6 18 9.5');
+   edit.addEventListener('click',()=>{
+    if(row.querySelector('[data-cake-edit]'))return;
+    const editor=document.createElement('div');editor.className='cake-edit-panel';
+    const input=document.createElement('input');input.type='number';input.min='1';input.step='1';input.value=String(item.whole);input.className='select cake-edit-input';input.setAttribute('data-cake-edit','1');
+    const preview=document.createElement('span');preview.className='muted';preview.textContent='= '+(item.whole*10)+' кусочков';
+    input.addEventListener('input',()=>{const n=Number(input.value);preview.textContent=Number.isInteger(n)&&n>0?'= '+(n*10)+' кусочков':'Укажи целое число';});
+    const save=document.createElement('button');save.type='button';save.className='user-action save cake-edit-save';save.innerHTML=icon('M5 12.5 9.5 17 19 7');save.append(document.createTextNode('Сохранить'));
+    const cancel=document.createElement('button');cancel.type='button';cancel.className='user-action cake-edit-cancel';cancel.innerHTML=icon('M6 6l12 12M18 6 6 18');cancel.append(document.createTextNode('Отменить'));
+    save.addEventListener('click',async()=>{const quantity=input.value.trim();if(!/^[1-9]\d*$/.test(quantity)){alert('Укажи целое число больше нуля.');return;}save.disabled=true;save.classList.add('is-loading');try{const resp=await fetch(API_URL+'?action=cakes-record-update',{method:'POST',headers:{'Content-Type':'application/json','X-Session-Token':session.token},body:JSON.stringify({id:item.id,cake:item.cake,point:item.point,quantity})});const result=await resp.json();if(!resp.ok||!result.ok)throw new Error(result.error||'Не удалось изменить запись.');await loadMyCakeRecords(true);}catch(e){alert(e.message);save.disabled=false;save.classList.remove('is-loading');}});
+    cancel.addEventListener('click',()=>editor.remove());editor.append(input,preview,save,cancel);info.append(editor);input.focus();
+   });
+   const del=document.createElement('button');del.type='button';del.className='user-action delete';del.title='Удалить запись';del.setAttribute('aria-label','Удалить запись');del.innerHTML=icon('M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5');
+   del.addEventListener('click',async()=>{if(!confirm('Удалить эту запись?'))return;del.disabled=true;try{const resp=await fetch(API_URL+'?action=cakes-record-delete',{method:'POST',headers:{'Content-Type':'application/json','X-Session-Token':session.token},body:JSON.stringify({id:item.id})});const result=await resp.json();if(!resp.ok||!result.ok)throw new Error(result.error||'Не удалось удалить запись.');await loadMyCakeRecords(true);}catch(e){alert(e.message);del.disabled=false;}});
+   actions.append(edit,del);row.append(info,actions);holder.append(row);
   });
-  const del=document.createElement('button');del.type='button';del.className='user-action delete';del.title='Удалить запись';del.setAttribute('aria-label','Удалить запись');del.innerHTML=icon('M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5');
-  del.addEventListener('click',async()=>{if(!confirm('Удалить эту запись?'))return;try{const resp=await fetch(API_URL+'?action=cakes-record-delete',{method:'POST',headers:{'Content-Type':'application/json','X-Session-Token':session.token},body:JSON.stringify({id:item.id})});const result=await resp.json();if(!resp.ok||!result.ok)throw new Error(result.error||'Не удалось удалить запись.');await loadMyCakeRecords();}catch(e){alert(e.message);}});
-  actions.append(edit,del);row.append(info,actions);holder.append(row);
- });
+ };
+ const cached=readAppCache('cake-records');if(cached?.data)renderRecords(cached.data);
+ const response=await fetchWithRetry(API_URL+'?action=cakes-records',{headers:{'X-Session-Token':session.token},cache:'no-store'});const data=await response.json();if(!response.ok||!data.ok)throw new Error(data.error||'Не удалось загрузить записи.');
+ const records=data.records||[];writeAppCache('cake-records',records);renderRecords(records);
 }
 async function openCakesPage(){
   cakesError.textContent='';
