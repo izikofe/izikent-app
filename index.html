@@ -203,7 +203,7 @@ footer{text-align:center;color:var(--muted);font-size:10px;padding:8px 0 18px}
 <section id="reconcile" class="hidden"><button class="back" data-page="home">← Главное меню</button><div class="eyebrow">Контроль задолженностей</div><h1>Сверка</h1>
 <div class="card"><div class="row"><h2>Текущие долги</h2><button class="back" id="refreshReconcile" type="button">↻ Обновить</button></div>
 <div id="reconcileDate" class="muted"></div><div id="reconcileContent" style="margin-top:12px">Нажми «Обновить», чтобы загрузить данные.</div></div></section><section id="cakes" class="hidden"><button class="back" data-page="home">← Главное меню</button><div class="eyebrow">Учёт продукции</div><h1>Торты</h1>
-<div class="card"><h2>Новая запись</h2><p class="muted">Дата поставится автоматически. Выбери торт и торговую точку, затем укажи количество целых тортов.</p>
+<div class="card"><h2>Новая запись</h2><p class="muted">Дата поставится автоматически. Выбери торт и торговую точку, затем укажи количество целых тортов. Один целый торт — 10 кусочков.</p>
 <form id="cakesForm">
 <label class="field-label" for="cakeName">Наименование торта</label>
 <select class="select" id="cakeName" required><option value="">Загружаем список…</option></select>
@@ -214,6 +214,7 @@ footer{text-align:center;color:var(--muted);font-size:10px;padding:8px 0 18px}
 <button class="primary" id="cakesSubmit" type="submit">Записать в таблицу</button>
 <div class="error" id="cakesError" role="alert"></div><div class="notice hidden" id="cakesSuccess" role="status"></div>
 </form></div>
+<div class="card" id="myCakeRecordsCard"><h2>Мои ожидающие записи</h2><div id="myCakeRecords">Загрузка записей…</div></div>
 <div class="card hidden" id="cakesCatalogCard"><h2>Справочник тортов</h2><p class="muted">Добавляй новые торты, меняй названия и отключай позиции, которые больше не используются.</p><form id="cakeCatalogForm"><label class="field-label" for="newCakeName">Название нового торта</label><input class="select" id="newCakeName" maxlength="100" placeholder="Например, Красный бархат" required><button class="primary" id="addCakeButton" type="submit">Добавить торт</button><div class="error" id="cakeCatalogError" role="alert"></div></form><div id="cakeCatalogList" style="margin-top:12px"></div></div></section>
 <section id="users" class="hidden"><button class="back" data-page="home">← Главное меню</button><div class="eyebrow">Управление доступом</div><h1>Пользователи</h1>
 <div class="card"><h2>Добавить пользователя</h2><p class="muted">Задай имя и PIN-код из 8 цифр. Должность можно назначить позже.</p>
@@ -538,10 +539,19 @@ document.getElementById('cakeCatalogForm').addEventListener('submit',async event
  event.preventDefault();const input=document.getElementById('newCakeName'),button=document.getElementById('addCakeButton'),error=document.getElementById('cakeCatalogError');error.textContent='';button.disabled=true;
  try{await cakesSettingsApi('POST',{mode:'add',name:input.value.trim()});input.value='';cakesListsLoaded=false;await loadCakesData(true);await loadCakesCatalog();}catch(e){error.textContent=e.message;}finally{button.disabled=false;}
 });
+async function loadMyCakeRecords(){
+ const holder=document.getElementById('myCakeRecords');const session=getSession();if(!session?.token)throw new Error('Сессия закончилась. Войди заново.');
+ const response=await fetchWithRetry(API_URL+'?action=cakes-records',{headers:{'X-Session-Token':session.token},cache:'no-store'});const data=await response.json();if(!response.ok||!data.ok)throw new Error(data.error||'Не удалось загрузить записи.');
+ holder.innerHTML='';if(!data.records?.length){holder.textContent='Пока нет ожидающих записей.';return;}
+ data.records.forEach(item=>{const row=document.createElement('div');row.className='listitem';const info=document.createElement('div');info.style.minWidth='0';const title=document.createElement('strong');title.textContent=item.cake+' — '+item.whole+' шт. ('+item.pieces+' кусочков)';const meta=document.createElement('div');meta.className='muted';meta.textContent=item.point+' · '+item.created_at;info.append(title,meta);const actions=document.createElement('div');actions.className='user-actions';actions.style.marginTop='0';
+ const edit=document.createElement('button');edit.type='button';edit.className='user-action edit';edit.textContent='Изменить';edit.addEventListener('click',async()=>{const quantity=prompt('Количество целых тортов:',String(item.whole));if(quantity===null)return;if(!/^[1-9]\\d*$/.test(quantity.trim())){alert('Укажи целое число больше нуля.');return;}try{const resp=await fetch(API_URL+'?action=cakes-record-update',{method:'POST',headers:{'Content-Type':'application/json','X-Session-Token':session.token},body:JSON.stringify({id:item.id,cake:item.cake,point:item.point,quantity})});const result=await resp.json();if(!resp.ok||!result.ok)throw new Error(result.error||'Не удалось изменить запись.');await loadMyCakeRecords();}catch(e){alert(e.message);}});
+ const del=document.createElement('button');del.type='button';del.className='user-action delete';del.textContent='Удалить';del.addEventListener('click',async()=>{if(!confirm('Удалить эту запись?'))return;try{const resp=await fetch(API_URL+'?action=cakes-record-delete',{method:'POST',headers:{'Content-Type':'application/json','X-Session-Token':session.token},body:JSON.stringify({id:item.id})});const result=await resp.json();if(!resp.ok||!result.ok)throw new Error(result.error||'Не удалось удалить запись.');await loadMyCakeRecords();}catch(e){alert(e.message);}});
+ actions.append(edit,del);row.append(info,actions);holder.append(row);});
+}
 async function openCakesPage(){
   cakesError.textContent='';
   cakesSuccess.classList.add('hidden');
-  try{await loadCakesData();await loadCakesCatalog();}
+  try{await loadCakesData();await loadCakesCatalog();await loadMyCakeRecords();}
   catch(error){renderRetry(cakesError,error.message,()=>openCakesPage());}
 }cakesForm.addEventListener('submit',async(event)=>{
   event.preventDefault();
@@ -560,7 +570,7 @@ async function openCakesPage(){
   cakesSubmit.disabled=true;
   cakesSubmit.textContent='Записываем…';
   try{
-    const response=await fetch(API_URL+'?action=cakes-add',{
+    const response=await fetch(API_URL+'?action=cakes-record-add',{
       method:'POST',
       headers:{'Content-Type':'application/json','X-Session-Token':session.token},
       body:JSON.stringify({cake,point:place,quantity})
@@ -568,9 +578,9 @@ async function openCakesPage(){
     const data=await response.json();
     if(response.status===401){localStorage.removeItem(SESSION_KEY);showLogin();throw new Error('Сессия закончилась. Войди заново.');}
     if(!response.ok||!data.ok)throw new Error(data.error||'Не удалось записать торты.');
-    cakesSuccess.textContent='Запись добавлена в таблицу «ТОРТЫ».';
+    cakesSuccess.textContent='Запись сохранена. Кусочков: '+(data.pieces||Number(quantity)*10)+'.';
     cakesSuccess.classList.remove('hidden');
-    cakesForm.reset();
+    cakesForm.reset();await loadMyCakeRecords();
   }catch(error){cakesError.textContent=error.message||'Ошибка связи с сервером.';}
   finally{cakesSubmit.disabled=false;cakesSubmit.textContent='Записать в таблицу';}
 });
