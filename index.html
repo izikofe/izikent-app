@@ -920,8 +920,9 @@ borrowForm.addEventListener('submit', async (event)=>{
 });
 
 const pages=[...document.querySelectorAll('main section')];
-const pagePaths={home:'/home',tools:'/tools',profile:'/profile',knowledge:'/knowledge',loans:'/loans',returns:'/returns',reconcile:'/reconcile',cakes:'/cakes',users:'/users'};
-const pathPages=Object.fromEntries(Object.entries(pagePaths).map(([page,path])=>[path,page]));
+const APP_BASE='/izikent-app';
+const pagePaths={home:APP_BASE+'/home',tools:APP_BASE+'/tools',profile:APP_BASE+'/profile',knowledge:APP_BASE+'/knowledge',loans:APP_BASE+'/loans',returns:APP_BASE+'/returns',reconcile:APP_BASE+'/reconcile',cakes:APP_BASE+'/cakes',users:APP_BASE+'/users'};
+const pathPages=Object.fromEntries(Object.entries(pagePaths).map(([page,path])=>[path.slice(APP_BASE.length),page]));
 function requestedPageFromUrl(){
   let pathname=location.pathname;
   const fallback=new URLSearchParams(location.search).get('__route');
@@ -929,9 +930,11 @@ function requestedPageFromUrl(){
     try{
       const restored=new URL(fallback,location.origin);
       pathname=restored.pathname;
-      history.replaceState({page:pathPages[pathname]||'home'},'',pathname+restored.search+restored.hash);
+      history.replaceState({page:pathPages[pathname.startsWith(APP_BASE+'/')?pathname.slice(APP_BASE.length):pathname]||'home'},'',pathname+restored.search+restored.hash);
     }catch(e){}
   }
+  if(pathname===APP_BASE||pathname===APP_BASE+'/')return 'home';
+  if(pathname.startsWith(APP_BASE+'/'))pathname=pathname.slice(APP_BASE.length);
   return pathPages[pathname.replace(/\/$/,'')]||'home';
 }
 let pendingPageId=requestedPageFromUrl();
@@ -941,7 +944,7 @@ function showPage(id,options={}){
   const needed={knowledge:'База знаний',loans:'Займы',returns:'Возвраты',reconcile:'Сверка',cakes:'Торты',users:'Пользователи'};
   if(needed[id]&&!accessRightsLoaded){pendingPageId=id;return;}
   if(needed[id]&&!owner&&rights[needed[id]]!==true&&id!=='knowledge'){
-    history.replaceState({page:'tools'},'','/tools');
+    history.replaceState({page:'tools'},'',pagePaths.tools);
     showPage('tools',{updateUrl:false});
     return;
   }
