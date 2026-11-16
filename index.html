@@ -213,7 +213,8 @@ footer{text-align:center;color:var(--muted);font-size:10px;padding:8px 0 18px}
 <select class="select" id="cakePlace" required><option value="">Загружаем список…</option></select>
 <button class="primary" id="cakesSubmit" type="submit">Записать в таблицу</button>
 <div class="error" id="cakesError" role="alert"></div><div class="notice hidden" id="cakesSuccess" role="status"></div>
-</form></div></section>
+</form></div>
+<div class="card hidden" id="cakesCatalogCard"><h2>Справочник тортов</h2><p class="muted">Добавляй новые торты, меняй названия и отключай позиции, которые больше не используются.</p><form id="cakeCatalogForm"><label class="field-label" for="newCakeName">Название нового торта</label><input class="select" id="newCakeName" maxlength="100" placeholder="Например, Красный бархат" required><button class="primary" id="addCakeButton" type="submit">Добавить торт</button><div class="error" id="cakeCatalogError" role="alert"></div></form><div id="cakeCatalogList" style="margin-top:12px"></div></div></section>
 <section id="users" class="hidden"><button class="back" data-page="home">← Главное меню</button><div class="eyebrow">Управление доступом</div><h1>Пользователи</h1>
 <div class="card"><h2>Добавить пользователя</h2><p class="muted">Задай имя и PIN-код из 8 цифр. Должность можно назначить позже.</p>
 <form id="createUserForm">
@@ -506,10 +507,41 @@ async function loadCakesData(force=false){
   fill(cakePlace,data.places,'Выбери торговую точку');
   cakesListsLoaded=true;
 }
+async function cakesSettingsApi(method='GET',body=null){
+ const session=getSession();if(!session?.token)throw new Error('Сессия закончилась. Войди заново.');
+ const headers={'X-Session-Token':session.token};if(body!==null)headers['Content-Type']='application/json';
+ const response=await fetchWithRetry(API_URL+'?action=cakes-settings',{method,headers,body:body===null?undefined:JSON.stringify(body),cache:'no-store'});
+ const data=await response.json();if(response.status===401){localStorage.removeItem(SESSION_KEY);showLogin();throw new Error('Сессия закончилась. Войди заново.');}
+ if(!response.ok||!data.ok)throw new Error(data.error||'Не удалось загрузить справочник тортов.');return data;
+}
+async function loadCakesCatalog(){
+ const card=document.getElementById('cakesCatalogCard'),list=document.getElementById('cakeCatalogList'),error=document.getElementById('cakeCatalogError');
+ const rights=window.izikentPermissions||{};const canManage=!!(rights.owner||rights['Управление базой']);
+ card.classList.toggle('hidden',!canManage);if(!canManage)return;error.textContent='';list.textContent='Загружаем справочник…';
+ try{const data=await cakesSettingsApi();renderCakesCatalog(data.cakes||[]);}catch(e){list.textContent='';error.textContent=e.message;}
+}
+function renderCakesCatalog(items){
+ const list=document.getElementById('cakeCatalogList');list.innerHTML='';if(!items.length){list.textContent='Список пока пуст.';return;}
+ items.forEach(item=>{
+  const row=document.createElement('div');row.className='listitem';row.style.alignItems='center';
+  const info=document.createElement('div');info.style.minWidth='0';const name=document.createElement('strong');name.textContent=item.name;
+  const status=document.createElement('div');status.className='muted';status.textContent=item.active?'Активен':'Отключён';info.append(name,status);
+  const actions=document.createElement('div');actions.className='user-actions';actions.style.marginTop='0';
+  const edit=document.createElement('button');edit.type='button';edit.className='user-action edit';edit.title='Переименовать';edit.innerHTML='<svg viewBox="0 0 24 24"><path d="m4 16.5-.8 4.3 4.3-.8L19 8.5 15.5 5 4 16.5ZM13.8 6.7l3.5 3.5"/></svg>';
+  edit.addEventListener('click',async()=>{const value=prompt('Новое название торта:',item.name);if(value===null)return;try{await cakesSettingsApi('POST',{mode:'rename',old_name:item.name,name:value.trim()});cakesListsLoaded=false;await loadCakesData(true);await loadCakesCatalog();}catch(e){alert(e.message);}});
+  const toggle=document.createElement('button');toggle.type='button';toggle.className='user-action '+(item.active?'delete':'save');toggle.title=item.active?'Отключить':'Включить';toggle.innerHTML=item.active?'<svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg>':'<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>';
+  toggle.addEventListener('click',async()=>{if(!confirm('Изменить статус торта «'+item.name+'»?'))return;try{await cakesSettingsApi('POST',{mode:'toggle',old_name:item.name,active:!item.active});cakesListsLoaded=false;await loadCakesData(true);await loadCakesCatalog();}catch(e){alert(e.message);}});
+  actions.append(edit,toggle);row.append(info,actions);list.append(row);
+ });
+}
+document.getElementById('cakeCatalogForm').addEventListener('submit',async event=>{
+ event.preventDefault();const input=document.getElementById('newCakeName'),button=document.getElementById('addCakeButton'),error=document.getElementById('cakeCatalogError');error.textContent='';button.disabled=true;
+ try{await cakesSettingsApi('POST',{mode:'add',name:input.value.trim()});input.value='';cakesListsLoaded=false;await loadCakesData(true);await loadCakesCatalog();}catch(e){error.textContent=e.message;}finally{button.disabled=false;}
+});
 async function openCakesPage(){
   cakesError.textContent='';
   cakesSuccess.classList.add('hidden');
-  try{await loadCakesData();}
+  try{await loadCakesData();await loadCakesCatalog();}
   catch(error){renderRetry(cakesError,error.message,()=>openCakesPage());}
 }cakesForm.addEventListener('submit',async(event)=>{
   event.preventDefault();
