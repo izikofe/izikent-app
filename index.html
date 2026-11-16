@@ -102,13 +102,16 @@ footer{text-align:center;color:var(--muted);font-size:10px;padding:8px 0 18px}
   <div id="knowledgeContent">
    <div class="eyebrow">Обучение команды</div><h1>База знаний</h1>
    <p class="muted">Видеоинструкции и материалы для работы.</p>
-   <div class="card">
-    <h2>Кулинария</h2>
-    <a class="tile" href="https://disk.yandex.ru/i/ODHH0qtkDL9ypw" target="_blank" rel="noopener noreferrer" style="display:flex;width:100%;text-decoration:none;color:inherit">
-     <div class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 10 6-10 6z" fill="none" stroke="#315966" stroke-width="1.8" stroke-linejoin="round"/><rect x="3" y="3" width="18" height="18" rx="3" fill="none" stroke="#315966" stroke-width="1.5"/></svg></div>
-     <div><strong>Куриная грудка с пюре</strong><small>Открыть видео на Яндекс Диске</small></div>
-    </a>
-   </div>
+   <button class="primary hidden" id="addKnowledgeButton" type="button" style="margin:8px 0 14px">Добавить обучение</button>
+   <form id="knowledgeForm" class="card hidden">
+    <h2 id="knowledgeFormTitle">Новое обучение</h2>
+    <label class="field-label" for="knowledgeTitle">Название</label><input class="select" id="knowledgeTitle" maxlength="200" required placeholder="Например, Куриная грудка с пюре">
+    <label class="field-label" for="knowledgeUrl">Ссылка на Яндекс Диск</label><input class="select" id="knowledgeUrl" type="url" required placeholder="https://disk.yandex.ru/...">
+    <label class="field-label" for="knowledgeDescription">Описание (необязательно)</label><textarea class="select news-textarea" id="knowledgeDescription" maxlength="2000" placeholder="Кратко о содержании обучения"></textarea>
+    <div class="user-actions"><button class="user-action save" id="saveKnowledgeButton" type="submit" aria-label="Сохранить обучение" title="Сохранить">✓</button><button class="user-action delete" id="cancelKnowledgeButton" type="button" aria-label="Отмена" title="Отмена">×</button></div>
+    <div class="error" id="knowledgeError" role="alert"></div>
+   </form>
+   <div id="knowledgeList"><p class="muted">Загружаем обучения…</p></div>
   </div>
  </section>
 <section id="tools" class="hidden">
@@ -258,6 +261,7 @@ async function refreshAccessRights(){
   document.getElementById('usersTile')?.classList.toggle('hidden',!allowed('Пользователи'));
   document.getElementById('knowledgeDenied')?.classList.toggle('hidden',p['База знаний']===true);
   document.getElementById('knowledgeContent')?.classList.toggle('hidden',p['База знаний']!==true);
+  document.getElementById('addKnowledgeButton')?.classList.toggle('hidden',!p['Управление базой']);
  }catch(e){window.izikentPermissions={};['cakesTile','loansTile','returnTile','reconcileTile','usersTile'].forEach(id=>document.getElementById(id)?.classList.add('hidden'));document.getElementById('knowledgeDenied')?.classList.remove('hidden');document.getElementById('knowledgeContent')?.classList.add('hidden');}
 }
 async function loadPlaces(){
@@ -666,6 +670,7 @@ function showPage(id){
   const activeTab=['profile','home','knowledge'].includes(id)?id:'tools';
   document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('active',b.dataset.page===activeTab));
   if(id==='users')loadUsersList();
+  if(id==='knowledge'&&(rights['База знаний']===true||owner))loadKnowledge();
   if(id==='reconcile')showReconcile();
   if(id==='cakes')openCakesPage();
   window.scrollTo({top:0,behavior:'smooth'});
@@ -696,6 +701,53 @@ if(!restoreSession())showLogin();
 function getNewsSession(){const x=getSession();return x?.token?x:null;}
 async function newsApi(action,{method='GET',body=null}={}){const session=getNewsSession();if(!session)throw new Error('Новости пока недоступны: не удалось войти в новый сервис. Проверь доступ сотрудника.');const headers={'X-Session-Token':session.token};if(body!==null)headers['Content-Type']='application/json';const response=await fetch(NEWS_API_URL+'?action='+encodeURIComponent(action),{method,headers,body:body===null?undefined:JSON.stringify(body),cache:'no-store'});let data={};try{data=await response.json()}catch(_){throw new Error('Сервер новостей вернул неверный ответ.')}if(!response.ok||!data.ok)throw new Error((data.error||'Ошибка сервиса новостей.')+(data.diagnostic?'\nДиагностика: '+data.diagnostic:''));return data;}
 function escNews(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+let editingKnowledgeId='';
+function resetKnowledgeForm(){
+ editingKnowledgeId='';
+ document.getElementById('knowledgeForm').reset();
+ document.getElementById('knowledgeForm').classList.add('hidden');
+ document.getElementById('knowledgeFormTitle').textContent='Новое обучение';
+ document.getElementById('saveKnowledgeButton').title='Сохранить';
+ document.getElementById('knowledgeError').textContent='';
+}
+async function loadKnowledge(){
+ const list=document.getElementById('knowledgeList');if(!list)return;
+ list.innerHTML='<p class="muted">Загружаем обучения…</p>';
+ try{
+  const data=await newsApi('knowledge');list.innerHTML='';
+  if(!data.items?.length){list.innerHTML='<div class="card"><p class="muted">Пока обучений нет. Можно добавить первое.</p></div>';return;}
+  const canManage=!!(window.izikentPermissions||{})['Управление базой'];
+  data.items.forEach(item=>{
+   const card=document.createElement('div');card.className='card';
+   const title=document.createElement('h2');title.textContent=item.title;card.append(title);
+   if(item.description){const desc=document.createElement('p');desc.className='muted';desc.textContent=item.description;card.append(desc);}
+   const link=document.createElement('a');link.className='tile';link.href=item.url;link.target='_blank';link.rel='noopener noreferrer';link.style.textDecoration='none';link.style.color='inherit';
+   const ico=document.createElement('div');ico.className='ico';ico.textContent='▶';
+   const label=document.createElement('div');const strong=document.createElement('strong');strong.textContent='Открыть обучение';const small=document.createElement('small');small.textContent='Яндекс Диск';label.append(strong,small);link.append(ico,label);card.append(link);
+   const meta=document.createElement('div');meta.className='news-meta';meta.textContent=(item.author||'')+(item.created_at?' · '+item.created_at:'');card.append(meta);
+   if(canManage){
+    const actions=document.createElement('div');actions.className='user-actions';
+    const edit=document.createElement('button');edit.type='button';edit.className='user-action edit';edit.title='Редактировать';edit.setAttribute('aria-label','Редактировать обучение');edit.textContent='✎';
+    edit.addEventListener('click',()=>{editingKnowledgeId=item.id;document.getElementById('knowledgeTitle').value=item.title;document.getElementById('knowledgeUrl').value=item.url;document.getElementById('knowledgeDescription').value=item.description||'';document.getElementById('knowledgeFormTitle').textContent='Редактировать обучение';document.getElementById('knowledgeForm').classList.remove('hidden');document.getElementById('knowledgeError').textContent='';document.getElementById('knowledgeForm').scrollIntoView({behavior:'smooth',block:'start'});});
+    const del=document.createElement('button');del.type='button';del.className='user-action delete';del.title='Удалить';del.setAttribute('aria-label','Удалить обучение');del.textContent='×';
+    del.addEventListener('click',async()=>{if(!confirm('Удалить обучение «'+item.title+'»?'))return;del.disabled=true;try{await newsApi('knowledge-delete',{method:'POST',body:{id:item.id}});await loadKnowledge();}catch(e){alert(e.message);del.disabled=false;}});
+    actions.append(edit,del);card.append(actions);
+   }
+   list.append(card);
+  });
+ }catch(e){list.innerHTML='<div class="card"><p class="error">'+escNews(e.message)+'</p></div>';}
+}
+document.getElementById('addKnowledgeButton').addEventListener('click',()=>{resetKnowledgeForm();document.getElementById('knowledgeForm').classList.remove('hidden');document.getElementById('knowledgeForm').scrollIntoView({behavior:'smooth',block:'start'});});
+document.getElementById('cancelKnowledgeButton').addEventListener('click',resetKnowledgeForm);
+document.getElementById('knowledgeForm').addEventListener('submit',async e=>{
+ e.preventDefault();const button=document.getElementById('saveKnowledgeButton'),error=document.getElementById('knowledgeError');error.textContent='';
+ const body={title:document.getElementById('knowledgeTitle').value.trim(),url:document.getElementById('knowledgeUrl').value.trim(),description:document.getElementById('knowledgeDescription').value.trim()};
+ button.disabled=true;
+ try{await newsApi(editingKnowledgeId?'knowledge-update':'knowledge-create',{method:'POST',body:editingKnowledgeId?{...body,id:editingKnowledgeId}:body});resetKnowledgeForm();await loadKnowledge();}
+ catch(err){error.textContent=err.message;}
+ finally{button.disabled=false;}
+});
+
 function newsDate(v){return v||'';}
 function newsTimestamp(value){
  if(!value)return 0;
