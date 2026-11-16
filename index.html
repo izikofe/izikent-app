@@ -29,6 +29,9 @@ footer{text-align:center;color:var(--muted);font-size:10px;padding:8px 0 18px}
 #myCakeRecords .cake-edit-save,#myCakeRecords .cake-edit-cancel{width:auto;min-width:42px;padding:0 13px;font-size:13px;gap:6px}
 #myCakeRecords .cake-edit-save svg,#myCakeRecords .cake-edit-cancel svg{width:17px;height:17px}
 #myCakeRecords .cake-edit-input{max-width:115px;margin-top:7px}
+#cakesTechnologistCard .listitem{margin-top:10px;padding:14px;border-radius:18px;background:linear-gradient(145deg,#ffffffa8,#dcebed80);border:1px solid #ffffffc9;box-shadow:0 7px 18px #294f5b18,inset 0 1px 2px #fff}
+#cakesTechnologistCard details summary{cursor:pointer;color:#315b66;font-weight:700}
+#cakesTechnologistCard .primary{width:100%;border-radius:15px}
 #myCakeRecords .cake-edit-panel{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:9px}
 #myCakeRecords .cake-edit-save,#myCakeRecords .cake-edit-cancel{height:40px;border-radius:13px;font-size:13px;font-weight:700;letter-spacing:.01em}
 #myCakeRecords .cake-edit-save{background:linear-gradient(145deg,#eaffffed,#9ce8e8c9);border:1px solid #75dce0;color:#08777d;box-shadow:0 5px 13px #36c8cb35,inset 0 1px 2px #fff}
@@ -229,6 +232,7 @@ footer{text-align:center;color:var(--muted);font-size:10px;padding:8px 0 18px}
 <div class="error" id="cakesError" role="alert"></div><div class="notice hidden" id="cakesSuccess" role="status"></div>
 </form></div>
 <div class="card" id="myCakeRecordsCard"><h2>Мои ожидающие записи</h2><div id="myCakeRecords">Загрузка записей…</div></div>
+<div class="card hidden" id="cakesTechnologistCard"><div class="row" style="align-items:center;justify-content:space-between;gap:12px"><h2 style="margin:0">Рабочее место технолога</h2><button type="button" class="user-action save" id="refreshCakeTech" title="Обновить" aria-label="Обновить"><svg viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.5 9A7 7 0 0 1 18 6l2 2M4 16l2 2a7 7 0 0 0 12.5-3"/></svg></button></div><p class="muted">Ожидающие записи сгруппированы по точке и виду торта. Подтверждение закрывает только текущую партию.</p><label class="field-label" for="cakeTechPointFilter">Торговая точка</label><select class="select" id="cakeTechPointFilter"><option value="">Все точки</option></select><div id="cakeTechCards">Загружаем записи…</div><div class="error" id="cakeTechError" role="alert"></div></div>
 <div class="card hidden" id="cakesCatalogCard"><h2>Справочник тортов</h2><p class="muted">Добавляй новые торты, меняй названия и отключай позиции, которые больше не используются.</p><form id="cakeCatalogForm"><label class="field-label" for="newCakeName">Название нового торта</label><input class="select" id="newCakeName" maxlength="100" placeholder="Например, Красный бархат" required><button class="primary" id="addCakeButton" type="submit">Добавить торт</button><div class="error" id="cakeCatalogError" role="alert"></div></form><div id="cakeCatalogList" style="margin-top:12px"></div></div></section>
 <section id="users" class="hidden"><button class="back" data-page="home">← Главное меню</button><div class="eyebrow">Управление доступом</div><h1>Пользователи</h1>
 <div class="card"><h2>Добавить пользователя</h2><p class="muted">Задай имя и PIN-код из 8 цифр. Должность можно назначить позже.</p>
@@ -587,10 +591,45 @@ async function loadMyCakeRecords(){
   const records=data.records||[];writeAppCache('cake-records',records);renderRecords(records);
  }catch(error){if(hasCached)return;throw error;}
 }
+async function loadCakeTechnologist(){
+ const card=document.getElementById('cakesTechnologistCard');
+ const rights=window.izikentPermissions||{};
+ const allowed=!!(rights.owner||rights['Подтверждение пересорта тортов']);
+ card.classList.toggle('hidden',!allowed);if(!allowed)return;
+ const holder=document.getElementById('cakeTechCards'),error=document.getElementById('cakeTechError');
+ const filter=document.getElementById('cakeTechPointFilter');error.textContent='';
+ const cached=readAppCache('cake-tech-pending');
+ const render=(data)=>{
+  const previous=filter.value;filter.innerHTML='<option value="">Все точки</option>';
+  (data.points||[]).forEach(point=>{const option=document.createElement('option');option.value=point;option.textContent=point;filter.append(option);});
+  if((data.points||[]).includes(previous))filter.value=previous;
+  holder.innerHTML='';
+  const selected=filter.value;
+  const cards=(data.cards||[]).filter(x=>!selected||x.point===selected);
+  if(!cards.length){holder.textContent='Нет ожидающих подтверждения записей.';return;}
+  cards.forEach(item=>{
+   const box=document.createElement('div');box.className='listitem';box.style.display='block';
+   const head=document.createElement('div');head.style.cssText='display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap';
+   const info=document.createElement('div');info.style.minWidth='0';const title=document.createElement('strong');title.textContent=item.cake;const point=document.createElement('div');point.className='muted';point.textContent=item.point;info.append(title,point);
+   const totals=document.createElement('div');totals.style.textAlign='right';const whole=document.createElement('strong');whole.textContent=item.whole+' целых';const pieces=document.createElement('div');pieces.className='muted';pieces.textContent=item.pieces+' кусочков';totals.append(whole,pieces);head.append(info,totals);box.append(head);
+   const employees=document.createElement('div');employees.className='muted';employees.style.marginTop='8px';employees.textContent='Внесли: '+(item.employees||[]).join(', ');box.append(employees);
+   const details=document.createElement('details');details.style.marginTop='8px';const summary=document.createElement('summary');summary.textContent='Записи сотрудников ('+item.records.length+')';details.append(summary);
+   item.records.forEach(rec=>{const line=document.createElement('div');line.className='muted';line.style.marginTop='5px';line.textContent=rec.employee+' · '+rec.whole+' шт. · '+rec.created_at;details.append(line);});box.append(details);
+   const confirm=document.createElement('button');confirm.type='button';confirm.className='primary';confirm.style.marginTop='12px';confirm.textContent='Подтвердить пересорт';
+   confirm.addEventListener('click',async()=>{if(!window.confirm('Подтвердить текущую партию «'+item.cake+'» на точке «'+item.point+'»?\\n\\nЗаписей: '+item.records.length+'\\nЦелых тортов: '+item.whole+'\\nКусочков: '+item.pieces))return;confirm.disabled=true;confirm.textContent='Подтверждаем…';try{const session=getSession();const response=await fetch(API_URL+'?action=cakes-tech-confirm',{method:'POST',headers:{'Content-Type':'application/json','X-Session-Token':session.token},body:JSON.stringify({point:item.point,cake:item.cake})});const result=await response.json();if(!response.ok||!result.ok)throw new Error(result.error||'Не удалось подтвердить партию.');await Promise.all([loadCakeTechnologist(),loadMyCakeRecords(true)]);}catch(e){error.textContent=e.message;confirm.disabled=false;confirm.textContent='Подтвердить пересорт';}});
+   box.append(confirm);holder.append(box);
+  });
+ };
+ if(cached?.data)render(cached.data);
+ try{const session=getSession();const response=await fetchWithRetry(API_URL+'?action=cakes-tech-pending',{headers:{'X-Session-Token':session.token},cache:'no-store'});const data=await response.json();if(!response.ok||!data.ok)throw new Error(data.error||'Не удалось загрузить записи технолога.');writeAppCache('cake-tech-pending',data);render(data);}
+ catch(e){if(!cached?.data)error.textContent=e.message;}
+}
+document.getElementById('cakeTechPointFilter').addEventListener('change',()=>{const cached=readAppCache('cake-tech-pending');if(cached?.data){const filter=document.getElementById('cakeTechPointFilter');const holder=document.getElementById('cakeTechCards');filter.dispatchEvent(new Event('cake-filter-render'));}});
+document.getElementById('refreshCakeTech').addEventListener('click',()=>loadCakeTechnologist());
 async function openCakesPage(){
   cakesError.textContent='';
   cakesSuccess.classList.add('hidden');
-  try{await Promise.all([loadCakesData(),loadCakesCatalog(),loadMyCakeRecords()]);}
+  try{await Promise.all([loadCakesData(),loadCakesCatalog(),loadMyCakeRecords(),loadCakeTechnologist()]);}
   catch(error){renderRetry(cakesError,error.message,()=>openCakesPage());}
 }cakesForm.addEventListener('submit',async(event)=>{
   event.preventDefault();
