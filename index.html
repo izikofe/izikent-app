@@ -295,8 +295,15 @@ async function refreshAccessRights(){
   document.getElementById('addKnowledgeButton')?.classList.toggle('hidden',!p['Управление базой']);
  }catch(e){window.izikentPermissions={};['cakesTile','loansTile','returnTile','reconcileTile','usersTile'].forEach(id=>document.getElementById(id)?.classList.add('hidden'));document.getElementById('knowledgeDenied')?.classList.remove('hidden');document.getElementById('knowledgeContent')?.classList.add('hidden');}
 }
+function appCacheKey(name){const session=getSession();const user=session?.newsUser?.name||session?.user?.name||'employee';return 'izikent_cache_v1_'+user+'_'+name;}
+function readAppCache(name){try{const raw=localStorage.getItem(appCacheKey(name));return raw?JSON.parse(raw):null;}catch(e){return null;}}
+function writeAppCache(name,data){try{localStorage.setItem(appCacheKey(name),JSON.stringify({data,savedAt:Date.now()}));}catch(e){}}
+function renderPlaces(names){
+ ['borrower','lender','returnBorrower'].forEach(id=>{const el=document.getElementById(id);if(!el)return;const previous=el.value;el.innerHTML='<option value="">Выбери точку</option>';names.forEach(n=>{const o=document.createElement('option');o.value=n;o.textContent=n;el.append(o);});if(names.includes(previous))el.value=previous;});
+}
 async function loadPlaces(){
- try{const d=await newsApi('places');const names=d.places||[];['borrower','lender','returnBorrower'].forEach(id=>{const el=document.getElementById(id);if(!el)return;const previous=el.value;el.innerHTML='<option value="">Выбери точку</option>';names.forEach(n=>{const o=document.createElement('option');o.value=n;o.textContent=n;el.append(o);});if(names.includes(previous))el.value=previous;});}catch(e){}
+ const cached=readAppCache('places');if(cached?.data)renderPlaces(cached.data);
+ try{const d=await newsApi('places');const names=d.places||[];writeAppCache('places',names);renderPlaces(names);}catch(e){}
 }
 function showLogin(){
   appScreen.classList.add('hidden');appScreen.style.display='none';
@@ -438,6 +445,9 @@ document.getElementById('saveRoleButton').addEventListener('click',async()=>{
 
 async function loadCakesData(force=false){
   if(cakesListsLoaded&&!force)return;
+  const cached=readAppCache('cakes-data');
+  const fill=(select,items,placeholder)=>{select.innerHTML='';const first=document.createElement('option');first.value='';first.textContent=placeholder;select.append(first);(items||[]).forEach(value=>{const option=document.createElement('option');option.value=value;option.textContent=value;select.append(option);});};
+  if(cached?.data){fill(cakeName,cached.data.cakes,'Выбери торт');fill(cakePlace,cached.data.places,'Выбери торговую точку');cakesListsLoaded=true;}
   const session=getSession();
   if(!session?.token)throw new Error('Сессия закончилась. Войди заново.');
   const response=await fetchWithRetry(API_URL+'?action=cakes-data',{
@@ -446,11 +456,7 @@ async function loadCakesData(force=false){
   const data=await response.json();
   if(response.status===401){localStorage.removeItem(SESSION_KEY);showLogin();throw new Error('Сессия закончилась. Войди заново.');}
   if(!response.ok||!data.ok)throw new Error(data.error||'Не удалось загрузить списки тортов.');
-  const fill=(select,items,placeholder)=>{
-    select.innerHTML='';
-    const first=document.createElement('option');first.value='';first.textContent=placeholder;select.append(first);
-    (items||[]).forEach(value=>{const option=document.createElement('option');option.value=value;option.textContent=value;select.append(option);});
-  };
+  writeAppCache('cakes-data',{cakes:data.cakes||[],places:data.places||[]});
   fill(cakeName,data.cakes,'Выбери торт');
   fill(cakePlace,data.places,'Выбери торговую точку');
   cakesListsLoaded=true;
@@ -738,9 +744,14 @@ function resetKnowledgeForm(){
 }
 async function loadKnowledge(){
  const list=document.getElementById('knowledgeList');if(!list)return;
- list.innerHTML='<p class="muted">Загружаем обучения…</p>';
+ const cached=readAppCache('knowledge');let hasCache=false;
+ if(cached?.data){renderKnowledgeItems(cached.data);hasCache=true;}else list.innerHTML='<p class="muted">Загружаем обучения…</p>';
  try{
-  const data=await newsApi('knowledge');list.innerHTML='';
+  const data=await newsApi('knowledge');writeAppCache('knowledge',data);renderKnowledgeItems(data);
+ }catch(e){if(!hasCache)renderRetry(list,e.message,loadKnowledge);}
+}
+function renderKnowledgeItems(data){
+ const list=document.getElementById('knowledgeList');if(!list)return;list.innerHTML='';
   if(!data.items?.length){list.innerHTML='<div class="card"><p class="muted">Пока обучений нет. Можно добавить первое.</p></div>';return;}
   const canManage=!!(window.izikentPermissions||{})['Управление базой'];
   data.items.forEach(item=>{
@@ -761,7 +772,6 @@ async function loadKnowledge(){
    }
    list.append(card);
   });
- }catch(e){renderRetry(list,e.message,loadKnowledge);}
 }
 document.getElementById('addKnowledgeButton').addEventListener('click',()=>{resetKnowledgeForm();document.getElementById('knowledgeForm').classList.remove('hidden');document.getElementById('knowledgeForm').scrollIntoView({behavior:'smooth',block:'start'});});
 document.getElementById('cancelKnowledgeButton').addEventListener('click',resetKnowledgeForm);
@@ -812,9 +822,7 @@ async function loadNews(){
  }catch(e){}
  if(!hasCache)list.innerHTML='<p class="muted">Загружаем новости…</p>';
  try{
-  const data=await newsApi('news');
-  const me=await newsApi('me');
-  const birthdaysData=await newsApi('birthdays');
+  const [data,me,birthdaysData]=await Promise.all([newsApi('news'),newsApi('me'),newsApi('birthdays')]);
   const snapshot={data,me,birthdaysData,savedAt:Date.now()};
   try{localStorage.setItem(cacheKey,JSON.stringify(snapshot));}catch(e){}
   renderNewsData(data,me,birthdaysData);
