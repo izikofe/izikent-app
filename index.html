@@ -589,7 +589,7 @@ createUserForm.addEventListener('submit',async(event)=>{
   try{
     const response=await fetch(API_URL+'?action=users',{method:'POST',
       headers:{'Content-Type':'application/json','X-Session-Token':session.token},
-      body:JSON.stringify({name,role,pin})});
+      body:JSON.stringify({mode:'create',name,role,pin})});
     const data=await response.json();
     if(response.status===401){localStorage.removeItem(SESSION_KEY);showLogin();throw new Error('Сессия закончилась. Войди заново.');}
     if(!response.ok||!data.ok)throw new Error(data.error||'Не удалось создать пользователя');
