@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#607f87"><meta name="app-version" content="12.0-unified-api"><meta name="description" content="Рабочий кабинет">
+<meta name="theme-color" content="#607f87"><meta name="app-version" content="12.1-remember-session"><meta name="description" content="Рабочий кабинет">
 <link rel="manifest" href="manifest.webmanifest?v=15"><link rel="icon" href="icon-approved.png?v=15" type="image/png">
 <title>Рабочий кабинет</title>
 <style>
@@ -123,6 +123,10 @@ footer{text-align:center;color:var(--muted);font-size:10px;padding:8px 0 18px}
         <select class="select" id="employee" required><option value="">Загружаем сотрудников…</option></select>
         <label class="field-label" for="pin">PIN-код</label>
         <input class="pin" id="pin" type="password" inputmode="numeric" pattern="[0-9]{8}" maxlength="8" minlength="8" placeholder="••••••••" autocomplete="current-password" required>
+        <label for="rememberSession" style="display:flex;align-items:center;gap:10px;margin:14px 0 18px;color:var(--espresso);font-size:14px;line-height:1.35;cursor:pointer">
+          <input id="rememberSession" type="checkbox" style="width:18px;height:18px;accent-color:var(--blue-dark);flex:0 0 auto">
+          Не выходить из аккаунта (7 дней)
+        </label>
         <button class="primary" id="loginButton" type="submit">Войти</button>
         <div class="error" id="loginError" role="alert"></div>
       </form>
@@ -713,7 +717,13 @@ headerMenuButton.addEventListener('click',()=>{
 document.addEventListener('click',event=>{
  if(!event.target.closest('.dashboard-menu-wrap')){headerMenu.classList.add('hidden');headerMenuButton.setAttribute('aria-expanded','false');}
 });
-logoutButton.addEventListener('click',()=>{
+logoutButton.addEventListener('click',async()=>{
+  const saved=getSession();
+  try{
+    if(saved&&saved.token){
+      await fetch(API_URL+'?action=logout',{method:'POST',headers:{'Content-Type':'application/json','X-Session-Token':saved.token},body:'{}',cache:'no-store'});
+    }
+  }catch(error){console.warn('Не удалось завершить сессию на сервере:',error);}
   localStorage.removeItem(SESSION_KEY);
   loginForm.reset();
   loginError.textContent='';
@@ -728,7 +738,7 @@ loginForm.addEventListener('submit',async(event)=>{
  if(!/^\d{8}$/.test(pin)){loginError.textContent='Введи PIN-код из 8 цифр.';return;}
  loginButton.disabled=true;loginButton.textContent='Проверяем…';
  try{
-  const response=await fetch(API_URL+'?action=login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,pin}),cache:'no-store'});
+  const response=await fetch(API_URL+'?action=login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,pin,remember:document.getElementById("rememberSession").checked}),cache:'no-store'});
   const data=await response.json();
   if(!response.ok||!data.ok||!data.token)throw new Error(data.error||'Не удалось войти. Проверь имя и PIN.');
   const expiresAt=Date.now()+Number(data.expires_in||28800)*1000;
