@@ -1,4 +1,4 @@
-const CACHE_NAME = "izikent-v8-15-original-approved-png";
+const CACHE_NAME = "izikent-v8-7-user-create";
 const APP_SHELL = [
   "./",
   "./index.html",
