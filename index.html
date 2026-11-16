@@ -782,24 +782,45 @@ function newsTimestamp(value){
  if(ru){const d=new Date(Number(ru[3]),Number(ru[2])-1,Number(ru[1]),Number(ru[4]||0),Number(ru[5]||0),Number(ru[6]||0));return d.getTime()||0;}
  const parsed=Date.parse(raw);return Number.isNaN(parsed)?0:parsed;
 }
+function newsCacheKey(){
+ const session=getSession();const name=session?.newsUser?.name||session?.user?.name||'employee';
+ return 'izikent_news_cache_v1_'+encodeURIComponent(name);
+}
+function renderNewsData(data,me,birthdaysData){
+ const list=document.getElementById('newsList');if(!list)return;
+ const canPublish=!!me.user?.permissions?.['Публикация новостей'];
+ document.getElementById('composeToggle').classList.toggle('hidden',!canPublish);
+ list.innerHTML='';
+ if(birthdaysData.birthdays?.length){const names=birthdaysData.birthdays.map(person=>escNews(person.name)).join(', ');const block=document.createElement('div');block.className='birthday-tile';block.innerHTML='<div class="birthday-tile-icon"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M9 27h30v12H9zM6 39h36M12 27v-5h24v5M16 22v-9m8 9V9m8 13v-9M12 18c2-3 4-3 6 0m3-5c2-3 4-3 6 0m3 5c2-3 4-3 6 0M10 32h28" /></svg></div><div class="birthday-tile-content"><strong class="birthday-tile-title">СЕГОДНЯ СВОЙ ДЕНЬ РОЖДЕНИЯ ОТМЕЧАЮТ <svg class="birthday-title-cake" viewBox="0 0 32 32" aria-label="торт" role="img"><path d="M5 16h22v10H5zM3 26h26v3H3zM8 16v-3h16v3M10 13V7m6 6V5m6 8V7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.5 6.5c-2-2 1-3 1.5-5 2 2 2 4 0 5m6.5-1c-2-2 1-3 1.5-5 2 2 2 4 0 5m4.5 1c-2-2 1-3 1.5-5 2 2 2 4 0 5" fill="currentColor"/></svg>:</strong><span class="birthday-tile-names">'+names+'</span></div>';list.append(block);}
+ if(!data.news?.length){const empty=document.createElement('div');empty.className='news-empty';empty.innerHTML='<div class="news-mark">✦</div><h2>Пока новостей нет</h2><p class="muted">Здесь появятся новости и объявления команды.</p>';list.append(empty);return;}
+ const sortedNews=[...(data.news||[])].sort((a,b)=>newsTimestamp(b.published_at)-newsTimestamp(a.published_at));
+ sortedNews.forEach(n=>{
+  const article=document.createElement('article');article.className='news-item';
+  const image=n.image&&(n.image.startsWith('https://')||n.image.startsWith('http://'))?'<img src="'+escNews(n.image)+'" alt="" style="width:100%;max-height:220px;object-fit:cover;border-radius:15px;margin:8px 0">':'';
+  const menu=canPublish?'<button class="news-menu-trigger" type="button" aria-label="Действия с новостью" title="Действия"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg></button><div class="news-menu hidden"><button class="news-delete user-action delete" type="button" aria-label="Удалить новость" title="Удалить новость"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m3 0-1 14H7L6 7m4 4v6m4-6v6"/></svg></button></div>':'';
+  article.dataset.newsId=n.id||'';
+  article.innerHTML=menu+'<h2 class="news-title"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2.5"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>'+escNews(n.title)+'</span>'+(n.pinned?'<span class="pinned-label">ВАЖНО 🔥</span>':'')+'</h2>'+image+'<div class="news-body">'+escNews(n.text)+'</div><div class="news-meta">'+escNews(n.author)+' · '+escNews(newsDate(n.published_at))+'</div>';
+  list.append(article);
+ });
+}
 async function loadNews(){
- const list=document.getElementById('newsList');if(!list)return;list.innerHTML='<p class="muted">Загружаем новости…</p>';
+ const list=document.getElementById('newsList');if(!list)return;
+ const cacheKey=newsCacheKey();let hasCache=false;
  try{
-  const data=await newsApi('news');const me=await newsApi('me');const birthdaysData=await newsApi('birthdays');const canPublish=!!me.user?.permissions?.['Публикация новостей'];
-  document.getElementById('composeToggle').classList.toggle('hidden',!canPublish);
-  list.innerHTML='';
-  if(birthdaysData.birthdays?.length){const names=birthdaysData.birthdays.map(person=>escNews(person.name)).join(', ');const block=document.createElement('div');block.className='birthday-tile';block.innerHTML='<div class="birthday-tile-icon"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M9 27h30v12H9zM6 39h36M12 27v-5h24v5M16 22v-9m8 9V9m8 13v-9M12 18c2-3 4-3 6 0m3-5c2-3 4-3 6 0m3 5c2-3 4-3 6 0M10 32h28" /></svg></div><div class="birthday-tile-content"><strong class="birthday-tile-title">СЕГОДНЯ СВОЙ ДЕНЬ РОЖДЕНИЯ ОТМЕЧАЮТ <svg class="birthday-title-cake" viewBox="0 0 32 32" aria-label="торт" role="img"><path d="M5 16h22v10H5zM3 26h26v3H3zM8 16v-3h16v3M10 13V7m6 6V5m6 8V7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.5 6.5c-2-2 1-3 1.5-5 2 2 2 4 0 5m6.5-1c-2-2 1-3 1.5-5 2 2 2 4 0 5m4.5 1c-2-2 1-3 1.5-5 2 2 2 4 0 5" fill="currentColor"/></svg>:</strong><span class="birthday-tile-names">'+names+'</span></div>';list.append(block);}
-  if(!data.news?.length){const empty=document.createElement('div');empty.className='news-empty';empty.innerHTML='<div class="news-mark">✦</div><h2>Пока новостей нет</h2><p class="muted">Здесь появятся новости и объявления команды.</p>';list.append(empty);return;}
-  const sortedNews=[...(data.news||[])].sort((a,b)=>newsTimestamp(b.published_at)-newsTimestamp(a.published_at));
-  sortedNews.forEach(n=>{
-   const article=document.createElement('article');article.className='news-item';
-   const image=n.image&&(n.image.startsWith('https://')||n.image.startsWith('http://'))?'<img src="'+escNews(n.image)+'" alt="" style="width:100%;max-height:220px;object-fit:cover;border-radius:15px;margin:8px 0">':'';
-   const menu=canPublish?'<button class="news-menu-trigger" type="button" aria-label="Действия с новостью" title="Действия"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg></button><div class="news-menu hidden"><button class="news-delete user-action delete" type="button" aria-label="Удалить новость" title="Удалить новость"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m3 0-1 14H7L6 7m4 4v6m4-6v6"/></svg></button></div>':'';
-   article.dataset.newsId=n.id||'';
-   article.innerHTML=menu+'<h2 class="news-title"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2.5"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>'+escNews(n.title)+'</span>'+(n.pinned?'<span class="pinned-label">ВАЖНО 🔥</span>':'')+'</h2>'+image+'<div class="news-body">'+escNews(n.text)+'</div><div class="news-meta">'+escNews(n.author)+' · '+escNews(newsDate(n.published_at))+'</div>';
-   list.append(article);
-  });
- }catch(e){renderRetry(list,e.message,loadNews);document.getElementById('composeToggle').classList.add('hidden');}
+  const cached=localStorage.getItem(cacheKey);
+  if(cached){const snapshot=JSON.parse(cached);if(snapshot?.data&&snapshot?.me&&snapshot?.birthdaysData){renderNewsData(snapshot.data,snapshot.me,snapshot.birthdaysData);hasCache=true;}}
+ }catch(e){}
+ if(!hasCache)list.innerHTML='<p class="muted">Загружаем новости…</p>';
+ try{
+  const data=await newsApi('news');
+  const me=await newsApi('me');
+  const birthdaysData=await newsApi('birthdays');
+  const snapshot={data,me,birthdaysData,savedAt:Date.now()};
+  try{localStorage.setItem(cacheKey,JSON.stringify(snapshot));}catch(e){}
+  renderNewsData(data,me,birthdaysData);
+ }catch(e){
+  if(!hasCache){renderRetry(list,e.message,loadNews);document.getElementById('composeToggle').classList.add('hidden');}
+ }
 }
 document.getElementById('newsList').addEventListener('click',async e=>{
  const trigger=e.target.closest('.news-menu-trigger');
