@@ -348,83 +348,92 @@ async function loadLoginUsers(){
 const permissionNames=['База знаний','Торты','Займы','Возвраты','Сверка','Пользователи','Управление базой','Публикация новостей'];
 let usersEditorData=null;
 async function loadUsersList(){
-  const session=JSON.parse(localStorage.getItem(SESSION_KEY)||'null');
+  const session=getSession();
   const list=document.getElementById('usersList');
   if(!session?.token){list.textContent='Сессия закончилась. Войди заново.';return;}
-  list.textContent='Загружаем список…';
+  const cached=readAppCache('users');
+  let hasCache=false;
+  if(cached?.data){renderUsersList(cached.data,session,list);hasCache=true;}
+  else list.textContent='Загружаем список…';
   try{
     const response=await fetchWithRetry(API_URL+'?action=users',{headers:{'X-Session-Token':session.token},cache:'no-store'});
     const data=await response.json();if(!response.ok||!data.ok)throw new Error(data.error||'Не удалось загрузить список');
-    usersEditorData=data;list.innerHTML='';
-    const roles=Object.keys(data.roles||{});
-    
-    data.users.filter(user=>user.active!==false).forEach(user=>{
-      const item=document.createElement('div');item.className='card';item.style.margin='8px 0';
-      const name=document.createElement('strong');name.textContent=user.name;item.append(name);
-      const select=document.createElement('select');select.className='select';select.style.marginTop='8px';
-      const unassigned=document.createElement('option');unassigned.value='';unassigned.textContent='Должность не назначена';unassigned.selected=!user.role;select.append(unassigned);
-      roles.forEach(role=>{const o=document.createElement('option');o.value=role;o.textContent=role;o.selected=role===user.role;select.append(o);});
-      item.append(select);
-
-      const actions=document.createElement('div');actions.className='user-actions';
-      const makeIconButton=(kind,label,svg)=>{const button=document.createElement('button');button.type='button';button.className='user-action '+kind;button.title=label;button.setAttribute('aria-label',label);button.innerHTML=svg;return button;};
-      const save=makeIconButton('save','Сохранить должность','<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h12l4 4v14H3V3z"/><path d="M7 3v6h10V3M7 21v-8h10v8"/></svg>');
-      save.addEventListener('click',async()=>{save.disabled=true;try{
-        const res=await fetch(API_URL+'?action=users',{method:'POST',headers:{'Content-Type':'application/json','X-Session-Token':session.token},body:JSON.stringify({mode:'role',name:user.name,role:select.value})});
-        const result=await res.json();if(!res.ok||!result.ok)throw new Error(result.error||'Не удалось изменить должность');
-        user.role=select.value;save.title='Должность сохранена';save.setAttribute('aria-label','Должность сохранена');
-      }catch(e){alert(e.message);}finally{save.disabled=false;}});
-      actions.append(save);
-
-      const edit=makeIconButton('edit','Редактировать имя','<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 16.5-.8 4.3 4.3-.8L20 7.5 16.5 4 4 16.5z"/><path d="m14.8 5.7 3.5 3.5"/></svg>');
-      edit.addEventListener('click',()=>{
-        if(item.querySelector('.user-name-edit'))return;
-        const editor=document.createElement('div');editor.className='user-name-edit';
-        const input=document.createElement('input');input.className='select';input.type='text';input.maxLength=50;input.value=user.name;input.setAttribute('aria-label','Новое имя сотрудника');
-        const editActions=document.createElement('div');editActions.className='user-actions';
-        const confirmEdit=makeIconButton('save','Сохранить новое имя','<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>');
-        const cancelEdit=makeIconButton('delete','Отменить изменение','<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>');
-        const error=document.createElement('div');error.className='user-edit-error';
-        cancelEdit.addEventListener('click',()=>editor.remove());
-        confirmEdit.addEventListener('click',async()=>{
-          const newName=input.value.trim();
-          error.textContent='';
-          if(!newName){error.textContent='Имя не может быть пустым.';return;}
-          if(newName===user.name){editor.remove();return;}
-          confirmEdit.disabled=true;cancelEdit.disabled=true;
-          try{
-            const res=await fetch(API_URL+'?action=users',{method:'POST',headers:{'Content-Type':'application/json','X-Session-Token':session.token},body:JSON.stringify({mode:'rename',old_name:user.name,name:newName})});
-            const result=await res.json();if(!res.ok||!result.ok)throw new Error(result.error||'Не удалось изменить имя сотрудника');
-            user.name=result.user?.name||newName;name.textContent=user.name;editor.remove();
-            await loadLoginUsers();
-          }catch(e){error.textContent=e.message;confirmEdit.disabled=false;cancelEdit.disabled=false;}
-        });
-        editActions.append(confirmEdit,cancelEdit);editor.append(input,editActions,error);name.insertAdjacentElement('afterend',editor);input.focus();input.select();
-      });
-      actions.append(edit);
-
-      const remove=makeIconButton('delete','Отключить сотрудника','<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m3 0-1 14H7L6 7m4 4v6m4-6v6"/></svg>');
-      remove.addEventListener('click',async()=>{
-        if(!confirm('Отключить сотрудника «'+user.name+'»? Он больше не сможет войти в приложение. История записей сохранится.'))return;
-        remove.disabled=true;
-        try{
-          const res=await fetch(API_URL+'?action=users',{method:'POST',headers:{'Content-Type':'application/json','X-Session-Token':session.token},body:JSON.stringify({mode:'delete',name:user.name})});
-          const result=await res.json();if(!res.ok||!result.ok)throw new Error(result.error||'Не удалось отключить сотрудника');
-          item.remove();
-        }catch(e){alert(e.message);remove.disabled=false;}
-      });
-      actions.append(remove);item.append(actions);list.append(item);
-    });
-    const roleName=document.getElementById('editRoleName'), holder=document.getElementById('rolePermissions');
-    holder.innerHTML='';
-    roles.forEach(role=>{
-      const btn=document.createElement('button');btn.type='button';btn.className='secondary';btn.textContent=role;btn.style.margin='4px';
-      btn.addEventListener('click',()=>{roleName.value=role;renderRolePermissions(data.roles[role]);});
-      holder.append(btn);
-    });
-    roleName.value='';renderRolePermissions({});
-  }catch(error){renderRetry(list,error.message,loadUsersList);}
+    writeAppCache('users',data);
+    renderUsersList(data,session,list);
+  }catch(error){if(!hasCache)renderRetry(list,error.message,loadUsersList);}
 }
+function renderUsersList(data,session,list){
+  usersEditorData=data;list.innerHTML='';
+  const roles=Object.keys(data.roles||{});
+  
+  data.users.filter(user=>user.active!==false).forEach(user=>{
+    const item=document.createElement('div');item.className='card';item.style.margin='8px 0';
+    const name=document.createElement('strong');name.textContent=user.name;item.append(name);
+    const select=document.createElement('select');select.className='select';select.style.marginTop='8px';
+    const unassigned=document.createElement('option');unassigned.value='';unassigned.textContent='Должность не назначена';unassigned.selected=!user.role;select.append(unassigned);
+    roles.forEach(role=>{const o=document.createElement('option');o.value=role;o.textContent=role;o.selected=role===user.role;select.append(o);});
+    item.append(select);
+
+    const actions=document.createElement('div');actions.className='user-actions';
+    const makeIconButton=(kind,label,svg)=>{const button=document.createElement('button');button.type='button';button.className='user-action '+kind;button.title=label;button.setAttribute('aria-label',label);button.innerHTML=svg;return button;};
+    const save=makeIconButton('save','Сохранить должность','<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h12l4 4v14H3V3z"/><path d="M7 3v6h10V3M7 21v-8h10v8"/></svg>');
+    save.addEventListener('click',async()=>{save.disabled=true;try{
+      const res=await fetch(API_URL+'?action=users',{method:'POST',headers:{'Content-Type':'application/json','X-Session-Token':session.token},body:JSON.stringify({mode:'role',name:user.name,role:select.value})});
+      const result=await res.json();if(!res.ok||!result.ok)throw new Error(result.error||'Не удалось изменить должность');
+      user.role=select.value;save.title='Должность сохранена';save.setAttribute('aria-label','Должность сохранена');
+    }catch(e){alert(e.message);}finally{save.disabled=false;}});
+    actions.append(save);
+
+    const edit=makeIconButton('edit','Редактировать имя','<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 16.5-.8 4.3 4.3-.8L20 7.5 16.5 4 4 16.5z"/><path d="m14.8 5.7 3.5 3.5"/></svg>');
+    edit.addEventListener('click',()=>{
+      if(item.querySelector('.user-name-edit'))return;
+      const editor=document.createElement('div');editor.className='user-name-edit';
+      const input=document.createElement('input');input.className='select';input.type='text';input.maxLength=50;input.value=user.name;input.setAttribute('aria-label','Новое имя сотрудника');
+      const editActions=document.createElement('div');editActions.className='user-actions';
+      const confirmEdit=makeIconButton('save','Сохранить новое имя','<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>');
+      const cancelEdit=makeIconButton('delete','Отменить изменение','<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>');
+      const error=document.createElement('div');error.className='user-edit-error';
+      cancelEdit.addEventListener('click',()=>editor.remove());
+      confirmEdit.addEventListener('click',async()=>{
+        const newName=input.value.trim();
+        error.textContent='';
+        if(!newName){error.textContent='Имя не может быть пустым.';return;}
+        if(newName===user.name){editor.remove();return;}
+        confirmEdit.disabled=true;cancelEdit.disabled=true;
+        try{
+          const res=await fetch(API_URL+'?action=users',{method:'POST',headers:{'Content-Type':'application/json','X-Session-Token':session.token},body:JSON.stringify({mode:'rename',old_name:user.name,name:newName})});
+          const result=await res.json();if(!res.ok||!result.ok)throw new Error(result.error||'Не удалось изменить имя сотрудника');
+          user.name=result.user?.name||newName;name.textContent=user.name;editor.remove();
+          await loadLoginUsers();
+        }catch(e){error.textContent=e.message;confirmEdit.disabled=false;cancelEdit.disabled=false;}
+      });
+      editActions.append(confirmEdit,cancelEdit);editor.append(input,editActions,error);name.insertAdjacentElement('afterend',editor);input.focus();input.select();
+    });
+    actions.append(edit);
+
+    const remove=makeIconButton('delete','Отключить сотрудника','<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m3 0-1 14H7L6 7m4 4v6m4-6v6"/></svg>');
+    remove.addEventListener('click',async()=>{
+      if(!confirm('Отключить сотрудника «'+user.name+'»? Он больше не сможет войти в приложение. История записей сохранится.'))return;
+      remove.disabled=true;
+      try{
+        const res=await fetch(API_URL+'?action=users',{method:'POST',headers:{'Content-Type':'application/json','X-Session-Token':session.token},body:JSON.stringify({mode:'delete',name:user.name})});
+        const result=await res.json();if(!res.ok||!result.ok)throw new Error(result.error||'Не удалось отключить сотрудника');
+        item.remove();
+      }catch(e){alert(e.message);remove.disabled=false;}
+    });
+    actions.append(remove);item.append(actions);list.append(item);
+  });
+  const roleName=document.getElementById('editRoleName'), holder=document.getElementById('rolePermissions');
+  holder.innerHTML='';
+  roles.forEach(role=>{
+    const btn=document.createElement('button');btn.type='button';btn.className='secondary';btn.textContent=role;btn.style.margin='4px';
+    btn.addEventListener('click',()=>{roleName.value=role;renderRolePermissions(data.roles[role]);});
+    holder.append(btn);
+  });
+  roleName.value='';renderRolePermissions({});
+
+}
+
 function renderRolePermissions(values){
   const holder=document.getElementById('rolePermissions');holder.querySelectorAll('label.permission-row').forEach(x=>x.remove());
   permissionNames.forEach(name=>{const label=document.createElement('label');label.className='permission-row';label.style.cssText='display:flex;gap:10px;align-items:center;padding:8px 0';
