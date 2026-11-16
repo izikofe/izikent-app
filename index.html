@@ -250,15 +250,17 @@ async function fetchWithRetry(url,options={}){
   const isRead=(options.method||'GET').toUpperCase()==='GET';
   if(!isRead)return fetch(url,options);
   let lastError;
-  for(let attempt=0;attempt<3;attempt++){
+  const delays=[500,1000,2000,3500];
+  for(let attempt=0;attempt<5;attempt++){
     try{
       const response=await fetch(url,options);
       if(response.status<500&&response.status!==408&&response.status!==429)return response;
       lastError=new Error('Сервер временно недоступен (HTTP '+response.status+').');
     }catch(error){lastError=error;}
-    if(attempt<2)await new Promise(resolve=>setTimeout(resolve,attempt===0?600:1400));
+    if(attempt<delays.length)await new Promise(resolve=>setTimeout(resolve,delays[attempt]));
   }
-  throw new Error('Не удалось загрузить данные после 3 попыток. Проверь соединение и попробуй ещё раз.');
+  const reason=lastError?.message||'нет ответа от сервера';
+  throw new Error('Не удалось связаться с сервером после 5 попыток. '+reason);
 }
 function renderRetry(container,message,retry){
   container.innerHTML='';
@@ -579,9 +581,11 @@ async function loadMyCakeRecords(){
    actions.append(edit,del);row.append(info,actions);holder.append(row);
   });
  };
- const cached=readAppCache('cake-records');if(cached?.data)renderRecords(cached.data);
- const response=await fetchWithRetry(API_URL+'?action=cakes-records',{headers:{'X-Session-Token':session.token},cache:'no-store'});const data=await response.json();if(!response.ok||!data.ok)throw new Error(data.error||'Не удалось загрузить записи.');
- const records=data.records||[];writeAppCache('cake-records',records);renderRecords(records);
+ const cached=readAppCache('cake-records');const hasCached=Array.isArray(cached?.data);if(hasCached)renderRecords(cached.data);
+ try{
+  const response=await fetchWithRetry(API_URL+'?action=cakes-records',{headers:{'X-Session-Token':session.token},cache:'no-store'});const data=await response.json();if(!response.ok||!data.ok)throw new Error(data.error||'Не удалось загрузить записи.');
+  const records=data.records||[];writeAppCache('cake-records',records);renderRecords(records);
+ }catch(error){if(hasCached)return;throw error;}
 }
 async function openCakesPage(){
   cakesError.textContent='';
