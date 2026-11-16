@@ -415,8 +415,10 @@ function showLogin(){
 }
 function decodeTokenPayload(token){
   try{
-    const part=token.split('.')[0].replace(/-/g,'+').replace(/_/g,'/');
-    const padded=part+'='.repeat((4-part.length%4)%4);
+    const part=token.split('.')[1];
+    if(!part)return null;
+    const normalized=part.replace(/-/g,'+').replace(/_/g,'/');
+    const padded=normalized+'='.repeat((4-normalized.length%4)%4);
     return JSON.parse(atob(padded));
   }catch(e){return null;}
 }
@@ -424,11 +426,14 @@ function restoreSession(){
   try{
     const session=JSON.parse(localStorage.getItem(SESSION_KEY)||'null');
     if(!session)return false;
-    const legacyPayload=session.token?decodeTokenPayload(session.token):null;
-    const legacyValid=!!legacyPayload?.exp&&legacyPayload.exp*1000>Date.now();
-    const newsValid=!!session.newsToken&&Number(session.newsExpiresAt||0)>Date.now();
-    if(!legacyValid&&!newsValid){localStorage.removeItem(SESSION_KEY);return false;}
-    showApp(session.newsUser||session.user||{name:legacyPayload?.sub||'Сотрудник'});
+    const token=session.token||session.newsToken||'';
+    if(!token){localStorage.removeItem(SESSION_KEY);return false;}
+    const payload=decodeTokenPayload(token);
+    const tokenExpiresAt=Number(payload?.exp||0)*1000;
+    const storedExpiresAt=Number(session.expiresAt||session.newsExpiresAt||0);
+    const expiresAt=tokenExpiresAt||storedExpiresAt;
+    if(expiresAt&&expiresAt<=Date.now()){localStorage.removeItem(SESSION_KEY);return false;}
+    showApp(session.newsUser||session.user||{name:payload?.sub||'Сотрудник'});
     return true;
   }catch(e){localStorage.removeItem(SESSION_KEY);return false;}
 }
