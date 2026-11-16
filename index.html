@@ -255,8 +255,8 @@ async function fetchWithRetry(url,options={}){
   const isRead=(options.method||'GET').toUpperCase()==='GET';
   if(!isRead)return fetch(url,options);
   let lastError;
-  const delays=[500,1000,2000,3500];
-  for(let attempt=0;attempt<5;attempt++){
+  const delays=[250,750];
+  for(let attempt=0;attempt<3;attempt++){
     try{
       const response=await fetch(url,options);
       if(response.status<500&&response.status!==408&&response.status!==429)return response;
@@ -265,7 +265,7 @@ async function fetchWithRetry(url,options={}){
     if(attempt<delays.length)await new Promise(resolve=>setTimeout(resolve,delays[attempt]));
   }
   const reason=lastError?.message||'нет ответа от сервера';
-  throw new Error('Не удалось связаться с сервером после 5 попыток. '+reason);
+  throw new Error('Не удалось связаться с сервером после 3 попыток. '+reason);
 }
 function renderRetry(container,message,retry){
   container.innerHTML='';
