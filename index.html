@@ -378,6 +378,11 @@ async function refreshAccessRights(force=false){
     document.getElementById('addKnowledgeButton')?.classList.toggle('hidden',!p['Управление базой']);
     accessRightsLoaded=true;
     lastAccessRightsCheck=Date.now();
+    if(pendingPageId){
+      const target=pendingPageId;
+      pendingPageId='';
+      showPage(target,{replaceUrl:true});
+    }
     return true;
    }catch(e){
     lastError=e;
@@ -915,10 +920,31 @@ borrowForm.addEventListener('submit', async (event)=>{
 });
 
 const pages=[...document.querySelectorAll('main section')];
-function showPage(id){
+const pagePaths={home:'/home',tools:'/tools',profile:'/profile',knowledge:'/knowledge',loans:'/loans',returns:'/returns',reconcile:'/reconcile',cakes:'/cakes',users:'/users'};
+const pathPages=Object.fromEntries(Object.entries(pagePaths).map(([page,path])=>[path,page]));
+function requestedPageFromUrl(){
+  let pathname=location.pathname;
+  const fallback=new URLSearchParams(location.search).get('__route');
+  if(fallback){
+    try{
+      const restored=new URL(fallback,location.origin);
+      pathname=restored.pathname;
+      history.replaceState({page:pathPages[pathname]||'home'},'',pathname+restored.search+restored.hash);
+    }catch(e){}
+  }
+  return pathPages[pathname.replace(/\\/$/,'')]||'home';
+}
+let pendingPageId=requestedPageFromUrl();
+function showPage(id,options={}){
+  if(!pagePaths[id])id='home';
   const rights=window.izikentPermissions||{},owner=!!rights.owner;
   const needed={knowledge:'База знаний',loans:'Займы',returns:'Возвраты',reconcile:'Сверка',cakes:'Торты',users:'Пользователи'};
-  if(needed[id]&&!owner&&rights[needed[id]]!==true&&id!=='knowledge'){showPage('tools');return;}
+  if(needed[id]&&!accessRightsLoaded){pendingPageId=id;return;}
+  if(needed[id]&&!owner&&rights[needed[id]]!==true&&id!=='knowledge'){
+    history.replaceState({page:'tools'},'','/tools');
+    showPage('tools',{updateUrl:false});
+    return;
+  }
   if(id==='knowledge'){
     document.getElementById('knowledgeDenied')?.classList.toggle('hidden',rights['База знаний']===true);
     document.getElementById('knowledgeContent')?.classList.toggle('hidden',rights['База знаний']!==true);
@@ -926,12 +952,22 @@ function showPage(id){
   pages.forEach(p=>p.classList.toggle('hidden',p.id!==id));
   const activeTab=['profile','home','knowledge'].includes(id)?id:'tools';
   document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('active',b.dataset.page===activeTab));
+  if(options.updateUrl!==false){
+    const method=options.replaceUrl?'replaceState':'pushState';
+    history[method]({page:id},'',pagePaths[id]);
+  }
   if(id==='users')loadUsersList();
   if(id==='knowledge'&&(rights['База знаний']===true||owner))loadKnowledge();
   if(id==='reconcile')showReconcile();
   if(id==='cakes')openCakesPage();
   window.scrollTo({top:0,behavior:'smooth'});
 }
+window.addEventListener('popstate',()=>{
+  if(!document.getElementById('appScreen').classList.contains('hidden')){
+    pendingPageId='';
+    showPage(requestedPageFromUrl(),{updateUrl:false});
+  }
+});
 document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
 let swReloadPending=false;
 if('serviceWorker' in navigator && location.protocol.startsWith('http')){
