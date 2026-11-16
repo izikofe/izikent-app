@@ -624,7 +624,7 @@ async function loadCakeTechnologist(){
  try{const session=getSession();const response=await fetchWithRetry(API_URL+'?action=cakes-tech-pending',{headers:{'X-Session-Token':session.token},cache:'no-store'});const data=await response.json();if(!response.ok||!data.ok)throw new Error(data.error||'Не удалось загрузить записи технолога.');writeAppCache('cake-tech-pending',data);render(data);}
  catch(e){if(!cached?.data)error.textContent=e.message;}
 }
-document.getElementById('cakeTechPointFilter').addEventListener('change',()=>{const cached=readAppCache('cake-tech-pending');if(cached?.data){const filter=document.getElementById('cakeTechPointFilter');const holder=document.getElementById('cakeTechCards');filter.dispatchEvent(new Event('cake-filter-render'));}});
+document.getElementById('cakeTechPointFilter').addEventListener('change',()=>loadCakeTechnologist());
 document.getElementById('refreshCakeTech').addEventListener('click',()=>loadCakeTechnologist());
 async function openCakesPage(){
   cakesError.textContent='';
