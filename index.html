@@ -197,6 +197,27 @@ footer{text-align:center;color:var(--muted);font-size:10px;padding:8px 0 18px}
 <script>
 const API_URL='https://functions.yandexcloud.net/d4eg87r5uv033mv47vuq';
 const NEWS_API_URL=API_URL;
+async function fetchWithRetry(url,options={}){
+  const isRead=(options.method||'GET').toUpperCase()==='GET';
+  if(!isRead)return fetch(url,options);
+  let lastError;
+  for(let attempt=0;attempt<3;attempt++){
+    try{
+      const response=await fetch(url,options);
+      if(response.status<500&&response.status!==408&&response.status!==429)return response;
+      lastError=new Error('Сервер временно недоступен (HTTP '+response.status+').');
+    }catch(error){lastError=error;}
+    if(attempt<2)await new Promise(resolve=>setTimeout(resolve,attempt===0?600:1400));
+  }
+  throw new Error('Не удалось загрузить данные после 3 попыток. Проверь соединение и попробуй ещё раз.');
+}
+function renderRetry(container,message,retry){
+  container.innerHTML='';
+  const text=document.createElement('p');text.className='error';text.textContent=message;
+  const button=document.createElement('button');button.type='button';button.className='primary';button.style.marginTop='10px';button.textContent='Повторить загрузку';
+  button.addEventListener('click',retry);
+  container.append(text,button);
+}
 const SESSION_KEY='izikent_session_v1';
 // Переносим активную сессию из старого временного хранилища в постоянное.
 try{if(!localStorage.getItem(SESSION_KEY)){const previousSession=window.sessionStorage.getItem(SESSION_KEY);if(previousSession)localStorage.setItem(SESSION_KEY,previousSession);}}catch(e){}
@@ -308,7 +329,7 @@ async function loadLoginUsers(){
   select.innerHTML='<option value="">Загружаем сотрудников…</option>';
   select.disabled=true;loginError.textContent='';
   try{
-    const response=await fetch(API_URL+'?action=login-users&v='+Date.now(),{cache:'no-store'});
+    const response=await fetchWithRetry(API_URL+'?action=login-users&v='+Date.now(),{cache:'no-store'});
     const data=await response.json();
     if(!response.ok||!data.ok)throw new Error(data.error||'Ошибка загрузки активных сотрудников');
     select.innerHTML='<option value="">Выбери сотрудника</option>';
@@ -325,7 +346,7 @@ async function loadUsersList(){
   if(!session?.token){list.textContent='Сессия закончилась. Войди заново.';return;}
   list.textContent='Загружаем список…';
   try{
-    const response=await fetch(API_URL+'?action=users',{headers:{'X-Session-Token':session.token},cache:'no-store'});
+    const response=await fetchWithRetry(API_URL+'?action=users',{headers:{'X-Session-Token':session.token},cache:'no-store'});
     const data=await response.json();if(!response.ok||!data.ok)throw new Error(data.error||'Не удалось загрузить список');
     usersEditorData=data;list.innerHTML='';
     const roles=Object.keys(data.roles||{});
@@ -395,7 +416,7 @@ async function loadUsersList(){
       holder.append(btn);
     });
     roleName.value='';renderRolePermissions({});
-  }catch(error){list.textContent=error.message;}
+  }catch(error){renderRetry(list,error.message,loadUsersList);}
 }
 function renderRolePermissions(values){
   const holder=document.getElementById('rolePermissions');holder.querySelectorAll('label.permission-row').forEach(x=>x.remove());
@@ -419,7 +440,7 @@ async function loadCakesData(force=false){
   if(cakesListsLoaded&&!force)return;
   const session=getSession();
   if(!session?.token)throw new Error('Сессия закончилась. Войди заново.');
-  const response=await fetch(API_URL+'?action=cakes-data',{
+  const response=await fetchWithRetry(API_URL+'?action=cakes-data',{
     headers:{'X-Session-Token':session.token},cache:'no-store'
   });
   const data=await response.json();
@@ -438,7 +459,7 @@ async function openCakesPage(){
   cakesError.textContent='';
   cakesSuccess.classList.add('hidden');
   try{await loadCakesData();}
-  catch(error){cakesError.textContent=error.message;}
+  catch(error){renderRetry(cakesError,error.message,()=>openCakesPage());}
 }cakesForm.addEventListener('submit',async(event)=>{
   event.preventDefault();
   cakesError.textContent='';
@@ -502,7 +523,7 @@ function getSession(){
 async function loadDebts(){
   const session=getSession();
   if(!session?.token) throw new Error('Сессия закончилась. Войди заново.');
-  const response=await fetch(API_URL+'?action=debts',{headers:{'X-Session-Token':session.token},cache:'no-store'});
+  const response=await fetchWithRetry(API_URL+'?action=debts',{headers:{'X-Session-Token':session.token},cache:'no-store'});
   const data=await response.json();
   if(response.status===401){localStorage.removeItem(SESSION_KEY);showLogin();throw new Error('Сессия закончилась. Войди заново.');}
   if(!response.ok||!data.ok) throw new Error(data.error||'Не удалось загрузить долги.');
@@ -549,7 +570,7 @@ async function showReturnDebts(){
     });
     returnDebtList.append(choose);
     if(data.anomalies?.length){const warn=document.createElement('p');warn.className='error';warn.textContent='В журнале есть позиции с возвратом больше займа. Их нужно проверить.';returnDebtList.append(warn);}
-  }catch(error){returnDebtList.textContent=error.message;}
+  }catch(error){renderRetry(returnDebtList,error.message,()=>showReturnDebts());}
   finally{loadReturnDebtsButton.disabled=false;loadReturnDebtsButton.textContent='Показать долги';}
 }
 async function showReconcile(){
@@ -580,7 +601,7 @@ async function showReconcile(){
       warning.textContent='Внимание: обнаружено '+data.anomalies.length+' позиций, где возвраты превышают займы. Проверь журнал.';
       reconcileContent.append(warning);
     }
-  }catch(error){reconcileContent.textContent=error.message;}
+  }catch(error){renderRetry(reconcileContent,error.message,()=>showReconcile());}
 }
 async function submitReturn(){
   returnError.textContent='';
@@ -704,7 +725,7 @@ loadLoginUsers();
 if(!restoreSession())showLogin();
 
 function getNewsSession(){const x=getSession();return x?.token?x:null;}
-async function newsApi(action,{method='GET',body=null}={}){const session=getNewsSession();if(!session)throw new Error('Новости пока недоступны: не удалось войти в новый сервис. Проверь доступ сотрудника.');const headers={'X-Session-Token':session.token};if(body!==null)headers['Content-Type']='application/json';const response=await fetch(NEWS_API_URL+'?action='+encodeURIComponent(action),{method,headers,body:body===null?undefined:JSON.stringify(body),cache:'no-store'});let data={};try{data=await response.json()}catch(_){throw new Error('Сервер новостей вернул неверный ответ.')}if(!response.ok||!data.ok)throw new Error((data.error||'Ошибка сервиса новостей.')+(data.diagnostic?'\nДиагностика: '+data.diagnostic:''));return data;}
+async function newsApi(action,{method='GET',body=null}={}){const session=getNewsSession();if(!session)throw new Error('Новости пока недоступны: не удалось войти в новый сервис. Проверь доступ сотрудника.');const headers={'X-Session-Token':session.token};if(body!==null)headers['Content-Type']='application/json';const requestOptions={method,headers,body:body===null?undefined:JSON.stringify(body),cache:'no-store'};const response=await fetchWithRetry(NEWS_API_URL+'?action='+encodeURIComponent(action),requestOptions);let data={};try{data=await response.json()}catch(_){throw new Error('Сервер новостей вернул неверный ответ.')}if(!response.ok||!data.ok)throw new Error((data.error||'Ошибка сервиса новостей.')+(data.diagnostic?'\nДиагностика: '+data.diagnostic:''));return data;}
 function escNews(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 let editingKnowledgeId='';
 function resetKnowledgeForm(){
@@ -740,7 +761,7 @@ async function loadKnowledge(){
    }
    list.append(card);
   });
- }catch(e){list.innerHTML='<div class="card"><p class="error">'+escNews(e.message)+'</p></div>';}
+ }catch(e){renderRetry(list,e.message,loadKnowledge);}
 }
 document.getElementById('addKnowledgeButton').addEventListener('click',()=>{resetKnowledgeForm();document.getElementById('knowledgeForm').classList.remove('hidden');document.getElementById('knowledgeForm').scrollIntoView({behavior:'smooth',block:'start'});});
 document.getElementById('cancelKnowledgeButton').addEventListener('click',resetKnowledgeForm);
@@ -778,7 +799,7 @@ async function loadNews(){
    article.innerHTML=menu+'<h2 class="news-title"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2.5"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>'+escNews(n.title)+'</span>'+(n.pinned?'<span class="pinned-label">ВАЖНО 🔥</span>':'')+'</h2>'+image+'<div class="news-body">'+escNews(n.text)+'</div><div class="news-meta">'+escNews(n.author)+' · '+escNews(newsDate(n.published_at))+'</div>';
    list.append(article);
   });
- }catch(e){list.innerHTML='<p class="error">'+escNews(e.message)+'</p>';document.getElementById('composeToggle').classList.add('hidden');}
+ }catch(e){renderRetry(list,e.message,loadNews);document.getElementById('composeToggle').classList.add('hidden');}
 }
 document.getElementById('newsList').addEventListener('click',async e=>{
  const trigger=e.target.closest('.news-menu-trigger');
