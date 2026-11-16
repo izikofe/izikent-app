@@ -69,6 +69,22 @@ footer{text-align:center;color:var(--muted);font-size:10px;padding:8px 0 18px}
 .news-menu-trigger{top:8px;right:0;padding:0;font-size:0;z-index:2}
 .news-delete.user-action{width:48px;height:48px;border-radius:15px}
 @media(max-width:390px){.birthday-action{width:42px;height:42px;min-width:42px;flex-basis:42px;border-radius:14px}}
+.dashboard-header{padding:22px 20px 18px;border-radius:0 0 30px 30px;background:linear-gradient(135deg,rgba(31,78,88,.96),rgba(65,117,126,.94) 58%,rgba(93,151,153,.92));border-bottom:1px solid rgba(255,255,255,.32);box-shadow:0 12px 28px rgba(25,61,68,.18);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
+.dashboard-header-top{display:flex;align-items:center;justify-content:space-between;gap:12px;position:relative;z-index:3}
+.dashboard-identity{display:flex;align-items:center;gap:13px;min-width:0}
+.dashboard-avatar{width:54px;height:54px;flex:none;border-radius:17px;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,rgba(255,255,255,.3),rgba(255,255,255,.12));border:1px solid rgba(255,255,255,.55);box-shadow:0 5px 14px rgba(15,48,55,.18),inset 0 1px 2px rgba(255,255,255,.5);color:#fff;font-size:25px;font-weight:850}
+.dashboard-greeting-wrap{min-width:0}
+.dashboard-header .hello{margin:0;color:#f6f0e6;font-size:clamp(18px,4.6vw,23px);line-height:1.18;font-weight:850;overflow-wrap:anywhere}
+.dashboard-role{margin-top:5px;color:#d9eeee;font-size:13px;font-weight:600}
+.dashboard-menu-wrap{position:relative;flex:none}
+.dashboard-menu-button{width:46px;height:46px;border:1px solid rgba(255,255,255,.5);border-radius:15px;background:linear-gradient(145deg,rgba(255,255,255,.25),rgba(255,255,255,.1));color:#f6f0e6;display:flex;align-items:center;justify-content:center;box-shadow:0 5px 13px rgba(15,48,55,.15),inset 0 1px 2px rgba(255,255,255,.35)}
+.dashboard-menu-button svg{width:24px;height:24px;fill:currentColor}
+.dashboard-menu{position:absolute;right:0;top:54px;min-width:180px;padding:7px;border:1px solid rgba(255,255,255,.65);border-radius:16px;background:rgba(242,249,247,.96);box-shadow:0 10px 24px rgba(15,48,55,.22);backdrop-filter:blur(18px);z-index:10}
+.dashboard-menu .logout-btn{width:100%;border:0;background:transparent;color:#244b54;text-align:left;padding:11px 12px;font-size:13px;font-weight:750}
+.dashboard-header-divider{height:1px;margin:17px 0 12px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.38),transparent)}
+.dashboard-date{display:flex;align-items:center;gap:9px;color:#f6f0e6;font-size:13px;font-weight:650;text-transform:capitalize}
+.dashboard-date svg{width:19px;height:19px;fill:none;stroke:#d9eeee;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+@media(max-width:380px){.dashboard-header{padding:18px 16px 15px}.dashboard-avatar{width:47px;height:47px;border-radius:15px}.dashboard-identity{gap:10px}.dashboard-menu-button{width:42px;height:42px}}
 </style></head>
 <body>
 <section id="loginScreen" class="login-wrap">
@@ -90,7 +106,20 @@ footer{text-align:center;color:var(--muted);font-size:10px;padding:8px 0 18px}
   </div>
 </section>
 <div class="app hidden" id="appScreen">
-<header><div class="header-row"><div></div><button class="logout-btn" id="logoutButton" type="button">Выйти ↗</button></div><div class="hello" id="helloText">Привет, команда! 👋</div></header>
+<header class="dashboard-header">
+ <div class="dashboard-header-top">
+  <div class="dashboard-identity">
+   <div class="dashboard-avatar" id="headerAvatar">И</div>
+   <div class="dashboard-greeting-wrap"><div class="hello" id="helloText">Привет, команда! 👋</div><div class="dashboard-role" id="headerRole">Сотрудник</div></div>
+  </div>
+  <div class="dashboard-menu-wrap">
+   <button class="dashboard-menu-button" id="headerMenuButton" type="button" aria-label="Открыть меню" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button>
+   <div class="dashboard-menu hidden" id="headerMenu"><button class="logout-btn" id="logoutButton" type="button">Выйти из аккаунта ↗</button></div>
+  </div>
+ </div>
+ <div class="dashboard-header-divider"></div>
+ <div class="dashboard-date"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="16" rx="2.5"/><path d="M7.5 3v4M16.5 3v4M3.5 9h17"/></svg><span id="headerDate"></span></div>
+</header>
 <main>
 <section id="home">
  <div class="row"><h1>Новости</h1><button class="secondary refresh-button" id="refreshNews" type="button" aria-label="Обновить новости" title="Обновить новости"><span class="glass-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.9-3L3 11" fill="none" stroke="#71899a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 5v6h6M4 13a8 8 0 0 0 14.9 3L21 13" fill="none" stroke="#71899a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 19v-6h-6" fill="none" stroke="#71899a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button></div>
@@ -270,6 +299,9 @@ function calculateTenure(value){
 function showApp(user){
  loginScreen.classList.add('hidden');loginScreen.style.display='none';appScreen.classList.remove('hidden');appScreen.style.display='block';document.querySelector('.bottom').classList.remove('hidden');document.querySelector('.bottom').style.display='grid';
  document.getElementById('helloText').textContent='Привет, '+user.name+'! 👋';
+ document.getElementById('headerAvatar').textContent=(user.name||'И').trim().charAt(0).toUpperCase();
+ document.getElementById('headerRole').textContent=user.role||'Должность не указана';
+ document.getElementById('headerDate').textContent=new Intl.DateTimeFormat('ru-RU',{weekday:'long',day:'numeric',month:'long'}).format(new Date());
  document.getElementById('profileName').textContent=user.name||'Сотрудник';
  document.getElementById('profileAvatar').textContent=(user.name||'И').trim().charAt(0).toUpperCase();
  const role=user.role||'Не указана';
@@ -507,6 +539,16 @@ async function openCakesPage(){
   finally{cakesSubmit.disabled=false;cakesSubmit.textContent='Записать в таблицу';}
 });
 
+const headerMenuButton=document.getElementById('headerMenuButton');
+const headerMenu=document.getElementById('headerMenu');
+headerMenuButton.addEventListener('click',()=>{
+ const opened=!headerMenu.classList.contains('hidden');
+ headerMenu.classList.toggle('hidden',opened);
+ headerMenuButton.setAttribute('aria-expanded',String(!opened));
+});
+document.addEventListener('click',event=>{
+ if(!event.target.closest('.dashboard-menu-wrap')){headerMenu.classList.add('hidden');headerMenuButton.setAttribute('aria-expanded','false');}
+});
 logoutButton.addEventListener('click',()=>{
   localStorage.removeItem(SESSION_KEY);
   loginForm.reset();
