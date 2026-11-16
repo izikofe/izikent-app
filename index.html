@@ -253,6 +253,7 @@ async function refreshAccessRights(){
   document.getElementById('returnTile')?.classList.toggle('hidden',!allowed('Возвраты'));
   document.getElementById('reconcileTile')?.classList.toggle('hidden',!allowed('Сверка'));
   document.getElementById('usersTile')?.classList.toggle('hidden',!allowed('Пользователи'));
+  document.querySelector('[data-page="knowledge"]')?.classList.toggle('hidden',!allowed('База знаний'));
  }catch(e){window.izikentPermissions={};['cakesTile','loansTile','returnTile','reconcileTile','usersTile'].forEach(id=>document.getElementById(id)?.classList.add('hidden'));}
 }
 async function loadPlaces(){
@@ -298,7 +299,7 @@ async function loadLoginUsers(){
   }catch(error){select.innerHTML='<option value="">Не удалось загрузить сотрудников</option>';loginError.textContent='Не удалось загрузить активных сотрудников: '+error.message;}
   finally{select.disabled=false;}
 }
-const permissionNames=['Главная','Торты','Займы','Возвраты','Сверка','Пользователи','Управление базой','Публикация новостей'];
+const permissionNames=['База знаний','Торты','Займы','Возвраты','Сверка','Пользователи','Управление базой','Публикация новостей'];
 let usersEditorData=null;
 async function loadUsersList(){
   const session=JSON.parse(localStorage.getItem(SESSION_KEY)||'null');
@@ -651,7 +652,7 @@ borrowForm.addEventListener('submit', async (event)=>{
 const pages=[...document.querySelectorAll('main section')];
 function showPage(id){
   const rights=window.izikentPermissions||{},owner=!!rights.owner;
-  const needed={loans:'Займы',returns:'Возвраты',reconcile:'Сверка',cakes:'Торты',users:'Пользователи'};
+  const needed={knowledge:'База знаний',loans:'Займы',returns:'Возвраты',reconcile:'Сверка',cakes:'Торты',users:'Пользователи'};
   if(needed[id]&&!owner&&rights[needed[id]]!==true){showPage('tools');return;}
   pages.forEach(p=>p.classList.toggle('hidden',p.id!==id));
   const activeTab=['profile','home','knowledge'].includes(id)?id:'tools';
