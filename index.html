@@ -252,6 +252,7 @@ footer{text-align:center;color:var(--muted);font-size:10px;padding:8px 0 18px}
 const API_URL='https://functions.yandexcloud.net/d4eg87r5uv033mv47vuq';
 const NEWS_API_URL=API_URL;
 const pendingGetRequests=new Map();
+const NEWS_INFLIGHT_REQUESTS=new Map();
 async function fetchWithRetry(url,options={}){
   const isRead=(options.method||'GET').toUpperCase()==='GET';
   if(!isRead)return fetch(url,options);
@@ -915,7 +916,6 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
 if(!restoreSession())showLogin();
 
 function getNewsSession(){const x=getSession();return x?.token?x:null;}
-const NEWS_INFLIGHT_REQUESTS=new Map();
 async function newsApi(action,{method='GET',body=null}={}){
  const session=getNewsSession();
  if(!session)throw new Error('Новости пока недоступны: не удалось войти в новый сервис. Проверь доступ сотрудника.');
