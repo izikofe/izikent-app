@@ -161,8 +161,9 @@ footer{text-align:center;color:var(--muted);font-size:10px;padding:8px 0 18px}
  <div class="card" id="newsList"><div class="news-empty"><div class="news-mark">✦</div><h2>Новости команды</h2><p class="muted">Загружаем новости…</p></div></div>
 </section>
 <section id="knowledge" class="hidden">
+  <div id="knowledgeAccessLoading" class="card"><h2>Проверяем доступ</h2><p class="muted">Загружаем ваши права…</p></div>
   <div id="knowledgeDenied" class="card hidden"><h2>Нет доступа</h2><p class="muted">Запросите доступ у руководителя.</p></div>
-  <div id="knowledgeContent">
+  <div id="knowledgeContent" class="hidden">
    <div class="eyebrow">Обучение команды</div><h1>База знаний</h1>
    <p class="muted">Видеоинструкции и материалы для работы.</p>
    <button class="primary hidden" id="addKnowledgeButton" type="button" style="margin:8px 0 14px">Добавить обучение</button>
@@ -179,8 +180,8 @@ footer{text-align:center;color:var(--muted);font-size:10px;padding:8px 0 18px}
  </section>
 <section id="tools" class="hidden">
  <h1>Инструменты</h1>
- <div class="grid"><button class="tile" id="loansTile" data-page="loans"><div class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="#315966" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h16l-3-3m3 3-3 3M21 16H5l3 3m-3-3 3-3"/></g></svg></div><div><strong>Займы и возвраты</strong><small>Занять товар, вернуть и посмотреть сверку между точками</small></div></button></div>
-<div class="grid" style="margin-top:12px"><button class="tile" id="cakesTile" data-page="cakes"><div class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="#315966" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 13h10v6H7zM7 13c-2-1-2-4 0-5 1-.5 2 0 2.5 1C10 7 11 6 12 6s2 1 2.5 3c.5-1 1.5-1.5 2.5-1 2 1 2 4 0 5M9 19v2m6-2v2"/></g></svg></div><div><strong>Торты</strong><small>Записать количество тортов по торговым точкам</small></div></button></div>
+ <div class="grid"><button class="tile hidden" id="loansTile" data-page="loans"><div class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="#315966" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h16l-3-3m3 3-3 3M21 16H5l3 3m-3-3 3-3"/></g></svg></div><div><strong>Займы и возвраты</strong><small>Занять товар, вернуть и посмотреть сверку между точками</small></div></button></div>
+<div class="grid" style="margin-top:12px"><button class="tile hidden" id="cakesTile" data-page="cakes"><div class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="#315966" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 13h10v6H7zM7 13c-2-1-2-4 0-5 1-.5 2 0 2.5 1C10 7 11 6 12 6s2 1 2.5 3c.5-1 1.5-1.5 2.5-1 2 1 2 4 0 5M9 19v2m6-2v2"/></g></svg></div><div><strong>Торты</strong><small>Записать количество тортов по торговым точкам</small></div></button></div>
 <div class="grid" style="margin-top:12px">
 <button class="tile" type="button" disabled aria-label="Отработка процентов потерь — скоро"><div class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="#315966" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m12 6 1.5 4.5L18 12l-4.5 1.5L12 18l-1.5-4.5L6 12l4.5-1.5z"/></g></svg></div><div style="flex:1"><strong>Отработка % потерь</strong><small>Учёт отработки потерь</small></div><span class="pill">Скоро</span></button>
 </div>
@@ -203,8 +204,8 @@ footer{text-align:center;color:var(--muted);font-size:10px;padding:8px 0 18px}
 <div class="error" id="borrowError" role="alert"></div><div class="notice hidden" id="borrowSuccess" role="status"></div>
 </form></div>
 <div class="card"><h2>Другие операции</h2>
-<button class="tile" id="returnTile" data-page="returns" style="width:100%;margin-top:10px"><div class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="#315966" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m-4-4 4 4 4-4"/><path d="M4 17v3h16v-3"/></g></svg></div><div><strong>Возврат товара</strong><small>Посмотреть открытые займы и оформить возврат</small></div></button>
-<button class="tile" id="reconcileTile" data-page="reconcile" style="width:100%;margin-top:10px"><div class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="#315966" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10m5 10V4m5 16v-7m5 7V7"/></g></svg></div><div><strong>Сверка задолженностей</strong><small>Посмотреть текущие долги между точками</small></div></button>
+<button class="tile hidden" id="returnTile" data-page="returns" style="width:100%;margin-top:10px"><div class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="#315966" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m-4-4 4 4 4-4"/><path d="M4 17v3h16v-3"/></g></svg></div><div><strong>Возврат товара</strong><small>Посмотреть открытые займы и оформить возврат</small></div></button>
+<button class="tile hidden" id="reconcileTile" data-page="reconcile" style="width:100%;margin-top:10px"><div class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="#315966" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10m5 10V4m5 16v-7m5 7V7"/></g></svg></div><div><strong>Сверка задолженностей</strong><small>Посмотреть текущие долги между точками</small></div></button>
 </div></section>
 <section id="returns" class="hidden"><button class="back" data-page="home">← Главное меню</button><div class="eyebrow">Займы и возвраты</div><h1>Возврат товара</h1>
 <div class="card"><h2>Открытые займы</h2><p class="muted">Выбери точку, которая брала товар. Покажем только её незакрытые долги.</p>
@@ -345,21 +346,51 @@ function showApp(user){
  const birthdayToday=new Date();document.getElementById('profileBirthday').max=[birthdayToday.getFullYear(),String(birthdayToday.getMonth()+1).padStart(2,'0'),String(birthdayToday.getDate()).padStart(2,'0')].join('-');document.getElementById('profileBirthday').value=user.birthday||'';
  refreshAccessRights();loadNews();loadPlaces();
 }
-async function refreshAccessRights(){
- try{
-  const me=await newsApi('me');const p=me.user?.permissions||{};if(me.user?.birthday!==undefined)document.getElementById('profileBirthday').value=me.user.birthday||'';
-  const owner=me.user?.name==='Максим'||me.user?.role==='Шеф-повар';
-  const allowed=k=>owner||p[k]===true;
-  window.izikentPermissions={...p,owner};
-  document.getElementById('cakesTile')?.classList.toggle('hidden',!allowed('Торты'));
-  document.getElementById('loansTile')?.classList.toggle('hidden',!allowed('Займы'));
-  document.getElementById('returnTile')?.classList.toggle('hidden',!allowed('Возвраты'));
-  document.getElementById('reconcileTile')?.classList.toggle('hidden',!allowed('Сверка'));
-  document.getElementById('usersTile')?.classList.toggle('hidden',!allowed('Пользователи'));
-  document.getElementById('knowledgeDenied')?.classList.toggle('hidden',p['База знаний']===true);
-  document.getElementById('knowledgeContent')?.classList.toggle('hidden',p['База знаний']!==true);
-  document.getElementById('addKnowledgeButton')?.classList.toggle('hidden',!p['Управление базой']);
- }catch(e){window.izikentPermissions={};['cakesTile','loansTile','returnTile','reconcileTile','usersTile'].forEach(id=>document.getElementById(id)?.classList.add('hidden'));document.getElementById('knowledgeDenied')?.classList.remove('hidden');document.getElementById('knowledgeContent')?.classList.add('hidden');}
+let accessRightsLoaded=false;
+let accessRightsRequest=null;
+let lastAccessRightsCheck=0;
+async function refreshAccessRights(force=false){
+ if(accessRightsRequest)return accessRightsRequest;
+ if(!force&&Date.now()-lastAccessRightsCheck<30000)return;
+ accessRightsRequest=(async()=>{
+  const delays=[500,1500];
+  let lastError;
+  for(let attempt=0;attempt<3;attempt++){
+   try{
+    const me=await newsApi('me');
+    const p=me.user?.permissions||{};
+    if(me.user?.birthday!==undefined)document.getElementById('profileBirthday').value=me.user.birthday||'';
+    const owner=me.user?.name==='Максим'||me.user?.role==='Шеф-повар';
+    const allowed=k=>owner||p[k]===true;
+    window.izikentPermissions={...p,owner};
+    document.getElementById('cakesTile')?.classList.toggle('hidden',!allowed('Торты'));
+    document.getElementById('loansTile')?.classList.toggle('hidden',!allowed('Займы'));
+    document.getElementById('returnTile')?.classList.toggle('hidden',!allowed('Возвраты'));
+    document.getElementById('reconcileTile')?.classList.toggle('hidden',!allowed('Сверка'));
+    document.getElementById('usersTile')?.classList.toggle('hidden',!allowed('Пользователи'));
+    document.getElementById('knowledgeDenied')?.classList.toggle('hidden',p['База знаний']===true);
+    document.getElementById('knowledgeContent')?.classList.toggle('hidden',p['База знаний']!==true);
+    document.getElementById('knowledgeAccessLoading')?.classList.add('hidden');
+    document.getElementById('addKnowledgeButton')?.classList.toggle('hidden',!p['Управление базой']);
+    accessRightsLoaded=true;
+    lastAccessRightsCheck=Date.now();
+    return true;
+   }catch(e){
+    lastError=e;
+    if(attempt<delays.length)await new Promise(resolve=>setTimeout(resolve,delays[attempt]));
+   }
+  }
+  // Ошибка связи не означает, что у сотрудника отозвали права.
+  if(!accessRightsLoaded){
+   document.getElementById('knowledgeAccessLoading')?.classList.remove('hidden');
+   document.getElementById('knowledgeDenied')?.classList.add('hidden');
+   document.getElementById('knowledgeContent')?.classList.add('hidden');
+  }
+  console.warn('Не удалось обновить права доступа:',lastError);
+  return false;
+ })();
+ try{return await accessRightsRequest;}
+ finally{accessRightsRequest=null;}
 }
 function appCacheKey(name){const session=getSession();const user=session?.newsUser?.name||session?.user?.name||'employee';return 'izikent_cache_v1_'+user+'_'+name;}
 function readAppCache(name){try{const raw=localStorage.getItem(appCacheKey(name));return raw?JSON.parse(raw):null;}catch(e){return null;}}
@@ -904,8 +935,13 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
       const checkForUpdate=()=>registration.update().catch(()=>{});
       checkForUpdate();
       document.addEventListener('visibilitychange',()=>{
-        if(document.visibilityState==='visible')checkForUpdate();
+        if(document.visibilityState==='visible'){
+          checkForUpdate();
+          if(!document.getElementById('loginScreen').classList.contains('hidden'))return;
+          refreshAccessRights();
+        }
       });
+      window.addEventListener('focus',()=>refreshAccessRights());
       window.setInterval(checkForUpdate,60*1000);
     })
     .catch(()=>{});
